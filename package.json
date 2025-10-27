@@ -1,0 +1,19 @@
+{
+  "name": "telkomedika-online-reservation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tailwindcss -i ./app/static/src/input.css -o ./app/static/output.css --watch --config C:/Users/daisa/Desktop/Isaaq Vault/My Project/Telkomedika-Online-Reservation/tailwind.config.js",
+    "flask": "flask run",
+    "dev": "concurrently \"npm run build\" \"npm run flask\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.16",
+    "tailwindcss": "^4.1.16"
+  }
+}

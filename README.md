@@ -74,8 +74,31 @@ Ikuti instruksi dibawah untuk mendapatkan _local copy_ dari proyek ini.
 ### Prerequisites
 
 
-### Installation
-
+### Instalasi
+1. Clone repositori
+   ```sh
+   git clone https://github.com/yudhasw/Telkomedika-Online-Reservation.git
+   ```
+2. Buat Virtual Environment Python
+   ```sh
+   python -m venv .venv
+   ```
+   Aktifkan Environment
+   ```sh
+   env\Scripts\activate
+   ```
+4. Install Dependencies Python
+   ```sh
+   pip install -r requirements.txt
+   ```
+5. Install Dependencies NPM
+    ```sh
+   npm install
+   ```
+### Menjalankan Proyek
+   ```sh
+   npm run dev
+   ```
 
 ## Contributors
 * Fransiskus Harris Berliandu 				    103012330401 
