@@ -1,1 +1,62 @@
 @import "tailwindcss";
+
+@theme {
+  --color-backgrond: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground))
+}
+
+@layer {
+  ::-webkit-scrollbar {
+    display : none;
+  }
+
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+  }
+}
+
+@layer components {
+    .custom-input {
+        @apply block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    }
+
+    .custom-button {
+        @apply w-full py-2 px-4 bg-red-600 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 hover:bg-red-500 transition-colors;
+    }
+}
+
+@layer utilities {
+  .focus\:ring-custom {
+    @apply focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+
+  @media (width >=640px) {
+    max-width: 640px;
+  }
+
+  @media (width >=768px) {
+    max-width: 768px;
+  }
+
+  @media (width >=1024px) {
+    max-width: 1024px;
+  }
+
+  @media (width >=1280px) {
+    max-width: 1280px;
+  }
+
+  @media (width >=1400px) {
+    max-width: 1400px;
+  }
+}
+
+
+
