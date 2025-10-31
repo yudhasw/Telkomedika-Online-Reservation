@@ -58,5 +58,11 @@
   }
 }
 
+@utility red-button {
+  @apply bg-red-600 text-white px-40 py-2 rounded-full 
+  transition-colors duration-200 ease-in-out hover:bg-red-600 
+  active:bg-red-600 focus:outline-none hover:scale-[1.1];
+}
+
 
 

@@ -1,7 +1,6 @@
 from . import db
-from models.dokter import Dokter
 
-class Dokter(Dokter):
+class Dokter(db.Model):
   __tablename__ = 'dokter'
   dokter_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   nama_dokter = db.Column(db.String(255), nullable=True)
