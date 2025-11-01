@@ -14,11 +14,6 @@ class Pasien(db.Model, UserMixin):
   tanggal_lahir = db.Column("tanggal_lahir", db.Date)
   password      = db.Column("password", db.String(255), nullable=False)
 
-    # HANYA kalau tabelmu benar2 punya kolom 'role'
-    # role          = db.Column("role", db.String(20))
-
-    # Relasi: pastikan FK di Reservasi = 'pasien.pasien_id'
-    # reservasi = db.relationship("Reservasi", backref="pasien", lazy=True)
   @property
   def id(self):
       return self.pasien_id

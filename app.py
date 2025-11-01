@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
-from models import db, Pasien
+from models import db, Admin, Pasien
+from flask_login import LoginManager
 from routes import register_routes
 
 app = Flask(__name__)
@@ -11,13 +12,21 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 db.init_app(app)
-
 register_routes(app)
 
-print(Pasien.__table__)             # kolom real di DB
-print([a.key for a in Pasien.__mapper__.attrs])  # atribut ORM
-print(Pasien.__table__.columns.keys())
-print([c.name for c in Pasien.__table__.columns])
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    if user_id.startswith("admin-"):
+        id_val = int(user_id.split("-")[1])
+        return Admin.query.get(id_val)
+    elif user_id.startswith("pasien-"):
+        id_val = int(user_id.split("-")[1])
+        return Pasien.query.get(id_val)
+    return None
 
 @app.route('/')
 def index():

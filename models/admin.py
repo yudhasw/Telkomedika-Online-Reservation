@@ -4,7 +4,10 @@ from werkzeug.security import generate_password_hash
 
 class Admin(User):
   __tablename__ = 'admin'
-  admin_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  admin_id = db.Column("admin_id", db.Integer, primary_key=True, autoincrement=True)
+  nama = db.Column("nama_admin", db.String(255), nullable=False)
+  email         = db.Column("email_admin", db.String(255), unique=True, nullable=False)
+  password      = db.Column("password", db.String(255), nullable=False)
 
   def create_admin(nama, email, password):
     hashed_pass = generate_password_hash(password)

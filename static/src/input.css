@@ -29,7 +29,7 @@
 
 @layer utilities {
   .focus\:ring-custom {
-    @apply focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50;
+    @apply focus:ring-2 focus:ring-blue-500/50;
   }
 }
 
