@@ -14,19 +14,29 @@ class Admin(db.Model, UserMixin):
     return f"<Admin {self.nama}>"
 
 class Pasien(db.Model, UserMixin):
-  __tablename__ = "pasien"
-  pasien_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  nama = db.Column(db.String(255), nullable=False)
-  email = db.Column(db.String(255), unique=True, nullable=False)
-  nomor_hp = db.Column(db.String(15))
-  jenis_kelamin = db.Column(db.String(9))
-  tanggal_lahir = db.Column(db.Date)
-  password = db.Column(db.String(255), nullable=False)
+    __tablename__ = "pasien"
 
-  reservasi = db.relationship('Reservasi', backref='pasien', lazy=True)
+    pasien_id     = db.Column("pasien_id", db.Integer, primary_key=True, autoincrement=True)
+    nama          = db.Column("nama_pasien", db.String(255), nullable=False)                  # <- map ke nama_pasien
+    email         = db.Column("email_pasien", db.String(255), unique=True, nullable=False)    # <- map ke email_pasien
+    nomor_hp      = db.Column("nomor_hp", db.String(15))
+    jenis_kelamin = db.Column("jenis_kelamin", db.String(9))
+    tanggal_lahir = db.Column("tanggal_lahir", db.Date)
+    password      = db.Column("password", db.String(255), nullable=False)
 
-  def __repr__(self):
-    return f"<Pasien {self.nama}>"
+    # HANYA kalau tabelmu benar2 punya kolom 'role'
+    # role          = db.Column("role", db.String(20))
+
+    # Relasi: pastikan FK di Reservasi = 'pasien.pasien_id'
+    # reservasi = db.relationship("Reservasi", backref="pasien", lazy=True)
+
+    # Alias untuk Flask-Login (jangan buat Column 'id')
+    @property
+    def id(self):
+        return self.pasien_id
+
+    def __repr__(self):
+        return f"<Pasien {self.nama}>"
   
 class Poliklinik(db.Model):
   __tablename__ = 'poliklinik'

@@ -3,6 +3,7 @@ from . import db
 class Poliklinik(db.Model):
   __tablename__ = 'poliklinik'
   poliklinik_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  dokter_id = db.Column(db.Integer, db.ForeignKey('dokter.dokter_id'), nullable=False)
   nama_unit = db.Column(db.String(255), nullable=False)
   deskripsi = db.Column(db.String(255))
 

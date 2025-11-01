@@ -13,21 +13,23 @@ def register():
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
   if request.method == 'POST':
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
 
-    if "Admin@" in username:
-       user = Admin.query.filter_by(username=username).first()
+    if "Admin@" in email:
+       user = Admin.query.filter_by(email=email).first()
        role = 'admin'
     else:
-       user = Pasien.query.filter_by(username=username).first()
+       user = Pasien.query.filter_by(email=email).first()
        role = 'user'
 
-    if user and check_password_hash(user.password, password):
+    if user and password:
         session['user_id'] = user.admin_id if role == 'admin' else user.pasien_id
         flash('Login berhasil!')
-        return redirect(url_for('index.html'))
+        return render_template('index.html')
     else:
         flash('Username atau password salah.')
 
   return render_template('login.html')
+
+# check_password_hash(user.password, password)
