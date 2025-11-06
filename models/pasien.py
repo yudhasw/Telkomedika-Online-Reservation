@@ -1,9 +1,8 @@
 from . import db
 from flask_login import UserMixin
 from models.user import User
-from werkzeug.security import generate_password_hash
 
-class Pasien(db.Model, UserMixin):
+class Pasien(User, UserMixin):
   __tablename__ = "pasien"
 
   pasien_id     = db.Column("pasien_id", db.Integer, primary_key=True, autoincrement=True)
@@ -24,12 +23,10 @@ class Pasien(db.Model, UserMixin):
   reservasi = db.relationship('Reservasi', backref='pasien')
 
   def create(nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
-    # logic disini
-    hashed_pass = generate_password_hash(password)
     pasien = Pasien(
         nama=nama,
         email=email,
-        password=hashed_pass,
+        password=password,
         nomor_hp=nomor_hp,
         jenis_kelamin=jenis_kelamin,
         tanggal_lahir=tanggal_lahir

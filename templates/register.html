@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Login - Telkomedika{% endblock %}
+{% block title %}Registrasi - Telkomedika{% endblock %}
 {% block content %}
 <div class="min-h-screen flex items-center justify-center px-4">
   <div class="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
@@ -7,23 +7,39 @@
       <img src="https://via.placeholder.com/150x50?text=TelkomMedika+Logo" alt="Telkom Medika Logo" class="w-36">
     </div>
     
-    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Registrasi</h2>
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Sign Up</h2>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="mb-3 text-sm text-{{ 'red' if category == 'danger' else 'green' }}-600">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    {% if request.method == 'POST' %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="mb-3 text-sm text-{{ 'red' if category == 'danger' else 'green' }}-600">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    {% endif %}
     
-    <form action="{{ url_for('auth.registrasi') }}" method="GET" class="space-y-6">
+    <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-6">
       <div>
         <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-        <input type="name" id="name" name="name" required
+        <input type="text" id="name" name="name" required
           class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      </div>
+      <div>
+        <label for="tanggal-lahir" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+        <input type="date" id="tanggal-lahir" name="tanggal-lahir" required
+          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      </div>
+      <div>
+        <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+        <select id="gender" name="gender" required
+            class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            <option value=""></option>
+            <option value="laki_laki">Male</option>
+            <option value="perempuan">Female</option>
+        </select>
       </div>
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -32,7 +48,7 @@
       </div>
       <div>
         <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-        <input type="phone" id="phone" name="phone" required
+        <input type="text" id="phone" name="phone" required
           class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
       </div>
       <div>
@@ -53,11 +69,17 @@
         </button>
       </div>
     </form>
-
+    <div class="text-center mt-4">
+      <p class="text-sm text-gray-600">
+        Already have an account?<a href="{{ url_for('auth.login') }}" class="hover:text-blue-500 transition-colors hover:scale-110"> Sign In</a>
+      </p>
+    </div>
     <footer class="mt-8 text-center text-sm text-gray-500">
       <p>PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
       <p>Gedung OPMC Telkom, Jl. Letjen Suprapto No.17, RT.9/RW.7, Cemp. Puti, Jakarta</p>
     </footer>
   </div>
 </div>
+
+
 {% endblock %}

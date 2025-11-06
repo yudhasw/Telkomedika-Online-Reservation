@@ -20,17 +20,10 @@ login_manager.login_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
-    if user_id.startswith("admin-"):
-        id_val = int(user_id.split("-")[1])
-        return Admin.query.get(id_val)
-    elif user_id.startswith("pasien-"):
-        id_val = int(user_id.split("-")[1])
-        return Pasien.query.get(id_val)
-    return None
-
-@app.route('/')
-def index():
-	return render_template("login.html")
+    user = Admin.query.get(int(user_id))
+    if not user:
+        user = Pasien.query.get(int(user_id))
+    return user
 
 if __name__ == '__main__':
 	with app.app_context():
