@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from models.user import User
+from sqlalchemy.exc import SQLAlchemyError
 
 class Pasien(User, UserMixin):
   __tablename__ = "pasien"
@@ -22,18 +23,24 @@ class Pasien(User, UserMixin):
 
   reservasi = db.relationship('Reservasi', backref='pasien')
 
+  @classmethod
   def create(nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
-    pasien = Pasien(
-        nama=nama,
-        email=email,
-        password=password,
-        nomor_hp=nomor_hp,
-        jenis_kelamin=jenis_kelamin,
-        tanggal_lahir=tanggal_lahir
-    )
-    db.session.add(pasien)
-    db.session.commit()
-  
+    try:
+      pasien = Pasien(
+          nama=nama,
+          email=email,
+          password=password,
+          nomor_hp=nomor_hp,
+          jenis_kelamin=jenis_kelamin,
+          tanggal_lahir=tanggal_lahir
+      )
+      db.session.add(pasien)
+      db.session.commit()
+      return pasien, None
+    except SQLAlchemyError as e:
+      db.session.rollback
+      return None, str(e)
+
   def findAll():
     # logic disini
     return True
@@ -50,12 +57,5 @@ class Pasien(User, UserMixin):
     # logic disini
     return True
 
-  def login():
-    # logic disini
-    return True
-  
-  def logout():
-    # logic disini 
-    return True
 
  
