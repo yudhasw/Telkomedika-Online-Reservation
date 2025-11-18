@@ -2,13 +2,16 @@
 {% block title %}Login - Telkomedika{% endblock %}
 {% block content %}
 <div class="min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
-    <div class="flex justify-center mb-8">
-      <img src="https://via.placeholder.com/150x50?text=TelkomMedika+Logo" alt="Telkom Medika Logo" class="w-36">
-    </div>
+  <div class="bg-white w-full max-w-md p-8 rounded-lg">
     
-    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Welcome Back!</h2>
-    <p class="text-center text-gray-500 mb-8">Sign In to Continue</p>
+    <div class="flex justify-center mb-6">
+      <img src="https://via.placeholder.com/150x50?text=TelkomMedika+Logo" 
+           alt="Telkom Medika Logo" 
+           class="w-36">
+    </div>
+
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-1">Welcome Back!</h2>
+    <p class="text-center text-gray-500 mb-6">Sign In to Continue</p>
 
     {% if request.method == 'POST' %}
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,61 +24,75 @@
         {% endif %}
       {% endwith %}
     {% endif %}
-    
+
     <form action="{{ url_for('auth.login') }}" method="POST" class="space-y-6">
       <div>
         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="email" name="email" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          required
+          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
       </div>
       <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <label for="hs-toggle-password" class="block text-sm font-medium text-gray-700">Password</label>
         <div class="relative">
-          <input type="password" id="password" name="password" required
-            class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-          <button type="button" onclick="togglePassword()" class="absolute top-1/2 right-4 transform -translate-y-1/2">
-            <svg id="eye-icon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path id="eye-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.732 5 12 5c4.268 0 8.268 2.943 9.542 7-1.274 4.057-5.274 7-9.542 7-4.268 0-8.268-2.943-9.542-7zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"></path>
+          <input 
+            type="password" 
+            id="hs-toggle-password" 
+            name="password" 
+            required
+            class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 
+                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+          <button 
+            type="button"
+            data-hs-toggle-password='{"target": "#hs-toggle-password"}'
+            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 
+                   cursor-pointer">
+            <svg class="shrink-0 h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" 
+                 viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+              <path class="hs-password-active:hidden" 
+                    d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+              <path class="hs-password-active:hidden" 
+                    d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+              <path class="hs-password-active:hidden" 
+                    d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+              <line class="hs-password-active:hidden" x1="2" y1="2" x2="22" y2="22"></line>
+
+              <path class="hidden hs-password-active:block" 
+                    d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+              <circle class="hidden hs-password-active:block" cx="12" cy="12" r="3"></circle>
             </svg>
           </button>
         </div>
       </div>
-      <div>
-        <button type="submit"
-          class="w-full bg-red-600 text-white px-40 py-2 rounded-full transition-colors duration-200 ease-in-out hover:bg-red-600 
-          active:bg-red-600 focus:outline-none hover:scale-[1.1]">
+      <div class="text-center pt-5">
+        <button 
+          type="submit"
+          class="text-center w-full bg-red-600 text-white px-40 py-2 rounded-full transition 
+                hover:bg-red-700 hover:scale-[1.05]">
           Login
         </button>
       </div>
     </form>
+
     <div class="text-center mt-4">
       <p class="text-sm text-gray-600">
-        Don't have an account?<a href="{{ url_for('auth.register') }}" class="hover:text-blue-500 transition-colors hover:scale-110"> Sign Up</a>
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}" class="text-blue-600 hover:underline">
+          Sign Up
+        </a>
       </p>
     </div>
 
-    <footer class="mt-8 text-center text-sm text-gray-500">
+    <footer class="mt-6 text-center text-sm text-gray-500">
       <p>PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
       <p>Gedung OPMC Telkom, Jl. Letjen Suprapto No.17, RT.9/RW.7, Cemp. Puti, Jakarta</p>
     </footer>
+
   </div>
 </div>
-
-<script>
-  function togglePassword() {
-    var passwordInput = document.getElementById('password');
-    var eyeIcon = document.getElementById('eye-icon');
-    var eyePath = document.getElementById('eye-path');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      eyeIcon.classList.add('text-blue-500');
-      eyePath.setAttribute('d', 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z'); 
-    } else {
-      passwordInput.type = 'password';
-      eyeIcon.classList.remove('text-blue-500');
-      eyePath.setAttribute('d', 'M2.458 12C3.732 7.943 7.732 5 12 5c4.268 0 8.268 2.943 9.542 7-1.274 4.057-5.274 7-9.542 7-4.268 0-8.268-2.943-9.542-7zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z'); // Change to closed eye
-    }
-  }
-</script>
 {% endblock %}

@@ -2,12 +2,13 @@
 {% block title %}Registrasi - Telkomedika{% endblock %}
 {% block content %}
 <div class="min-h-screen flex items-center justify-center px-4">
-  <div class="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
+  <div class="bg-white w-full max-w-4xl p-8 rounded-lg">
     <div class="flex justify-center mb-8">
       <img src="https://via.placeholder.com/150x50?text=TelkomMedika+Logo" alt="Telkom Medika Logo" class="w-36">
     </div>
     
-    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Sign Up</h2>
+    <h2 class="text-2xl font-semibold text-center text-gray-800 mb-1">Sign Up</h2>
+    <p class="text-center text-gray-500 mb-6">Create an Account</p>
 
     {% if request.method == 'POST' %}
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -22,56 +23,67 @@
     {% endif %}
     
     <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-6">
-      <div>
-        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-        <input type="text" id="name" name="name" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+      <div class="grid grid-cols-2 gap-20 pb-5">
+        <div class="space-y-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+            <input type="text" id="name" name="name" placeholder="Alexander Sahur" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label for="tanggal-lahir" class="block text-sm font-medium text-gray-700">Date of Birth</label>
+            <input type="date" id="tanggal-lahir" name="tanggal-lahir" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
+            <select id="gender" name="gender" required
+                class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option selected>Choose a Gender</option>
+                <option value="laki_laki">Male</option>
+                <option value="perempuan">Female</option>
+            </select>
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input type="text" id="phone" name="phone" placeholder="0812-3456-7890" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="email" name="email" placeholder="alexander@gmail.com" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" name="password" placeholder="********" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div>
+            <div>
+              <!-- ini Informasi password seperti password must containt 8 words combination of blablabla -->
+            </div>
+          </div>
+          <div>
+            <label for="conf-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="conf-password" name="conf-password" placeholder="********" required
+              class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+        </div>
       </div>
-      <div>
-        <label for="tanggal-lahir" class="block text-sm font-medium text-gray-700">Date of Birth</label>
-        <input type="date" id="tanggal-lahir" name="tanggal-lahir" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      </div>
-      <div>
-        <label for="gender" class="block text-sm font-medium text-gray-700">Gender</label>
-        <select id="gender" name="gender" required
-            class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value=""></option>
-            <option value="laki_laki">Male</option>
-            <option value="perempuan">Female</option>
-        </select>
-      </div>
-      <div>
-        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" id="email" name="email" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      </div>
-      <div>
-        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
-        <input type="text" id="phone" name="phone" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      </div>
-      <div>
-        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-        <input type="password" id="password" name="password" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      </div>
-      <div>
-        <label for="conf-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-        <input type="password" id="conf-password" name="conf-password" required
-          class="mt-1 block w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
-      </div>
-      <div>
+      <div class="text-center">
         <button type="submit"
-          class="w-full bg-red-600 text-white px-40 py-2 rounded-full transition-colors duration-200 ease-in-out hover:bg-red-600 
-          active:bg-red-600 focus:outline-none hover:scale-[1.1]">
+          class="w-lg bg-red-600 text-white px-40 py-2 rounded-full 
+          transition hover:bg-red-700 hover:scale-[1.05]">
           Register
         </button>
       </div>
     </form>
     <div class="text-center mt-4">
       <p class="text-sm text-gray-600">
-        Already have an account?<a href="{{ url_for('auth.login') }}" class="hover:text-blue-500 transition-colors hover:scale-110"> Sign In</a>
+        Already have an account?<a href="{{ url_for('auth.login') }}" class="text-blue-600 hover:underline"> Sign In</a>
       </p>
     </div>
     <footer class="mt-8 text-center text-sm text-gray-500">

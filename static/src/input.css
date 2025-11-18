@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@import "../../node_modules/preline/variants.css";
+
+
 @theme {
   --color-backgrond: hsl(var(--background));
   --color-foreground: hsl(var(--foreground))
