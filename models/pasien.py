@@ -1,18 +1,17 @@
 from . import db
 from flask_login import UserMixin
-from models.user import User
 from sqlalchemy.exc import SQLAlchemyError
 
-class Pasien(User, UserMixin):
+class Pasien(db.Model, UserMixin):
   __tablename__ = "pasien"
 
-  pasien_id     = db.Column("pasien_id", db.Integer, primary_key=True, autoincrement=True)
-  nama          = db.Column("nama_pasien", db.String(255), nullable=False)                  # <- map ke nama_pasien
-  email         = db.Column("email_pasien", db.String(255), unique=True, nullable=False)    # <- map ke email_pasien
-  nomor_hp      = db.Column("nomor_hp", db.String(15))
+  pasien_id = db.Column("pasien_id", db.Integer, primary_key=True, autoincrement=True)
+  nama = db.Column("nama_pasien", db.String(255), nullable=False)
+  email = db.Column("email_pasien", db.String(255), unique=True, nullable=False)
+  nomor_hp = db.Column("nomor_hp", db.String(15))
   jenis_kelamin = db.Column("jenis_kelamin", db.String(9))
   tanggal_lahir = db.Column("tanggal_lahir", db.Date)
-  password      = db.Column("password", db.String(255), nullable=False)
+  password_hash = db.Column("password_hash", db.String(255), nullable=False)
 
   @property
   def id(self):
@@ -24,12 +23,12 @@ class Pasien(User, UserMixin):
   reservasi = db.relationship('Reservasi', backref='pasien')
 
   @classmethod
-  def create(nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
+  def create(cls, nama, email, password_hash, nomor_hp, jenis_kelamin, tanggal_lahir):
     try:
       pasien = Pasien(
           nama=nama,
           email=email,
-          password=password,
+          password_hash=password_hash,
           nomor_hp=nomor_hp,
           jenis_kelamin=jenis_kelamin,
           tanggal_lahir=tanggal_lahir
@@ -38,7 +37,7 @@ class Pasien(User, UserMixin):
       db.session.commit()
       return pasien, None
     except SQLAlchemyError as e:
-      db.session.rollback
+      db.session.rollback()
       return None, str(e)
 
   def findAll():

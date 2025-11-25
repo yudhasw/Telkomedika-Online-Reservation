@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 from flask_mail import Message
 from models import Reservasi, JadwalPemeriksaan, Pasien
 from datetime import date
-from app import mail
+from extensions import mail
 
 pasien_bp = Blueprint("pasien", __name__)
 
