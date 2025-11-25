@@ -1,8 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, session
 from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
 from models import db, Admin, Pasien
 from flask_login import LoginManager
-from flask_mail import Mail
+from extensions import mail
 from routes import register_routes
 
 app = Flask(__name__)
@@ -19,15 +19,17 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login'
 
-mail = Mail()
 mail.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
-    user = Admin.query.get(int(user_id))
-    if not user:
-        user = Pasien.query.get(int(user_id))
-    return user
+    role = session.get("role")
+
+    if role == "admin":
+        return Admin.query.get(int(user_id))
+    elif role == "pasien":
+        return Pasien.query.get(int(user_id))
+    return None
 
 if __name__ == '__main__':
 	with app.app_context():
