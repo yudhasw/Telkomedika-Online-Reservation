@@ -22,7 +22,7 @@ class Reservasi(db.Model):
       )
       db.session.add(reservasi)
       db.session.commit()
-      return reservasi, None
+      return reservasi, None  
     except SQLAlchemyError as e:
       db.session.rollback
       return None, str(e)
