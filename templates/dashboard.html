@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TelkoMedika Clone - Interactive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tm-red': '#E51B24',
+                        'tm-cyan': '#00A3C8',
+                        'tm-gray': '#666666',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        /* Kustom CSS untuk membuat tampilan Hero mirip aslinya */
+        .slider-wrapper {
+            transition: transform 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 bg-white">
+
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center z-50 relative">
+        <div class="flex items-center">
+            <div class="flex flex-col items-center">
+                <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
+            </div>
+        </div>
+
+        <div class="hidden md:flex space-x-8 items-center font-medium">
+            <a href="#" class="text-tm-red">Beranda</a>
+            
+            <div class="relative group">
+                <button class="flex items-center hover:text-tm-red focus:outline-none">
+                    Layanan <i class="fas fa-caret-down ml-1"></i>
+                </button>
+                <div class="absolute hidden group-hover:block w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 mt-2 z-50">
+                    <a href="#reservasi" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
+                    <a href="#jadwal-dokter" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                </div>
+            </div>
+            
+            <a href="#reservasi" class="hover:text-tm-red">Reservasi</a>
+        </div>
+
+        <div>
+            <a href="#" class="text-gray-800 font-medium hover:text-tm-red">Login</a>
+        </div>
+    </nav>
+
+    <header class="relative bg-gradient-to-r from-white to-gray-50 overflow-hidden min-h-[500px] flex items-center">
+        <div id="slider-container" class="w-full overflow-hidden">
+            <div id="slider-wrapper" class="flex w-[300%]">
+                
+                <div class="flex-shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center">
+                    <div class="w-full md:w-1/2 mb-10 md:mb-0">
+                        <h1 class="text-3xl md:text-4xl font-bold text-tm-red leading-tight mb-4">
+                            Punya pertanyaan <br>
+                            seputar layanan <br>
+                            kesehatan kami?
+                        </h1>
+                        <h2 class="text-2xl font-bold text-tm-cyan mb-6">
+                            Hubungi <br>
+                            <span class="text-4xl">TM Care</span>
+                        </h2>
+                        <a href="#" class="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-green-600 transition">
+                            <i class="fab fa-whatsapp text-2xl mr-2"></i>
+                            TelkoMedika Care
+                        </a>
+                    </div>
+                    <div class="w-full md:w-1/2 relative">
+                        <div class="absolute inset-0 bg-tm-cyan rounded-full opacity-10 transform scale-110 translate-x-10"></div>
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             alt="TM Care" 
+                             class="relative z-10 rounded-bl-[100px] w-full object-cover h-[400px] shadow-xl">
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center justify-center bg-gray-100">
+                    <h2 class="text-4xl font-bold text-tm-cyan">Layanan Kesehatan Lengkap</h2>
+                </div>
+                
+                <div class="flex-shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center justify-center bg-gray-200">
+                    <h2 class="text-4xl font-bold text-tm-red">Cek Promosi Terbaru</h2>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="slider-indicators" class="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <span data-slide="0" class="h-3 w-3 bg-tm-red rounded-full cursor-pointer"></span>
+            <span data-slide="1" class="h-3 w-3 bg-gray-300 rounded-full cursor-pointer"></span>
+            <span data-slide="2" class="h-3 w-3 bg-gray-300 rounded-full cursor-pointer"></span>
+        </div>
+    </header>
+
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-light text-gray-800 mb-2">Layanan <span class="font-normal">Telkomedika Online Reservation</span></h2>
+            <p class="text-xs text-gray-500 mb-10 max-w-2xl mx-auto">
+                Layanan ini memudahkan Anda untuk melakukan pemesanan dan melihat jadwal dokter secara daring.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <a id="reservasi" href="#" class="relative group overflow-hidden rounded-2xl shadow-lg h-64 block">
+                    <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dokter Gigi" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                    <div class="absolute bottom-4 right-4 bg-tm-red/90 text-white px-6 py-2 rounded-lg font-bold hover:bg-tm-red transition">
+                        Reservasi
+                    </div>
+                </a>
+
+                <a id="jadwal-dokter" href="#" class="relative group overflow-hidden rounded-2xl shadow-lg h-64 block">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Jadwal" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">
+                    <div class="absolute bottom-4 right-4 bg-tm-cyan/90 text-white px-6 py-2 rounded-lg font-bold hover:bg-tm-cyan transition">
+                        Lihat Jadwal
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <p class="text-xs text-gray-500 mb-2">
+                    Kepercayaan adalah hal yang paling utama bagi kami serta menjadi motivasi<br>
+                    untuk selalu mengupayakan yang terbaik, dengan berlandaskan kepada
+                </p>
+                <h2 class="text-3xl font-bold text-tm-cyan">Komitmen TelkoMedika</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                
+                <div class="flex flex-col items-start p-4">
+                    <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center">
+                        <div class="text-tm-cyan text-6xl text-center">
+                            <i class="fas fa-user-md"></i>
+                            <i class="fas fa-certificate text-2xl -ml-4 align-top text-orange-400"></i>
+                        </div>
+                    </div>
+                    <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Tenaga<br>Profesional</h3>
+                    <div class="text-xs text-gray-500 leading-relaxed flex">
+                        <span class="text-tm-cyan mr-2">▶</span>
+                        <p>TelkoMedika berkomitmen dalam memiliki tenaga kesehatan yang profesional, berpengalaman, dan tersertifikasi.<br><br>
+                        TelkoMedika juga telah tersertifikasi SMK3 Emas, PJK3, ISO 9001, ISO 14001, dan ISO 45001.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-start p-4">
+                    <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center">
+                        <div class="text-tm-cyan text-6xl text-center">
+                            <i class="fas fa-hand-holding-medical"></i>
+                        </div>
+                    </div>
+                    <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Solusi<br>Menyeluruh</h3>
+                    <div class="text-xs text-gray-500 leading-relaxed flex">
+                        <span class="text-tm-cyan mr-2">▶</span>
+                        <p>TelkoMedika berkomitmen untuk memberikan solusi menyeluruh dengan layanan konsultasi dan kustomisasi program kesehatan dengan dukungan sistem <i>event</i> dan <i>cost management</i>.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-start p-4">
+                    <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center">
+                        <div class="text-tm-cyan text-6xl text-center">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Mudah<br>Diakses</h3>
+                    <div class="text-xs text-gray-500 leading-relaxed flex">
+                        <span class="text-tm-cyan mr-2">▶</span>
+                        <p>TelkoMedika berkomitmen untuk dapat diakses oleh seluruh masyarakat di Indonesia dengan lokasi layanan TelkoMedika yang didukung dengan 1.200 mitra yang telah memenuhi <i>compliance</i> medis dan hukum.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-start p-4">
+                    <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center">
+                        <div class="text-tm-cyan text-6xl text-center">
+                            <i class="fas fa-microchip"></i>
+                            <i class="fas fa-cog text-3xl -ml-2 align-bottom"></i>
+                        </div>
+                    </div>
+                    <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Teknologi<br>Canggih</h3>
+                    <div class="text-xs text-gray-500 leading-relaxed flex">
+                        <span class="text-tm-cyan mr-2">▶</span>
+                        <p>TelkoMedika berkomitmen dalam memberikan customer experience yang terbaik dengan digitalisasi <i>end to end</i>. Komitmen ini juga menciptakan salah satu produk unggulan kami yaitu <i>Wellness Program</i>.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-gray-300 mt-10 py-8">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12">
+            </div>
+
+            <div class="text-right text-[10px] text-gray-800 font-medium">
+                <p class="font-bold">PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
+                <p>Gedung OPMC Telkom</p>
+                <p>Jl. Letjen Suprapto No. 17, RT.9/RW.7, Cemp.</p>
+                <p>Putih Tim., Kec. Cemp. Putih, Kota Jakarta</p>
+                <p>Pusat, Daerah Khusus Ibukota Jakarta 10510</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapper = document.getElementById('slider-wrapper');
+            const indicators = document.getElementById('slider-indicators').children;
+            let currentSlide = 0;
+            const totalSlides = indicators.length;
+
+            // Fungsi untuk menggeser slide
+            const updateSlider = (index) => {
+                const offset = index * -100; // Geser sejauh 100% * index
+                wrapper.style.transform = `translateX(${offset / totalSlides}%)`;
+                
+                // Update indikator warna
+                Array.from(indicators).forEach((indicator, i) => {
+                    if (i === index) {
+                        indicator.classList.replace('bg-gray-300', 'bg-tm-red');
+                    } else {
+                        indicator.classList.replace('bg-tm-red', 'bg-gray-300');
+                    }
+                });
+                currentSlide = index;
+            };
+
+            // Event listener untuk indikator
+            Array.from(indicators).forEach(indicator => {
+                indicator.addEventListener('click', (event) => {
+                    const slideIndex = parseInt(event.target.getAttribute('data-slide'));
+                    updateSlider(slideIndex);
+                });
+            });
+
+            // Otomatis geser setiap 5 detik (opsional)
+            setInterval(() => {
+                let nextSlide = (currentSlide + 1) % totalSlides;
+                updateSlider(nextSlide);
+            }, 5000);
+
+            // Inisialisasi slide pertama
+            updateSlider(0);
+        });
+    </script>
+</body>
+</html>
