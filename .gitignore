@@ -2,4 +2,8 @@
 /node_modules/
 /__pycache__/
 .env
-
+__pycache__/
+*.pyc
+*.pyo
+instance/
+.env
