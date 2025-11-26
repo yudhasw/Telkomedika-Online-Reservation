@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Jadwal Dokter - Telkomedika{% endblock %}
+
+{% block content %}
+<div class="min-h-screen p-10">
+    <h1 class="text-3xl font-bold mb-8">Jadwal Dokter</h1>
+
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full text-left text-sm">
+            <thead class="bg-gray-100 border-b">
+                <tr>
+                    <th class="px-6 py-3">Dokter</th>
+                    <th class="px-6 py-3">Poliklinik</th>
+                    <th class="px-6 py-3">Jam Mulai</th>
+                    <th class="px-6 py-3">Jam Selesai</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for jadwal in data %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ jadwal.dokter.nama_dokter }}</td>
+                    <td class="px-6 py-4">{{ jadwal.poliklinik.nama_poli }}</td>
+                    <td class="px-6 py-4">{{ jadwal.jam_mulai }}</td>
+                    <td class="px-6 py-4">{{ jadwal.jam_selesai }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center py-6 text-gray-500">
+                        Tidak ada jadwal dokter yang terdaftar.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

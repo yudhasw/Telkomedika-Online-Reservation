@@ -6,7 +6,7 @@ class Dokter(db.Model):
   nama_dokter = db.Column(db.String(255), nullable=True)
   spesialisasi = db.Column(db.String(60))
 
-  
+  list_jadwal = db.relationship("ListJadwal", back_populates="dokter")
 
   def create(nama, spesialis):
     dokter = Dokter(nama=nama, spesialis=spesialis)

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import current_user, login_required
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import Reservasi, JadwalPemeriksaan, Pasien
+from models import Reservasi, JadwalPemeriksaan, Pasien, ListJadwal
 from datetime import date
 from extensions import mail
 
@@ -253,4 +253,11 @@ def notifikasiReservasi(pasien, reservasi):
     """
 
     mail.send(msg)
+
+@pasien_bp.route('/jadwal-dokter')
+def jadwal_dokter():
+    list_jadwal = ListJadwal.get_data()
+
+    return render_template('jadwalDokter.html', data=list_jadwal)
+
 
