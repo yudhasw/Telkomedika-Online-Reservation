@@ -4,7 +4,7 @@ from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Reservasi, JadwalPemeriksaan, Pasien
 from datetime import date
-from app import mail, db
+from extensions import mail
 
 pasien_bp = Blueprint("pasien", __name__)
 

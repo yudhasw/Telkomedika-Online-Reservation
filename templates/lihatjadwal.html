@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TelkoMedika - Jadwal Dokter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tm-red': '#E51B24',
+                        'tm-cyan': '#00A3C8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans text-gray-800 bg-white min-h-screen">
+
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-100">
+        <div class="flex items-center">
+            <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
+        </div>
+        <div class="hidden md:flex space-x-8 items-center font-medium">
+            <a href="#" class="hover:text-tm-red">Beranda</a>
+            <div class="relative group">
+                <button class="flex items-center text-tm-red focus:outline-none">
+                    Layanan <i class="fas fa-caret-down ml-1"></i>
+                </button>
+                <div class="absolute hidden group-hover:block w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 mt-2 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                </div>
+            </div>
+            <a href="#" class="hover:text-tm-red">Reservasi</a>
+        </div>
+        <div>
+            <a href="#" class="text-gray-800 font-medium hover:text-tm-red">Login</a>
+        </div>
+    </nav>
+    
+    <div class="container mx-auto px-6 py-8 max-w-5xl">
+        <h1 class="text-2xl font-semibold mb-6">Jadwal Dokter</h1>
+
+        <div class="bg-white p-4 shadow-md rounded-lg mb-6 border border-gray-200">
+            <div class="flex flex-wrap items-center gap-4 mb-4">
+                <label for="tanggal_layanan" class="text-sm font-medium text-gray-700">Tanggal Pelayanan</label>
+                
+                <div class="relative">
+                    <input type="date" id="tanggal_layanan" value="2005-02-23" 
+                           class="w-40 pl-4 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm appearance-none">
+                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+
+                <div class="relative">
+                    <select id="all_time" class="appearance-none w-28 pr-8 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm">
+                        <option value="all">All Time</option>
+                        <option value="morning">Pagi (08:00)</option>
+                        <option value="afternoon">Siang (11:00)</option>
+                    </select>
+                    <i class="fas fa-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+
+                <button id="btn_pakai" class="bg-tm-red text-white px-6 py-2 rounded-lg hover:bg-red-700 transition text-sm font-medium">
+                    Pakai
+                </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                
+                <button data-filter="Semua" class="filter-btn bg-tm-red text-white px-4 py-1.5 rounded-lg text-sm transition">
+                    Semua
+                </button>
+                <button data-filter="Umum" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center">
+                    <i class="fas fa-user-md mr-2 text-tm-cyan"></i> Umum
+                </button>
+                <button data-filter="Gigi" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center">
+                    <i class="fas fa-tooth mr-2 text-tm-cyan"></i> Spesialis Gigi
+                </button>
+
+                <div class="relative flex-grow max-w-xs ml-auto md:ml-4">
+                    <input type="text" id="search_dokter" placeholder="Search..."
+                           class="w-full pl-4 pr-10 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan text-sm">
+                    <i id="search_close" class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hidden"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div id="doctor_list">
+            
+            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Tersedia">
+                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
+                <div class="flex-grow">
+                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
+                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
+                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
+                </div>
+                <div class="text-right flex flex-col space-y-1">
+                    <button class="status-btn bg-tm-cyan text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Tersedia">Tersedia</button>
+                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-blue-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
+                </div>
+            </div>
+
+            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Umum" data-status="Habis">
+                <img src="https://images.unsplash.com/photo-1559839734-2b7194cbcc47?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Tasnim" class="w-20 h-20 rounded-full object-cover mr-4">
+                <div class="flex-grow">
+                    <p class="font-bold text-lg">Dr. Tasnim Mridha</p>
+                    <p class="text-sm text-gray-600">Dokter Umum</p>
+                    <p class="text-sm text-gray-600 font-semibold mt-1">11:00 - 14:00</p>
+                </div>
+                <div class="text-right flex flex-col space-y-1">
+                    <button class="status-btn bg-tm-red text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Habis">Habis</button>
+                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-red-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
+                </div>
+            </div>
+
+            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Tersedia">
+                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
+                <div class="flex-grow">
+                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
+                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
+                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
+                </div>
+                <div class="text-right flex flex-col space-y-1">
+                    <button class="status-btn bg-tm-cyan text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Tersedia">Tersedia</button>
+                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-blue-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
+                </div>
+            </div>
+
+            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Habis">
+                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
+                <div class="flex-grow">
+                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
+                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
+                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
+                </div>
+                <div class="text-right flex flex-col space-y-1">
+                    <button class="status-btn bg-tm-red text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Habis">Habis</button>
+                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-red-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="border-t border-gray-300 mt-10 py-8">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12">
+            </div>
+            <div class="text-right text-[10px] text-gray-800 font-medium">
+                <p class="font-bold">PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
+                <p>Gedung OPMC Telkom</p>
+                <p>Jl. Letjen Suprapto No. 17, RT.9/RW.7, Cemp.</p>
+                <p>Putih Tim., Kec. Cemp. Putih, Kota Jakarta</p>
+                <p>Pusat, Daerah Khusus Ibukota Jakarta 10510</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const doctorCards = document.querySelectorAll('.doctor-card');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const searchInput = document.getElementById('search_dokter');
+            const searchClose = document.getElementById('search_close');
+            const btnPakai = document.getElementById('btn_pakai');
+            const allTimeSelect = document.getElementById('all_time');
+            const tanggalLayananInput = document.getElementById('tanggal_layanan');
+
+            let activeFilter = 'Semua';
+
+            // --- Fungsionalitas Filter Utama (Semua, Umum, Gigi) ---
+            const filterDoctors = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedTime = allTimeSelect.value;
+
+                doctorCards.forEach(card => {
+                    const spesialis = card.getAttribute('data-spesialis');
+                    const name = card.querySelector('.font-bold').textContent.toLowerCase();
+                    const time = card.querySelector('.font-semibold').textContent.trim(); // e.g., "08:00 - 10:00"
+
+                    // Filter 1: Spesialisasi
+                    const matchesSpecialty = activeFilter === 'Semua' || spesialis === activeFilter;
+
+                    // Filter 2: Search Bar
+                    const matchesSearch = name.includes(searchTerm);
+                    
+                    // Filter 3: Waktu (Sederhana)
+                    let matchesTime = true;
+                    if (selectedTime === 'morning') {
+                        matchesTime = time.includes('08:00'); // Asumsi "Pagi" adalah 08:00
+                    } else if (selectedTime === 'afternoon') {
+                        matchesTime = time.includes('11:00'); // Asumsi "Siang" adalah 11:00
+                    }
+
+                    if (matchesSpecialty && matchesSearch && matchesTime) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+
+            // Event listener untuk tombol filter (Semua, Umum, Gigi)
+            filterBtns.forEach(button => {
+                button.addEventListener('click', () => {
+                    activeFilter = button.getAttribute('data-filter');
+                    
+                    // Update tampilan tombol
+                    filterBtns.forEach(btn => {
+                        btn.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                    });
+                    button.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                    button.classList.add('bg-tm-red', 'text-white', 'border-transparent');
+                    
+                    filterDoctors();
+                });
+            });
+
+            // --- Fungsionalitas Search Bar ---
+            searchInput.addEventListener('input', () => {
+                if (searchInput.value.length > 0) {
+                    searchClose.classList.remove('hidden');
+                } else {
+                    searchClose.classList.add('hidden');
+                }
+                filterDoctors();
+            });
+
+            searchClose.addEventListener('click', () => {
+                searchInput.value = '';
+                searchClose.classList.add('hidden');
+                filterDoctors();
+            });
+            
+            // --- Fungsionalitas Tombol 'Pakai' (Menerapkan filter Waktu) ---
+            btnPakai.addEventListener('click', () => {
+                // Dalam implementasi nyata, di sini Anda akan memuat data baru dari server 
+                // berdasarkan Tanggal dan Waktu yang dipilih.
+                alert(`Filter diterapkan!\nTanggal: ${tanggalLayananInput.value}\nWaktu: ${allTimeSelect.options[allTimeSelect.selectedIndex].text}`);
+                filterDoctors();
+            });
+
+            // --- Fungsionalitas Tombol Status (Tersedia/Habis) ---
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const card = event.target.closest('.doctor-card');
+                    const doctorName = card.querySelector('.font-bold').textContent;
+                    const status = event.target.getAttribute('data-status');
+
+                    if (status === 'Tersedia') {
+                        alert(`Anda akan diarahkan ke halaman reservasi untuk ${doctorName}.`);
+                        // Di sini Anda bisa menambahkan window.location.href ke halaman Reservasi
+                    } else {
+                        alert(`Maaf, kuota ${doctorName} sudah habis. Silakan pilih jadwal lain.`);
+                    }
+                });
+            });
+
+            // --- Fungsionalitas Tampilan Kuota ---
+            doctorCards.forEach(card => {
+                const kuotaValue = card.querySelector('.kuota-value');
+                const status = card.getAttribute('data-status');
+                
+                if (status === 'Tersedia') {
+                    kuotaValue.classList.add('text-blue-600');
+                    kuotaValue.classList.remove('text-red-600');
+                } else {
+                    kuotaValue.classList.add('text-red-600');
+                    kuotaValue.classList.remove('text-blue-600');
+                }
+            });
+
+            // Inisialisasi: pastikan filter "Semua" aktif saat pertama kali load
+            document.querySelector('[data-filter="Semua"]').click();
+        });
+    </script>
+</body>
+</html>

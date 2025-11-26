@@ -3,284 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservasi - Medika</title>
+    <title>TelkoMedika - Reservasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        medika: '#E83F3F',
-                        dark: '#333333',
-                        light: '#666666',
-                        bg: '#F8F9FA'
+                        'tm-red': '#E51B24',
+                        'tm-cyan': '#00A3C8',
                     },
                     fontFamily: {
-                        poppins: ['Poppins', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        /* Style untuk menyembunyikan radio button asli tapi tetap bisa dipilih */
-        .doctor-radio:checked + .doctor-card {
-            border-color: #E83F3F;
-            background-color: #FEF2F2; /* Red-50 */
-            box-shadow: 0 4px 6px -1px rgba(232, 63, 63, 0.2);
+        /* CSS untuk menghilangkan panah pada input type number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
         }
-        /* Indikator terpilih */
-        .doctor-radio:checked + .doctor-card .check-indicator {
-            display: block;
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        /* Custom Scrollbar untuk daftar dokter */
+        .scrollbar-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
     </style>
 </head>
-<body class="bg-white text-dark antialiased">
+<body class="font-sans text-gray-800 bg-white">
 
-    <header class="flex justify-between items-center px-6 md:px-12 py-4 border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div class="w-32">
-            <span class="text-2xl font-bold text-medika">Medika</span>
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-100 mb-8">
+        <div class="flex items-center">
+            <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
         </div>
-        <nav class="hidden md:flex items-center space-x-8 font-medium text-light">
-            <a href="{{ url_for('auth.login') }}" class="hover:text-medika transition">Beranda</a> <a href="#" class="text-medika">Reservasi</a>
-        </nav>
-        <div class="text-sm font-medium">
-            Halo, {{ pasien.nama }}
+        <div class="hidden md:flex space-x-8 items-center font-medium">
+            <a href="#" class="hover:text-tm-red">Beranda</a>
+            <div class="relative group">
+                <button class="flex items-center hover:text-tm-red focus:outline-none">
+                    Layanan <i class="fas fa-caret-down ml-1"></i>
+                </button>
+                <div class="absolute hidden group-hover:block w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 mt-2 z-50">
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
+                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                </div>
+            </div>
+            <a href="#" class="text-tm-red font-bold">Reservasi</a>
         </div>
-    </header>
+        <div>
+            <a href="#" class="text-gray-800 font-medium hover:text-tm-red">Login</a>
+        </div>
+    </nav>
 
-    <main class="max-w-5xl mx-auto px-4 py-10">
+    <div class="container mx-auto px-6 max-w-5xl mb-20">
         
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div class="mb-6 space-y-2">
-              {% for category, message in messages %}
-                <div class="p-4 rounded-lg flex items-center gap-3 
-                    {% if category == 'success' %} bg-green-100 text-green-700 border border-green-200
-                    {% elif category == 'danger' %} bg-red-100 text-red-700 border border-red-200
-                    {% else %} bg-yellow-100 text-yellow-700 border border-yellow-200 {% endif %}">
-                    <i class="fas fa-info-circle"></i>
-                    <span>{{ message }}</span>
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+        <h1 class="text-3xl text-center font-light mb-10">Reservasi</h1>
 
-        <h1 class="text-3xl font-semibold text-center mb-8 text-dark">Formulir Reservasi</h1>
-
-        <form method="POST" action="">
-            
-            <div class="flex justify-end mb-4 px-2">
-                <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="autofill-toggle" class="sr-only peer">
-                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-medika"></div>
-                    <span class="ms-3 text-sm font-medium text-dark">Isi otomatis dari data akun</span>
-                </label>
-            </div>
-
-            <section class="bg-gray-50 p-6 md:p-8 rounded-2xl mb-8 border border-gray-100">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="flex flex-col gap-2">
-                        <label class="font-medium text-dark">Nama Pasien</label>
-                        <input type="text" id="nama" name="nama_display" placeholder="Masukan Nama" 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-medika transition bg-white" readonly>
-                        <p class="text-xs text-gray-400">*Data diambil dari profil akun Anda</p>
+        <form id="reservationForm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mb-10">
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Nama</label>
+                        <input type="text" placeholder="Masukan Nama" class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm">
                     </div>
-
-                    <div class="flex flex-col gap-2">
-                        <label class="font-medium text-dark">Jenis Kelamin</label>
-                        <input type="text" id="gender" placeholder="-" 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed" disabled>
-                    </div>
-
-                    <div class="flex flex-col gap-2">
-                        <label class="font-medium text-dark">Email</label>
-                        <input type="email" id="email" placeholder="email@contoh.com" 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-gray-100 text-gray-500 cursor-not-allowed" disabled>
-                    </div>
-
-                    <div class="flex flex-col gap-2">
-                        <label class="font-medium text-dark">Nomor Telpon</label>
-                        <input type="tel" id="telepon" placeholder="08..." 
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-medika transition bg-white" readonly>
-                    </div>
-
-                    <div class="flex flex-col gap-2 md:col-span-2">
-                        <label class="font-medium text-dark">Pilih Tanggal Pelayanan</label>
-                        <div class="relative w-full">
-                            <input type="date" id="tanggal-pelayanan" name="tanggal_pelayanan" 
-                                value="{{ tanggal if tanggal else '' }}"
-                                min="{{ date_today }}" 
-                                class="w-full px-4 py-3 rounded-lg border border-medika bg-white text-dark font-medium focus:ring-2 focus:ring-red-200 outline-none cursor-pointer">
-                            <i class="fas fa-calendar absolute right-4 top-1/2 -translate-y-1/2 text-medika pointer-events-none"></i>
-                        </div>
-                        <p class="text-xs text-light">Ubah tanggal untuk melihat ketersediaan dokter.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="bg-white rounded-2xl mb-8">
-                <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <i class="fas fa-user-md text-medika"></i> Pilih Jadwal Dokter
-                </h2>
-
-                <div class="flex gap-3 overflow-x-auto pb-4 mb-2 no-scrollbar">
-                    <button type="button" class="tab-btn active bg-medika text-white px-5 py-2 rounded-full text-sm font-medium transition" onclick="filterPoli('all', this)">Semua</button>
-                    <button type="button" class="tab-btn bg-white border border-gray-300 text-gray-600 px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-50 transition" onclick="filterPoli('Umum', this)">Umum</button>
-                    <button type="button" class="tab-btn bg-white border border-gray-300 text-gray-600 px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-50 transition" onclick="filterPoli('Gigi', this)">Spesialis Gigi</button>
-                    </div>
-
-                <div class="grid grid-cols-1 gap-4 max-h-[600px] overflow-y-auto pr-2 custom-scroll">
                     
-                    {% if jadwal|length == 0 %}
-                        <div class="text-center py-10 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-                            <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
-                            <p class="text-gray-500">Tidak ada jadwal dokter tersedia pada tanggal ini.</p>
-                            <p class="text-sm text-gray-400">Silakan pilih tanggal lain.</p>
-                        </div>
-                    {% else %}
-                        
-                        {% for j in jadwal %}
-                        <label class="cursor-pointer relative group filter-item" data-poli="{{ j.poli.nama_poli }}"> <input type="radio" name="jadwal_id" value="{{ j.jadwal_id }}" class="doctor-radio sr-only" required>
-                            
-                            <div class="doctor-card bg-white p-4 rounded-xl border border-gray-200 transition-all duration-200 hover:shadow-md flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                                
-                                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 border border-gray-200 text-gray-400 text-2xl">
-                                    <i class="fas fa-user-doctor"></i>
-                                </div>
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Email</label>
+                        <input type="email" placeholder="Masukan Email" class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm">
+                    </div>
 
-                                <div class="flex-grow">
-                                    <h3 class="font-bold text-dark text-lg">{{ j.dokter.nama }}</h3>
-                                    <p class="text-medika text-sm font-medium mb-1">{{ j.poli.nama_poli }}</p>
-                                    <div class="flex items-center gap-3 text-sm text-gray-500">
-                                        <span class="flex items-center gap-1"><i class="far fa-clock"></i> {{ j.jam_mulai }} - {{ j.jam_selesai }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col items-end gap-2 w-full sm:w-auto">
-                                    <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                                        Tersedia
-                                    </span>
-                                    
-                                    <div class="check-indicator hidden text-medika animate-bounce">
-                                        <i class="fas fa-check-circle text-2xl"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                        {% endfor %}
-
-                    {% endif %}
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Nomor Telpon</label>
+                        <input type="number" placeholder="Masukan Nomer Telpon" class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm">
+                    </div>
                 </div>
-            </section>
 
-            <div class="text-center pb-12 pt-4">
-                <button type="submit" class="bg-medika text-white text-lg font-bold py-3 px-12 rounded-xl w-full md:w-1/2 hover:bg-red-700 hover:shadow-lg transition transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Buat Reservasi
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Jenis Kelamin</label>
+                        <div class="relative">
+                            <select class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm appearance-none bg-white cursor-pointer">
+                                <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Tanggal Lahir</label>
+                        <div class="relative">
+                            <input type="date" class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm uppercase-placeholder" placeholder="dd/mm/yyyy">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-2 ml-1">Tanggal Pelayanan</label>
+                        <div class="flex gap-3">
+                            <div class="relative flex-grow">
+                                <input type="date" value="2005-02-23" class="w-full px-6 py-3 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan text-sm">
+                            </div>
+                            <button type="button" class="bg-tm-red text-white px-8 py-3 rounded-full font-semibold text-sm hover:bg-red-700 transition shadow-md">
+                                Pakai
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 rounded-3xl p-6 md:p-8 shadow-inner mb-8">
+                <h2 class="text-lg font-bold mb-6">Jadwal Dokter</h2>
+
+                <div class="flex gap-3 mb-6">
+                    <button type="button" data-filter="Semua" class="filter-btn bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition">Semua</button>
+                    <button type="button" data-filter="Umum" class="filter-btn bg-white text-gray-600 px-6 py-2 rounded-lg text-sm font-medium shadow-sm flex items-center hover:bg-gray-50 transition">
+                        <i class="fas fa-user-md text-red-500 mr-2"></i> Umum
+                    </button>
+                    <button type="button" data-filter="Gigi" class="filter-btn bg-white text-gray-600 px-6 py-2 rounded-lg text-sm font-medium shadow-sm flex items-center hover:bg-gray-50 transition">
+                        <i class="fas fa-tooth text-red-500 mr-2"></i> Spesialis Gigi
+                    </button>
+                </div>
+
+                <div id="doctorList" class="max-h-[500px] overflow-y-auto pr-2 scrollbar-custom space-y-4">
+                    
+                    <div class="doctor-card bg-white rounded-xl p-4 flex flex-col md:flex-row items-center shadow-sm" data-spesialis="Gigi">
+                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" class="w-16 h-16 rounded-full object-cover mb-3 md:mb-0 md:mr-4">
+                        <div class="flex-grow text-center md:text-left">
+                            <h3 class="font-bold text-gray-800">Dr. Daris Hadiya Akbar</h3>
+                            <p class="text-sm text-gray-500">Spesialis Gigi</p>
+                            <p class="text-sm font-bold mt-1">08:00 - 10:00</p>
+                        </div>
+                        <div class="flex flex-col items-end min-w-[120px] mt-3 md:mt-0">
+                            <button type="button" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-lg mb-1 w-full">Tersedia</button>
+                            <div class="text-[10px] flex space-x-1">
+                                <span class="bg-black text-white px-2 py-0.5 rounded-l-md">Kuota: 10</span>
+                                <span class="bg-orange-400 text-white px-2 py-0.5 rounded-r-md">Sisa Kuota: 5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doctor-card bg-white rounded-xl p-4 flex flex-col md:flex-row items-center shadow-sm" data-spesialis="Umum">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b7194cbcc47?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" class="w-16 h-16 rounded-full object-cover mb-3 md:mb-0 md:mr-4">
+                        <div class="flex-grow text-center md:text-left">
+                            <h3 class="font-bold text-gray-800">Dr. Tasnim Mridha</h3>
+                            <p class="text-sm text-gray-500">Dokter Umum</p>
+                            <p class="text-sm font-bold mt-1">11:00 - 14:00</p>
+                        </div>
+                        <div class="flex flex-col items-end min-w-[120px] mt-3 md:mt-0">
+                            <button type="button" class="bg-tm-red text-white text-xs font-bold px-6 py-2 rounded-lg mb-1 w-full">Habis</button>
+                            <div class="text-[10px] flex space-x-1">
+                                <span class="bg-black text-white px-2 py-0.5 rounded-l-md">Kuota: 10</span>
+                                <span class="bg-orange-400 text-white px-2 py-0.5 rounded-r-md">Sisa Kuota: 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="doctor-card bg-white rounded-xl p-4 flex flex-col md:flex-row items-center shadow-sm" data-spesialis="Gigi">
+                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" class="w-16 h-16 rounded-full object-cover mb-3 md:mb-0 md:mr-4">
+                        <div class="flex-grow text-center md:text-left">
+                            <h3 class="font-bold text-gray-800">Dr. Daris Hadiya Akbar</h3>
+                            <p class="text-sm text-gray-500">Spesialis Gigi</p>
+                            <p class="text-sm font-bold mt-1">08:00 - 10:00</p>
+                        </div>
+                        <div class="flex flex-col items-end min-w-[120px] mt-3 md:mt-0">
+                            <button type="button" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-lg mb-1 w-full">Tersedia</button>
+                            <div class="text-[10px] flex space-x-1">
+                                <span class="bg-black text-white px-2 py-0.5 rounded-l-md">Kuota: 10</span>
+                                <span class="bg-orange-400 text-white px-2 py-0.5 rounded-r-md">Sisa Kuota: 5</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="doctor-card bg-white rounded-xl p-4 flex flex-col md:flex-row items-center shadow-sm" data-spesialis="Gigi">
+                        <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" class="w-16 h-16 rounded-full object-cover mb-3 md:mb-0 md:mr-4">
+                        <div class="flex-grow text-center md:text-left">
+                            <h3 class="font-bold text-gray-800">Dr. Daris Hadiya Akbar</h3>
+                            <p class="text-sm text-gray-500">Spesialis Gigi</p>
+                            <p class="text-sm font-bold mt-1">08:00 - 10:00</p>
+                        </div>
+                        <div class="flex flex-col items-end min-w-[120px] mt-3 md:mt-0">
+                            <button type="button" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-lg mb-1 w-full">Tersedia</button>
+                            <div class="text-[10px] flex space-x-1">
+                                <span class="bg-black text-white px-2 py-0.5 rounded-l-md">Kuota: 10</span>
+                                <span class="bg-orange-400 text-white px-2 py-0.5 rounded-r-md">Sisa Kuota: 5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <button type="submit" class="bg-tm-red text-white text-lg font-bold py-3 px-20 rounded-full shadow-lg hover:bg-red-700 transition transform hover:scale-105">
+                    Kirim
                 </button>
             </div>
-
         </form>
-    </main>
+
+    </div>
+
+    <footer class="border-t border-gray-300 py-8">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12">
+            </div>
+            <div class="text-right text-[10px] text-gray-800 font-medium">
+                <p class="font-bold">PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
+                <p>Gedung OPMC Telkom</p>
+                <p>Jl. Letjen Suprapto No. 17, RT.9/RW.7, Cemp.</p>
+                <p>Putih Tim., Kec. Cemp. Putih, Kota Jakarta</p>
+                <p>Pusat, Daerah Khusus Ibukota Jakarta 10510</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // 1. DATA PASIEN DARI BACKEND (JINJA2)
-        // Kita buat object JS aman dari variabel Flask 'pasien'
-        const userData = {
-            nama: "{{ pasien.nama|default('') }}",
-            email: "{{ pasien.email|default('') }}",
-            telepon: "{{ pasien.no_hp|default('') }}", // Sesuaikan nama kolom di model Pasien Anda
-            gender: "{{ pasien.jenis_kelamin|default('') }}" // Sesuaikan nama kolom (L/P)
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const doctorCards = document.querySelectorAll('.doctor-card');
+            const reservationForm = document.getElementById('reservationForm');
 
-        // 2. LOGIKA AUTOFILL
-        const toggle = document.getElementById('autofill-toggle');
-        const inpNama = document.getElementById('nama');
-        const inpEmail = document.getElementById('email');
-        const inpTelp = document.getElementById('telepon');
-        const inpGender = document.getElementById('gender');
+            // --- Logika Filter Dokter ---
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filterValue = btn.getAttribute('data-filter');
 
-        // Fungsi isi data
-        function fillData() {
-            inpNama.value = userData.nama;
-            inpEmail.value = userData.email;
-            inpTelp.value = userData.telepon;
-            inpGender.value = userData.gender === 'L' ? 'Laki-laki' : (userData.gender === 'P' ? 'Perempuan' : '-');
-        }
+                    // Reset Style Tombol
+                    filterBtns.forEach(b => {
+                        b.classList.remove('bg-blue-600', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-600');
+                    });
+                    // Set Style Tombol Aktif
+                    btn.classList.remove('bg-white', 'text-gray-600');
+                    btn.classList.add('bg-blue-600', 'text-white');
 
-        // Fungsi kosongkan data
-        function clearData() {
-            inpNama.value = '';
-            inpEmail.value = '';
-            inpTelp.value = '';
-            inpGender.value = '';
-        }
-
-        // Event Listener Toggle
-        toggle.addEventListener('change', function() {
-            if(this.checked) {
-                fillData();
-            } else {
-                clearData();
-            }
-        });
-
-        // Default: Nyalakan autofill saat halaman dimuat agar user tidak perlu mengetik ulang
-        window.addEventListener('DOMContentLoaded', () => {
-            toggle.checked = true;
-            fillData();
-        });
-
-
-        // 3. LOGIKA RELOAD TANGGAL (PENTING UNTUK BACKEND FILTER)
-        const dateInput = document.getElementById('tanggal-pelayanan');
-        
-        dateInput.addEventListener('change', function() {
-            const selectedDate = this.value;
-            if (selectedDate) {
-                // Redirect halaman dengan parameter ?tanggal=YYYY-MM-DD
-                // Ini akan memicu query_filter_Jadwal di backend Flask
-                const currentUrl = new URL(window.location.href);
-                currentUrl.searchParams.set('tanggal', selectedDate);
-                window.location.href = currentUrl.toString();
-            }
-        });
-
-
-        // 4. LOGIKA VISUAL TABS (Client-side filtering)
-        // Backend sudah mengirimkan list jadwal, kita hanya menyembunyikan yang tidak sesuai tab
-        function filterPoli(kategori, btn) {
-            // Update tombol active
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('bg-medika', 'text-white');
-                b.classList.add('bg-white', 'text-gray-600', 'border');
+                    // Filter Logic
+                    doctorCards.forEach(card => {
+                        if (filterValue === 'Semua' || card.getAttribute('data-spesialis') === filterValue) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
             });
-            btn.classList.remove('bg-white', 'text-gray-600', 'border');
-            btn.classList.add('bg-medika', 'text-white');
 
-            // Filter item jadwal
-            const items = document.querySelectorAll('.filter-item');
-            items.forEach(item => {
-                const poliItem = item.getAttribute('data-poli');
-                
-                if (kategori === 'all') {
-                    item.style.display = 'block';
-                } else {
-                    // Cek apakah nama poli mengandung kata kunci (Case Insensitive)
-                    // Misal Tab "Gigi" cocok dengan "Poli Gigi"
-                    if (poliItem.toLowerCase().includes(kategori.toLowerCase())) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
+            // --- Logika Submit Form ---
+            reservationForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                alert('Data reservasi berhasil dikirim! Silakan cek email Anda untuk konfirmasi.');
             });
-        }
+        });
     </script>
 </body>
 </html>
