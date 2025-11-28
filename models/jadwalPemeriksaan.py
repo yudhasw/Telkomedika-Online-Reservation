@@ -4,11 +4,12 @@ class JadwalPemeriksaan(db.Model):
   __tablename__ = 'jadwalpemeriksaan'
   jadwal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
   listjadwal_id = db.Column(db.String(255), db.ForeignKey('listjadwal.listjadwal_id'), nullable=False)
-  poliklinik_id = db.Column(db.Integer, db.ForeignKey('poliklinik.poliklinik_id'), nullable=False)
+  # poliklinik_id = db.Column(db.Integer, db.ForeignKey('poliklinik.poliklinik_id'), nullable=False)
   tanggal = db.Column(db.Date, nullable=False)
   kuota = db.Column(db.Integer, nullable=False)
 
-  poliklinik = db.relationship('Poliklinik', backref='jadwalpemeriksaan')
+  # poliklinik = db.relationship('Poliklinik', backref='jadwalpemeriksaan')
+  listjadwal = db.relationship('ListJadwal', backref='jadwal_pemeriksaan')
   reservasi = db.relationship('Reservasi', backref='jadwalpemeriksaan')
 
   def create(tanggal, list_jadwal, kuota):

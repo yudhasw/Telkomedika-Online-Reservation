@@ -11,14 +11,14 @@ class Reservasi(db.Model):
   status = db.Column(db.String(50), default='Menunggu')
   
   @classmethod
-  def create(pasien_id, jadwal_id, no_urut, tanggal, status):
+  def create(cls, pasien_id, jadwal_id, no_urut, tanggal, status):
     try:
       reservasi = Reservasi(
         pasien_id=pasien_id, 
         jadwal_id=jadwal_id, 
         no_urut=no_urut, 
         tanggal_reservasi=tanggal, 
-        status='Menuggu'
+        status=status
       )
       db.session.add(reservasi)
       db.session.commit()

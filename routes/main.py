@@ -3,6 +3,6 @@ from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
 
-@main.route('/')
-def home_page():
-  return render_template('home.html', user=current_user)
+# @main.route('/')
+# def home_page():
+#   return render_template('dashboardGuest.html', user=current_user)
