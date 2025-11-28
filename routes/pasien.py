@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import current_user, login_required
 from flask_mail import Message
-from models import Reservasi, JadwalPemeriksaan, Pasien
-from datetime import date
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import Reservasi, JadwalPemeriksaan, Pasien, ListJadwal, Poliklinik, Dokter, db
+from datetime import date, datetime
 from extensions import mail
 
 pasien_bp = Blueprint("pasien", __name__)
@@ -13,85 +14,199 @@ pasien_bp = Blueprint("pasien", __name__)
 def homepage():
     try:
         pasien = current_user
-        return render_template('home.html', pasien=pasien)
+        return render_template('dashboard.html', pasien=pasien)
     except Exception as e:
         flash(f"Terjadi kesalahan: {e}", "danger")
-        return render_template('home.html', pasien=pasien)
+        return render_template('dashboard.html', pasien=pasien)
+
+# @pasien_bp.route("/jadwal-dokter")
+# @login_required
+# def jadwalDokter():
+#     pasien = current_user
+
+#     poli_id = request.args.get('poli_id')
+#     tanggal_str = request.args.get('tanggal')
+
+#     # QUERY DASAR TANPA FILTER POLI DAN TANGGAL
+#     query_filter_Jadwal = JadwalPemeriksaan.query.filter(JadwalPemeriksaan.tanggal >= date.today())
+
+#     if poli_id:
+#         query_filter_Jadwal = query_filter_Jadwal.filter(JadwalPemeriksaan.poli_id == poli_id)
+
+#     if tanggal_str:
+#         tanggal = date.strptime(tanggal_str, '%Y-%m-%d').date()
+#         query_filter_Jadwal = query_filter_Jadwal.filter(JadwalPemeriksaan.tanggal == tanggal)
+
+#     # SORTING JADWAL SESUAI WAKTU (listjadwal)
+#     jadwal = query_filter_Jadwal.order_by(JadwalPemeriksaan.listjadwal_id.asc()).all()
+
+#     return render_template('jadwal.html', jadwal=jadwal)
 
 
-@pasien_bp.route("/profile")
+@pasien_bp.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile():
     pasien = current_user
-    
+
     if request.method == 'POST':
+        nama = request.form.get('nama')
+        email = request.form.get('email')
+        nomor_hp = request.form.get('nomor_hp')
+        jenis_kelamin = request.form.get('jenis_kelamin')
+        tanggal_lahir = request.form.get('tanggal_lahir')
+
         try:
-            Pasien.create(
-                nama='',
-                email='',
-                password='',
-                nomor_hp='',
-                jenis_kelamin='',
-                tanggal_lahir=''
-            )
+            pasien.nama = nama or pasien.nama
+            pasien.email = email or pasien.email
+            pasien.nomor_hp = nomor_hp or pasien.nomor_hp
+            pasien.jenis_kelamin = jenis_kelamin or pasien.jenis_kelamin
+            pasien.tanggal_lahir = tanggal_lahir or pasien.tanggal_lahir
+
+            db.session.commit()
+            flash("Profil berhasil diperbarui.", "success")
+            return redirect(url_for('pasien.homepage'))
         except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error updating profile: {e}")
             flash(f"Terjadi kesalahan: {e}", "danger")
 
     return render_template('profile.html', pasien=pasien)
 
 
-@pasien_bp.route("/form-administrasi", methods=['GET', 'POST'])
+@pasien_bp.route("/changepassword", methods=['GET', 'POST'])
 @login_required
-def form_administrasi():
+def profile_updatepassword():
     pasien = current_user
+
+    if request.method == 'POST':
+        old_password = request.form.get('old-password')
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('conf-password')
+
+        if not new_password:
+            flash("Password baru kosong.", "warning")
+            return render_template('changepassword.html', pasien=pasien)
+
+        if new_password != confirm_password: 
+            flash("Password tidak sama!", 'warning')
+            return render_template('changepassword.html', pasien=pasien)
+
+        if not check_password_hash(pasien.password, old_password):
+            flash("Password lama salah.", "warning")
+            return render_template('changepassword.html', pasien=pasien)
+
+        try:
+            pasien.password = generate_password_hash(new_password)
+            db.session.commit()
+            flash("Password berhasil diperbarui.", "success")
+            return redirect(url_for('pasien.profile'))
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error updating password: {e}")
+            flash(f"Terjadi kesalahan: {e}", "danger")
+
+    return render_template('profile_updatepassword.html', pasien=pasien)
+
+
+@pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
+@login_required
+def form_reservasi():
+    pasien = current_user
+
+    poli_id = request.args.get('poli_id')
+    tanggal_str = request.args.get('tanggal')
+
+    # 1. BASE QUERY DENGAN JOIN
+    query_jadwal = db.session.query(JadwalPemeriksaan).join(
+        ListJadwal, JadwalPemeriksaan.listjadwal_id == ListJadwal.listjadwal_id
+    ).join(
+        Dokter, ListJadwal.dokter_id == Dokter.dokter_id
+    ).join(
+        Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
+    )
+
+    # FILTER DASAR (TANGGAL >= HARI INI) --> DI-COMMENT AGAR SEMUA MUNCUL
+    # query_jadwal = query_jadwal.filter(JadwalPemeriksaan.tanggal >= date.today())
+
+    # FILTER POLI
+    if poli_id:
+        query_jadwal = query_jadwal.filter(ListJadwal.poliklinik_id == poli_id)
+
+    # FILTER TANGGAL SPESIFIK (JIKA USER MEMILIH TANGGAL DI FRONTEND)
+    if tanggal_str:
+        print(f"DEBUG: Tanggal diterima dari frontend: {tanggal_str}") 
+        try:
+            tanggal_obj = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
+            
+            # Kita langsung filter saja tanpa validasi masa lalu/masa depan
+            query_jadwal = query_jadwal.filter(JadwalPemeriksaan.tanggal == tanggal_obj)
+
+        except ValueError:
+            print(f"ERROR: Format tanggal salah! Input: {tanggal_str}")
+            flash("Format tanggal tidak valid.", "danger")
+
+    # Urutkan berdasarkan Tanggal, lalu Jam Mulai
+    jadwal = query_jadwal.order_by(
+        JadwalPemeriksaan.tanggal.asc(), 
+        ListJadwal.jam_mulai.asc()
+    ).all()
 
     if request.method == 'POST':
         jadwal_id = request.form.get('jadwal_id')
 
+        # Validasi Input
         if not jadwal_id:
             flash('Silakan pilih jadwal terlebih dahulu.', 'warning')
-            return render_template('pasien/form_administrasi.html', pasien=pasien)
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
 
+        # Cek Ketersediaan Nomor Urut
         try:
-            no_urut = nomorUrut(jadwal_id)
+            no_urut = nomorUrut(jadwal_id) 
         except Exception as e:
             current_app.logger.error(f"Gagal mendapatkan nomor urut: {e}")
-            flash('Terjadi kesalahan saat mengambil nomor antrian.', 'danger')
-            return render_template('pasien/form_administrasi.html', pasien=pasien)
+            flash('Terjadi kesalahan sistem saat mengambil nomor antrian.', 'danger')
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
 
         if not no_urut:
-            flash('Jadwal penuh.', 'warning')
-            return render_template('pasien/form_administrasi.html', pasien=pasien)
+            flash('Mohon maaf, Kuota untuk jadwal ini sudah penuh.', 'warning')
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
 
+        # Buat Reservasi
         reservasi, msg = Reservasi.create(
             pasien_id=pasien.pasien_id,
             jadwal_id=jadwal_id,
             no_urut=no_urut,
-            tanggal=date.today(),
+            tanggal=date.today(), 
             status='Menunggu'
         )
 
         if msg:
-            flash(f"Terjadi kesalahan saat membuat reservasi: {msg}", "danger")
-            return render_template('pasien/form_administrasi.html', pasien=pasien)
-
+            flash(f"Gagal membuat reservasi: {msg}", "danger")
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+        
+        # Kirim Notifikasi
         try:
             notifikasiReservasi(pasien, reservasi)
         except Exception as e:
-            current_app.logger.error(f"Gagal mengirim email reservasi: {e}")
-            flash("Reservasi berhasil dibuat, tetapi email notifikasi gagal dikirim.", "warning")
+            current_app.logger.error(f"Gagal mengirim email: {e}")
+            flash("Reservasi berhasil, namun notifikasi email gagal terkirim.", "warning")
 
-        flash("Reservasi berhasil dibuat.", "success")
-        return redirect(url_for('pasien_bp.homepage'))
+        flash("Reservasi berhasil dibuat! Silakan cek riwayat.", "success")
+        return redirect(url_for('pasien.homepage'))
 
-    return render_template('pasien/form_administrasi.html', pasien=pasien)
+    return render_template(
+        'reservasi.html', 
+        pasien=pasien, 
+        jadwal=jadwal, 
+        poli_id=poli_id, 
+        tanggal=tanggal_str
+    )
 
 
 def nomorUrut(jadwal_id):
     jadwal = JadwalPemeriksaan.query.get(jadwal_id)
-    current_nomor_urut = JadwalPemeriksaan.query.filter_by(
-        tanggal=jadwal.tanggal, 
-        listjadwal_id=jadwal.listjadwal_id
+    current_nomor_urut = Reservasi.query.filter_by(
+        jadwal_id=jadwal_id
     ).count()
     if current_nomor_urut < jadwal.kuota:
         return current_nomor_urut+1
@@ -133,4 +248,11 @@ def notifikasiReservasi(pasien, reservasi):
     """
 
     mail.send(msg)
+
+@pasien_bp.route('/jadwal-dokter')
+def jadwal_dokter():
+    list_jadwal = ListJadwal.get_data()
+
+    return render_template('lihatjadwal.html', data=list_jadwal)
+
 

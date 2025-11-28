@@ -22,266 +22,220 @@
         }
     </script>
 </head>
-<body class="font-sans text-gray-800 bg-white min-h-screen">
+<body class="font-sans text-gray-800 bg-white min-h-screen flex flex-col">
 
-    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-100">
+    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-50 shadow-sm">
         <div class="flex items-center">
-            <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
+            <a href="{{ url_for('pasien.homepage') }}">
+                <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
+            </a>
         </div>
+
         <div class="hidden md:flex space-x-8 items-center font-medium">
-            <a href="#" class="hover:text-tm-red">Beranda</a>
+            <a href="{{ url_for('pasien.homepage') }}" class="hover:text-tm-red transition">Beranda</a>
+            
             <div class="relative group">
-                <button class="flex items-center text-tm-red focus:outline-none">
+                <button class="flex items-center hover:text-tm-red focus:outline-none transition py-2">
                     Layanan <i class="fas fa-caret-down ml-1"></i>
                 </button>
-                <div class="absolute hidden group-hover:block w-48 bg-white border border-gray-200 rounded-md shadow-lg py-2 mt-2 z-50">
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
-                    <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                
+                <div class="absolute top-full left-0 pt-4 w-48 hidden group-hover:block z-50">
+                    <div class="bg-white border border-gray-200 rounded-md shadow-lg py-2">
+                        <a href="{{ url_for('pasien.form_reservasi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
+                        <a href="{{ url_for('pasien.jadwal_dokter') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                    </div>
                 </div>
             </div>
-            <a href="#" class="hover:text-tm-red">Reservasi</a>
+            <a href="{{ url_for('pasien.form_reservasi') }}" class="hover:text-tm-red transition">Reservasi</a>
         </div>
+
         <div>
-            <a href="#" class="text-gray-800 font-medium hover:text-tm-red">Login</a>
+            {% if current_user.is_authenticated %}
+                <span class="text-gray-600 mr-4 text-sm font-medium">Halo, {{ current_user.nama }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="text-tm-red font-medium hover:underline text-sm border border-tm-red px-4 py-1.5 rounded-full hover:bg-tm-red hover:text-white transition">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth.login_pasien') }}" class="text-gray-800 font-medium hover:text-tm-red transition">Login</a>
+            {% endif %}
         </div>
     </nav>
     
-    <div class="container mx-auto px-6 py-8 max-w-5xl">
+    <div class="container mx-auto px-6 py-8 max-w-5xl flex-grow">
         <h1 class="text-2xl font-semibold mb-6">Jadwal Dokter</h1>
 
         <div class="bg-white p-4 shadow-md rounded-lg mb-6 border border-gray-200">
-            <div class="flex flex-wrap items-center gap-4 mb-4">
-                <label for="tanggal_layanan" class="text-sm font-medium text-gray-700">Tanggal Pelayanan</label>
+            
+            <div class="flex flex-wrap items-center gap-4 mb-4 pb-4 border-b border-gray-100">
+                <label class="text-sm font-medium text-gray-700">Filter Cepat:</label>
                 
                 <div class="relative">
-                    <input type="date" id="tanggal_layanan" value="2005-02-23" 
-                           class="w-40 pl-4 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm appearance-none">
-                    <i class="fas fa-calendar-alt absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                </div>
-
-                <div class="relative">
-                    <select id="all_time" class="appearance-none w-28 pr-8 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm">
-                        <option value="all">All Time</option>
-                        <option value="morning">Pagi (08:00)</option>
-                        <option value="afternoon">Siang (11:00)</option>
+                    <select id="time_filter" class="appearance-none w-32 pr-8 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm">
+                        <option value="all">Semua Jam</option>
+                        <option value="pagi">Pagi (< 11:00)</option>
+                        <option value="siang">Siang (>= 11:00)</option>
                     </select>
                     <i class="fas fa-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
-
-                <button id="btn_pakai" class="bg-tm-red text-white px-6 py-2 rounded-lg hover:bg-red-700 transition text-sm font-medium">
-                    Pakai
-                </button>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                
-                <button data-filter="Semua" class="filter-btn bg-tm-red text-white px-4 py-1.5 rounded-lg text-sm transition">
-                    Semua
-                </button>
-                <button data-filter="Umum" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center">
+                <button onclick="filterPoli('Semua', this)" class="filter-btn bg-tm-red text-white px-4 py-1.5 rounded-lg text-sm transition font-medium">Semua</button>
+                <button onclick="filterPoli('Umum', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
                     <i class="fas fa-user-md mr-2 text-tm-cyan"></i> Umum
                 </button>
-                <button data-filter="Gigi" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center">
+                <button onclick="filterPoli('Gigi', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
                     <i class="fas fa-tooth mr-2 text-tm-cyan"></i> Spesialis Gigi
                 </button>
 
                 <div class="relative flex-grow max-w-xs ml-auto md:ml-4">
-                    <input type="text" id="search_dokter" placeholder="Search..."
+                    <input type="text" id="search_dokter" placeholder="Cari nama dokter..."
                            class="w-full pl-4 pr-10 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan text-sm">
                     <i id="search_close" class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hidden"></i>
                 </div>
             </div>
         </div>
         
-        <div id="doctor_list">
+        <div id="doctor_list" class="space-y-4">
             
-            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Tersedia">
-                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
-                <div class="flex-grow">
-                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
-                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
-                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
+            {% if not data %}
+                <div class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                    <i class="far fa-calendar-times text-4xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-500 font-medium">Belum ada data jadwal dokter.</p>
                 </div>
-                <div class="text-right flex flex-col space-y-1">
-                    <button class="status-btn bg-tm-cyan text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Tersedia">Tersedia</button>
-                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-blue-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
-                </div>
-            </div>
+            {% else %}
+                
+                {% for item in data %}
+                <div class="doctor-card flex flex-col md:flex-row items-center border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 bg-white" 
+                     data-spesialis="{{ item.poliklinik.nama_poli }}" 
+                     data-jam="{{ item.jam_mulai }}">
+                    
+                    <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mr-0 md:mr-6 mb-4 md:mb-0 flex-shrink-0">
+                        <i class="fas fa-user-doctor text-4xl text-gray-400"></i>
+                    </div>
 
-            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Umum" data-status="Habis">
-                <img src="https://images.unsplash.com/photo-1559839734-2b7194cbcc47?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Tasnim" class="w-20 h-20 rounded-full object-cover mr-4">
-                <div class="flex-grow">
-                    <p class="font-bold text-lg">Dr. Tasnim Mridha</p>
-                    <p class="text-sm text-gray-600">Dokter Umum</p>
-                    <p class="text-sm text-gray-600 font-semibold mt-1">11:00 - 14:00</p>
-                </div>
-                <div class="text-right flex flex-col space-y-1">
-                    <button class="status-btn bg-tm-red text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Habis">Habis</button>
-                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-red-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
-                </div>
-            </div>
+                    <div class="flex-grow text-center md:text-left w-full">
+                        <h3 class="font-bold text-lg text-gray-900 doctor-name">{{ item.dokter.nama_dokter }}</h3>
+                        <p class="text-sm text-gray-600 font-medium">{{ item.poliklinik.nama_poli }}</p>
+                        <div class="flex items-center justify-center md:justify-start gap-2 mt-2">
+                            <span class="bg-blue-50 text-tm-cyan px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                                <i class="far fa-clock mr-1"></i> {{ item.jam_mulai.strftime('%H:%M') }} - {{ item.jam_selesai.strftime('%H:%M') }}
+                            </span>
+                        </div>
+                    </div>
 
-            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Tersedia">
-                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
-                <div class="flex-grow">
-                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
-                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
-                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
+                    <div class="text-right flex flex-col space-y-2 mt-4 md:mt-0 w-full md:w-auto min-w-[140px]">
+                        <a href="{{ url_for('pasien.form_reservasi', poli_id=item.poliklinik_id) }}" 
+                           class="bg-tm-red text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-red-700 transition text-center shadow-sm">
+                            Buat Reservasi
+                        </a>
+                        <p class="text-[10px] text-gray-500 text-center">Lihat ketersediaan kuota di halaman reservasi</p>
+                    </div>
                 </div>
-                <div class="text-right flex flex-col space-y-1">
-                    <button class="status-btn bg-tm-cyan text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Tersedia">Tersedia</button>
-                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-blue-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
-                </div>
-            </div>
+                {% endfor %}
 
-            <div class="doctor-card flex items-center border border-gray-200 rounded-xl p-4 mb-4 shadow-sm" data-spesialis="Gigi" data-status="Habis">
-                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100&q=80" alt="Dr. Daris" class="w-20 h-20 rounded-full object-cover mr-4">
-                <div class="flex-grow">
-                    <p class="font-bold text-lg">Dr. Daris Hadiya Akbar</p>
-                    <p class="text-sm text-gray-600">Spesialis Gigi</p>
-                    <p class="text-sm text-gray-600 font-semibold mt-1">08:00 - 10:00</p>
-                </div>
-                <div class="text-right flex flex-col space-y-1">
-                    <button class="status-btn bg-tm-red text-white px-4 py-1 rounded-lg text-xs font-bold w-full" data-status="Habis">Habis</button>
-                    <p class="text-[10px] text-gray-500 flex items-center justify-end">Kuota: <span class="kuota-value font-bold ml-1 text-red-600" data-kuota="10">10</span> / <span class="text-xs ml-1">Lihat Kontak</span></p>
-                </div>
-            </div>
+            {% endif %}
 
         </div>
     </div>
 
-    <footer class="border-t border-gray-300 mt-10 py-8">
-        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+    <footer class="border-t border-gray-300 py-8 bg-gray-50 mt-auto">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="mb-4 md:mb-0">
-                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12">
+                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12 mix-blend-multiply">
             </div>
-            <div class="text-right text-[10px] text-gray-800 font-medium">
+            <div class="text-center md:text-right text-[10px] text-gray-800 font-medium">
                 <p class="font-bold">PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
-                <p>Gedung OPMC Telkom</p>
-                <p>Jl. Letjen Suprapto No. 17, RT.9/RW.7, Cemp.</p>
-                <p>Putih Tim., Kec. Cemp. Putih, Kota Jakarta</p>
-                <p>Pusat, Daerah Khusus Ibukota Jakarta 10510</p>
+                <p>Gedung OPMC Telkom, Jl. Letjen Suprapto No. 17</p>
+                <p>Jakarta Pusat, 10510</p>
             </div>
         </div>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const doctorCards = document.querySelectorAll('.doctor-card');
-            const filterBtns = document.querySelectorAll('.filter-btn');
             const searchInput = document.getElementById('search_dokter');
             const searchClose = document.getElementById('search_close');
-            const btnPakai = document.getElementById('btn_pakai');
-            const allTimeSelect = document.getElementById('all_time');
-            const tanggalLayananInput = document.getElementById('tanggal_layanan');
-
-            let activeFilter = 'Semua';
-
-            // --- Fungsionalitas Filter Utama (Semua, Umum, Gigi) ---
-            const filterDoctors = () => {
+            const timeFilter = document.getElementById('time_filter');
+            
+            // --- LOGIKA FILTER UTAMA ---
+            function applyFilters() {
+                const activeBtn = document.querySelector('.filter-btn.bg-tm-red');
+                const category = activeBtn ? activeBtn.innerText.trim() : 'Semua';
                 const searchTerm = searchInput.value.toLowerCase();
-                const selectedTime = allTimeSelect.value;
+                const selectedTime = timeFilter.value; // all, pagi, siang
 
-                doctorCards.forEach(card => {
-                    const spesialis = card.getAttribute('data-spesialis');
-                    const name = card.querySelector('.font-bold').textContent.toLowerCase();
-                    const time = card.querySelector('.font-semibold').textContent.trim(); // e.g., "08:00 - 10:00"
+                const cards = document.querySelectorAll('.doctor-card');
 
-                    // Filter 1: Spesialisasi
-                    const matchesSpecialty = activeFilter === 'Semua' || spesialis === activeFilter;
+                cards.forEach(card => {
+                    const poli = card.getAttribute('data-spesialis');
+                    const name = card.querySelector('.doctor-name').innerText.toLowerCase();
+                    const jamMulaiStr = card.getAttribute('data-jam'); // Format "HH:MM:SS" dari backend
 
-                    // Filter 2: Search Bar
-                    const matchesSearch = name.includes(searchTerm);
-                    
-                    // Filter 3: Waktu (Sederhana)
-                    let matchesTime = true;
-                    if (selectedTime === 'morning') {
-                        matchesTime = time.includes('08:00'); // Asumsi "Pagi" adalah 08:00
-                    } else if (selectedTime === 'afternoon') {
-                        matchesTime = time.includes('11:00'); // Asumsi "Siang" adalah 11:00
+                    // 1. Filter Kategori (Poli)
+                    let matchCategory = (category === 'Semua');
+                    if (!matchCategory) {
+                        // Cek apakah nama poli mengandung kata kunci tombol (misal: "Gigi" ada di "Poli Gigi")
+                        if (category === 'Umum' && poli.toLowerCase().includes('umum')) matchCategory = true;
+                        if (category.includes('Gigi') && poli.toLowerCase().includes('gigi')) matchCategory = true;
                     }
 
-                    if (matchesSpecialty && matchesSearch && matchesTime) {
+                    // 2. Filter Search
+                    const matchSearch = name.includes(searchTerm);
+
+                    // 3. Filter Waktu
+                    let matchTime = true;
+                    if (selectedTime !== 'all') {
+                        // Ambil jam (integer) dari string waktu
+                        const jam = parseInt(jamMulaiStr.split(':')[0]);
+                        if (selectedTime === 'pagi') {
+                            matchTime = (jam < 11);
+                        } else if (selectedTime === 'siang') {
+                            matchTime = (jam >= 11);
+                        }
+                    }
+
+                    // Gabungkan Semua Filter
+                    if (matchCategory && matchSearch && matchTime) {
                         card.style.display = 'flex';
                     } else {
                         card.style.display = 'none';
                     }
                 });
-            };
+            }
 
-            // Event listener untuk tombol filter (Semua, Umum, Gigi)
-            filterBtns.forEach(button => {
-                button.addEventListener('click', () => {
-                    activeFilter = button.getAttribute('data-filter');
-                    
-                    // Update tampilan tombol
-                    filterBtns.forEach(btn => {
-                        btn.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
-                        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
-                    });
-                    button.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-                    button.classList.add('bg-tm-red', 'text-white', 'border-transparent');
-                    
-                    filterDoctors();
+            // --- EVENT LISTENERS ---
+            
+            // 1. Tombol Filter Poli
+            window.filterPoli = function(kategori, btn) {
+                // Update Style Tombol
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
+                    b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
                 });
-            });
+                btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                btn.classList.add('bg-tm-red', 'text-white', 'border-transparent');
 
-            // --- Fungsionalitas Search Bar ---
+                applyFilters();
+            }
+
+            // 2. Search Input
             searchInput.addEventListener('input', () => {
                 if (searchInput.value.length > 0) {
                     searchClose.classList.remove('hidden');
                 } else {
                     searchClose.classList.add('hidden');
                 }
-                filterDoctors();
+                applyFilters();
             });
 
+            // 3. Search Close
             searchClose.addEventListener('click', () => {
                 searchInput.value = '';
                 searchClose.classList.add('hidden');
-                filterDoctors();
-            });
-            
-            // --- Fungsionalitas Tombol 'Pakai' (Menerapkan filter Waktu) ---
-            btnPakai.addEventListener('click', () => {
-                // Dalam implementasi nyata, di sini Anda akan memuat data baru dari server 
-                // berdasarkan Tanggal dan Waktu yang dipilih.
-                alert(`Filter diterapkan!\nTanggal: ${tanggalLayananInput.value}\nWaktu: ${allTimeSelect.options[allTimeSelect.selectedIndex].text}`);
-                filterDoctors();
+                applyFilters();
             });
 
-            // --- Fungsionalitas Tombol Status (Tersedia/Habis) ---
-            document.querySelectorAll('.status-btn').forEach(btn => {
-                btn.addEventListener('click', (event) => {
-                    const card = event.target.closest('.doctor-card');
-                    const doctorName = card.querySelector('.font-bold').textContent;
-                    const status = event.target.getAttribute('data-status');
-
-                    if (status === 'Tersedia') {
-                        alert(`Anda akan diarahkan ke halaman reservasi untuk ${doctorName}.`);
-                        // Di sini Anda bisa menambahkan window.location.href ke halaman Reservasi
-                    } else {
-                        alert(`Maaf, kuota ${doctorName} sudah habis. Silakan pilih jadwal lain.`);
-                    }
-                });
-            });
-
-            // --- Fungsionalitas Tampilan Kuota ---
-            doctorCards.forEach(card => {
-                const kuotaValue = card.querySelector('.kuota-value');
-                const status = card.getAttribute('data-status');
-                
-                if (status === 'Tersedia') {
-                    kuotaValue.classList.add('text-blue-600');
-                    kuotaValue.classList.remove('text-red-600');
-                } else {
-                    kuotaValue.classList.add('text-red-600');
-                    kuotaValue.classList.remove('text-blue-600');
-                }
-            });
-
-            // Inisialisasi: pastikan filter "Semua" aktif saat pertama kali load
-            document.querySelector('[data-filter="Semua"]').click();
+            // 4. Time Filter
+            timeFilter.addEventListener('change', applyFilters);
         });
     </script>
 </body>

@@ -40,17 +40,22 @@ class Pasien(db.Model, UserMixin):
       db.session.rollback()
       return None, str(e)
 
-  def findAll():
-    # logic disini
-    return True
-
-  def findOne():
-    # logic disini 
-    return True
-
-  def update():
-    # logic disini 
-    return True
+  @classmethod
+  def update(nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
+    try:
+      pasien = Pasien(
+          nama=nama,
+          email=email,
+          password=password,
+          nomor_hp=nomor_hp,
+          jenis_kelamin=jenis_kelamin,
+          tanggal_lahir=tanggal_lahir
+      )
+      db.session.commit()
+      return pasien, None
+    except SQLAlchemyError as e:
+      db.session.rollback
+      return None, str(e)
   
   def remove():
     # logic disini

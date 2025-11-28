@@ -1,40 +1,64 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Admin, Pasien
 from utils import auth_services
 
 auth_bp = Blueprint("auth", __name__)
 
+@auth_bp.route('/')
+def homepageGuest():
+    if current_user.is_authenticated:
+        role = session.get("role") 
+        
+        if role == "pasien":
+            return redirect(url_for('pasien.homepage'))
+        elif role == "admin":
+            return redirect(url_for('main.dashboard_admin'))
+        
+    return render_template('dashboardGuest.html', user=current_user)
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == 'POST':
         data = {
-          "nama" : request.form.get('name'),
-          "email" : request.form.get('email'),
-          "nomor_hp" : request.form.get('phone'),
-          "jenis_kelamin" : request.form.get('gender'),
-          "tanggal_lahir" : request.form.get('tanggal-lahir'),
-          "password" : request.form.get('password'),
-          "confirm_password" : request.form.get('conf-password'),
+            "nama" : request.form.get('nama'),         
+            "email" : request.form.get('email'),     
+            "nomor_hp" : request.form.get('nomor_hp'),     
+            "jenis_kelamin" : request.form.get('jenis_kelamin'), 
+            "tanggal_lahir" : request.form.get('tanggal_lahir'), 
+            "password" : request.form.get('password'),
+            "confirm_password" : request.form.get('confirm_password'), 
         }
 
+        # Validasi
         ok, msg, cleaned = auth_services.validate_register(data)
 
         if not ok:
-          for err in msg.values():
-            if err:
-              flash(err, 'danger')
-          return render_template('register.html', old=cleaned)
+            for err in msg.values():
+                if err:
+                    flash(err, 'danger')
+            return render_template('register.html', old=cleaned)
+        
         try:
-          password_hash = generate_password_hash(data['password'])
-          
-          Pasien.create(data['nama'], data['email'], password_hash, data['nomor_hp'], data['jenis_kelamin'], data['tanggal_lahir'])
-          flash("Registrasi akun berhasil!", 'success')
-          return redirect(url_for('auth.register'))
+            password_hash = generate_password_hash(cleaned['password'])
+            
+            Pasien.create(
+                nama=cleaned['nama'], 
+                email=cleaned['email'], 
+                password_hash=password_hash, 
+                nomor_hp=cleaned['phone'], 
+                jenis_kelamin=cleaned['jenis_kelamin'], 
+                tanggal_lahir=cleaned['tgl_lahir'] 
+            )
+            
+            flash("Registrasi akun berhasil! Silakan login.", 'success')
+            return redirect(url_for('auth.login_pasien')) 
+            
         except Exception as e:
-           flash("Terjadi kesalahan pada sistem", "error")
-           return render_template('register.html', old=cleaned)
+            print(f"Error Register: {e}") 
+            flash("Terjadi kesalahan pada sistem database.", "danger")
+            return render_template('register.html', old=cleaned)
     
     return render_template('register.html')
 

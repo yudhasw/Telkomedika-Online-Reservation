@@ -2,12 +2,11 @@ from . import db
 
 class Poliklinik(db.Model):
   __tablename__ = 'poliklinik'
-  poliklinik_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  dokter_id = db.Column(db.Integer, db.ForeignKey('dokter.dokter_id'), nullable=False)
-  nama_unit = db.Column(db.String(255), nullable=False)
-  deskripsi = db.Column(db.String(255))
+  poliklinik_id = db.Column("poliklinik_id",db.Integer, primary_key=True, autoincrement=True)
+  nama_poli = db.Column("nama_poli", db.String(255), nullable=False)
+  deskripsi = db.Column("deskripsi",db.String(255))
 
-  dokter = db.relationship('Dokter', backref='poliklinik')
+  list_jadwal = db.relationship("ListJadwal", back_populates="poliklinik")
   
   def create(nama_unit, deskripsi):
     poliklinik = Poliklinik(nama_unit=nama_unit, deskripsi=deskripsi)
