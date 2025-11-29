@@ -1,65 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TelkoMedika - Jadwal Dokter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'tm-red': '#E51B24',
-                        'tm-cyan': '#00A3C8',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="font-sans text-gray-800 bg-white min-h-screen flex flex-col">
+{% extends "base.html" %}
+{% block title %}Jadwal Dokter - Telkomedika{% endblock %}
 
-    <nav class="container mx-auto px-6 py-4 flex justify-between items-center border-b border-gray-100 sticky top-0 bg-white z-50 shadow-sm">
-        <div class="flex items-center">
-            <a href="{{ url_for('pasien.homepage') }}">
-                <img src="https://dummyimage.com/150x50/fff/E51B24.png&text=TelkoMedika" alt="Logo" class="h-10">
-            </a>
-        </div>
-
-        <div class="hidden md:flex space-x-8 items-center font-medium">
-            <a href="{{ url_for('pasien.homepage') }}" class="hover:text-tm-red transition">Beranda</a>
-            
-            <div class="relative group">
-                <button class="flex items-center hover:text-tm-red focus:outline-none transition py-2">
-                    Layanan <i class="fas fa-caret-down ml-1"></i>
-                </button>
-                
-                <div class="absolute top-full left-0 pt-4 w-48 hidden group-hover:block z-50">
-                    <div class="bg-white border border-gray-200 rounded-md shadow-lg py-2">
-                        <a href="{{ url_for('pasien.form_reservasi') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
-                        <a href="{{ url_for('pasien.jadwal_dokter') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
-                    </div>
-                </div>
-            </div>
-            <a href="{{ url_for('pasien.form_reservasi') }}" class="hover:text-tm-red transition">Reservasi</a>
-        </div>
-
-        <div>
-            {% if current_user.is_authenticated %}
-                <span class="text-gray-600 mr-4 text-sm font-medium">Halo, {{ current_user.nama }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="text-tm-red font-medium hover:underline text-sm border border-tm-red px-4 py-1.5 rounded-full hover:bg-tm-red hover:text-white transition">Logout</a>
-            {% else %}
-                <a href="{{ url_for('auth.login_pasien') }}" class="text-gray-800 font-medium hover:text-tm-red transition">Login</a>
-            {% endif %}
-        </div>
-    </nav>
-    
-    <div class="container mx-auto px-6 py-8 max-w-5xl flex-grow">
+{% block content %}
+<div class="flex flex-col min-h-screen">
+    <div class="container mx-auto px-6 py-8 max-w-5xl grow">
         <h1 class="text-2xl font-semibold mb-6">Jadwal Dokter</h1>
 
         <div class="bg-white p-4 shadow-md rounded-lg mb-6 border border-gray-200">
@@ -73,7 +17,7 @@
                         <option value="pagi">Pagi (< 11:00)</option>
                         <option value="siang">Siang (>= 11:00)</option>
                     </select>
-                    <i class="fas fa-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                    <i class="fas fa-caret-down absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
 
@@ -86,9 +30,9 @@
                     <i class="fas fa-tooth mr-2 text-tm-cyan"></i> Spesialis Gigi
                 </button>
 
-                <div class="relative flex-grow max-w-xs ml-auto md:ml-4">
+                <div class="relative grow max-w-xs ml-auto md:ml-4">
                     <input type="text" id="search_dokter" placeholder="Cari nama dokter..."
-                           class="w-full pl-4 pr-10 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan text-sm">
+                            class="w-full pl-4 pr-10 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan text-sm">
                     <i id="search_close" class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hidden"></i>
                 </div>
             </div>
@@ -105,14 +49,14 @@
                 
                 {% for item in data %}
                 <div class="doctor-card flex flex-col md:flex-row items-center border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 bg-white" 
-                     data-spesialis="{{ item.poliklinik.nama_poli }}" 
-                     data-jam="{{ item.jam_mulai }}">
+                        data-spesialis="{{ item.poliklinik.nama_poli }}" 
+                        data-jam="{{ item.jam_mulai }}">
                     
                     <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mr-0 md:mr-6 mb-4 md:mb-0 flex-shrink-0">
                         <i class="fas fa-user-doctor text-4xl text-gray-400"></i>
                     </div>
 
-                    <div class="flex-grow text-center md:text-left w-full">
+                    <div class="grow text-center md:text-left w-full">
                         <h3 class="font-bold text-lg text-gray-900 doctor-name">{{ item.dokter.nama_dokter }}</h3>
                         <p class="text-sm text-gray-600 font-medium">{{ item.poliklinik.nama_poli }}</p>
                         <div class="flex items-center justify-center md:justify-start gap-2 mt-2">
@@ -124,119 +68,90 @@
 
                     <div class="text-right flex flex-col space-y-2 mt-4 md:mt-0 w-full md:w-auto min-w-[140px]">
                         <a href="{{ url_for('pasien.form_reservasi', poli_id=item.poliklinik_id) }}" 
-                           class="bg-tm-red text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-red-700 transition text-center shadow-sm">
+                            class="bg-tm-red text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-red-700 transition text-center shadow-sm">
                             Buat Reservasi
                         </a>
                         <p class="text-[10px] text-gray-500 text-center">Lihat ketersediaan kuota di halaman reservasi</p>
                     </div>
                 </div>
                 {% endfor %}
-
             {% endif %}
-
         </div>
     </div>
+</div>
 
-    <footer class="border-t border-gray-300 py-8 bg-gray-50 mt-auto">
-        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="mb-4 md:mb-0">
-                <img src="https://dummyimage.com/150x60/fff/E51B24.png&text=TelkoMedika" alt="Logo Footer" class="h-12 mix-blend-multiply">
-            </div>
-            <div class="text-center md:text-right text-[10px] text-gray-800 font-medium">
-                <p class="font-bold">PT. SARANA USAHA SEJAHTERA INSANPALAPA</p>
-                <p>Gedung OPMC Telkom, Jl. Letjen Suprapto No. 17</p>
-                <p>Jakarta Pusat, 10510</p>
-            </div>
-        </div>
-    </footer>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const searchInput = document.getElementById('search_dokter');
+        const searchClose = document.getElementById('search_close');
+        const timeFilter = document.getElementById('time_filter');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const searchInput = document.getElementById('search_dokter');
-            const searchClose = document.getElementById('search_close');
-            const timeFilter = document.getElementById('time_filter');
-            
-            // --- LOGIKA FILTER UTAMA ---
-            function applyFilters() {
-                const activeBtn = document.querySelector('.filter-btn.bg-tm-red');
-                const category = activeBtn ? activeBtn.innerText.trim() : 'Semua';
-                const searchTerm = searchInput.value.toLowerCase();
-                const selectedTime = timeFilter.value; // all, pagi, siang
+        function applyFilters() {
+            const activeBtn = document.querySelector('.filter-btn.bg-tm-red');
+            const category = activeBtn ? activeBtn.innerText.trim() : 'Semua';
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedTime = timeFilter.value; 
 
-                const cards = document.querySelectorAll('.doctor-card');
+            const cards = document.querySelectorAll('.doctor-card');
 
-                cards.forEach(card => {
-                    const poli = card.getAttribute('data-spesialis');
-                    const name = card.querySelector('.doctor-name').innerText.toLowerCase();
-                    const jamMulaiStr = card.getAttribute('data-jam'); // Format "HH:MM:SS" dari backend
+            cards.forEach(card => {
+                const poli = card.getAttribute('data-spesialis');
+                const name = card.querySelector('.doctor-name').innerText.toLowerCase();
+                const jamMulaiStr = card.getAttribute('data-jam'); 
 
-                    // 1. Filter Kategori (Poli)
-                    let matchCategory = (category === 'Semua');
-                    if (!matchCategory) {
-                        // Cek apakah nama poli mengandung kata kunci tombol (misal: "Gigi" ada di "Poli Gigi")
-                        if (category === 'Umum' && poli.toLowerCase().includes('umum')) matchCategory = true;
-                        if (category.includes('Gigi') && poli.toLowerCase().includes('gigi')) matchCategory = true;
-                    }
-
-                    // 2. Filter Search
-                    const matchSearch = name.includes(searchTerm);
-
-                    // 3. Filter Waktu
-                    let matchTime = true;
-                    if (selectedTime !== 'all') {
-                        // Ambil jam (integer) dari string waktu
-                        const jam = parseInt(jamMulaiStr.split(':')[0]);
-                        if (selectedTime === 'pagi') {
-                            matchTime = (jam < 11);
-                        } else if (selectedTime === 'siang') {
-                            matchTime = (jam >= 11);
-                        }
-                    }
-
-                    // Gabungkan Semua Filter
-                    if (matchCategory && matchSearch && matchTime) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            }
-
-            // --- EVENT LISTENERS ---
-            
-            // 1. Tombol Filter Poli
-            window.filterPoli = function(kategori, btn) {
-                // Update Style Tombol
-                document.querySelectorAll('.filter-btn').forEach(b => {
-                    b.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
-                    b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
-                });
-                btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-                btn.classList.add('bg-tm-red', 'text-white', 'border-transparent');
-
-                applyFilters();
-            }
-
-            // 2. Search Input
-            searchInput.addEventListener('input', () => {
-                if (searchInput.value.length > 0) {
-                    searchClose.classList.remove('hidden');
-                } else {
-                    searchClose.classList.add('hidden');
+                let matchCategory = (category === 'Semua');
+                if (!matchCategory) {
+                    if (category === 'Umum' && poli.toLowerCase().includes('umum')) matchCategory = true;
+                    if (category.includes('Gigi') && poli.toLowerCase().includes('gigi')) matchCategory = true;
                 }
-                applyFilters();
-            });
 
-            // 3. Search Close
-            searchClose.addEventListener('click', () => {
-                searchInput.value = '';
+                const matchSearch = name.includes(searchTerm);
+
+                let matchTime = true;
+                if (selectedTime !== 'all') {
+                    const jam = parseInt(jamMulaiStr.split(':')[0]);
+                    if (selectedTime === 'pagi') {
+                        matchTime = (jam < 11);
+                    } else if (selectedTime === 'siang') {
+                        matchTime = (jam >= 11);
+                    }
+                }
+
+                if (matchCategory && matchSearch && matchTime) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        window.filterPoli = function(kategori, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
+                b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+            });
+            btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+            btn.classList.add('bg-tm-red', 'text-white', 'border-transparent');
+
+            applyFilters();
+        }
+
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length > 0) {
+                searchClose.classList.remove('hidden');
+            } else {
                 searchClose.classList.add('hidden');
-                applyFilters();
-            });
-
-            // 4. Time Filter
-            timeFilter.addEventListener('change', applyFilters);
+            }
+            applyFilters();
         });
-    </script>
-</body>
-</html>
+
+        searchClose.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClose.classList.add('hidden');
+            applyFilters();
+        });
+
+        timeFilter.addEventListener('change', applyFilters);
+    });
+</script>
+{% endblock %}
