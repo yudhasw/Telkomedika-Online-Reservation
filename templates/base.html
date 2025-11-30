@@ -24,44 +24,88 @@
           }
       }
   </script>
+  <style>
+    .nav-stable {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .nav-stable::after {
+        content: attr(data-text); 
+        content: attr(data-text) / ""; 
+        height: 0;
+        visibility: hidden;
+        overflow: hidden;
+        user-select: none;
+        pointer-events: none;
+        font-weight: 700;
+    }
+
+    @media (min-width: 768px) {
+        .nav-stable::after {
+            content: attr(data-text);
+        }
+    }
+</style>
 </head>
 <body class="font-sans text-gray-800 bg-white flex flex-col min-h-screen">
   <header class="sticky top-0 z-50 bg-white w-full border-b border-gray-100 shadow-sm">
-    <nav class="sticky container mx-auto px-6 py-4 flex justify-between items-center bg-white">
-        <div class="flex items-center">
+    <nav class="sticky container mx-auto px-6 py-3 flex items-center bg-white">
+        
+        <div class="flex items-center mr-12">
+          {% if request.endpoint not in ['auth.login_pasien', 'auth.register'] %}
             <a href="{{ url_for('pasien.homepage') }}">
-                <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-10">
+                <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-16 w-auto object-contain">
             </a>
+          {% else %}
+            <a href="{{ url_for('auth.homepageGuest') }}">
+                <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-16 w-auto object-contain">
+            </a>
+          {% endif %}
         </div>
       {% if request.endpoint not in ['auth.login_pasien', 'auth.register'] %}
-        <div class="hidden md:flex space-x-8 items-center font-medium">
+        <div class="hidden md:flex space-x-8 items-center font-medium text-gray-600">
             <a href="{{ url_for('pasien.homepage') }}" 
-            class="{{ 'text-tm-red' if request.endpoint == 'pasien.homepage'}} hover:text-tm-red transition">Beranda</a>
+               data-text="Beranda" 
+               class="nav-stable {{ 'text-tm-red font-semibold' if request.endpoint == 'pasien.homepage' else 'hover:text-tm-red transition'}}">
+              Beranda
+            </a>
             <div class="relative group">
-                <button class="flex items-center hover:text-tm-red focus:outline-none transition py-2 pr-10">
-                    Layanan <i class="fas fa-caret-down ml-2 absolute left-14.5 top-2/3 transform -translate-y-1/2"></i>
+                <button class="flex items-center hover:text-tm-red focus:outline-none transition py-2 pr-10 ">
+                    <span class="nav-stable" data-text="Layanan">Layanan</span> 
+                    <i class="fas fa-caret-down ml-2 absolute left-14.5 top-2/3 transform -translate-y-1/2"></i>
                 </button>
                 <div class="absolute top-full left-0 pt-4 w-48 hidden group-hover:block z-50">
                     <div class="bg-white border border-gray-200 rounded-md shadow-lg py-2">
                         <a href="{{ url_for('pasien.form_reservasi') }}" 
-                        class=" {{ 'text-tm-red' if request.endpoint == 'pasien.form_reservasi'}} block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reservasi</a>
+                           class="{{ 'text-tm-red font-semibold bg-gray-50' if request.endpoint == 'pasien.form_reservasi'}} block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                           Reservasi
+                        </a>
                         <a href="{{ url_for('pasien.jadwal_dokter') }}" 
-                        class=" {{ 'text-tm-red' if request.endpoint == 'pasien.jadwal_dokter'}} block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Jadwal Dokter</a>
+                           class="{{ 'text-tm-red font-semibold bg-gray-50' if request.endpoint == 'pasien.jadwal_dokter'}} block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                           Jadwal Dokter
+                        </a>
                     </div>
                 </div>
             </div>
             <a href="{{ url_for('pasien.form_reservasi') }}" 
-            class=" {{ 'text-tm-red' if request.endpoint == 'pasien.form_reservasi'}} hover:text-tm-red transition">Reservasi</a>
+               data-text="Reservasi"
+               class="nav-stable {{ 'text-tm-red font-bold' if request.endpoint == 'pasien.form_reservasi'}} hover:text-tm-red transition">
+              Reservasi
+            </a>
         </div>
-     
-        <div>
+        <div class="ml-auto">
             {% if current_user.is_authenticated %}
                 <span class="text-gray-600 mr-4 text-sm font-medium">Halo, {{ current_user.nama }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="text-tm-red font-medium hover:underline text-sm border border-tm-red px-4 py-1.5 rounded-full hover:bg-tm-red hover:text-white transition">Logout</a>
+                <a href="{{ url_for('auth.logout') }}" class="text-tm-red font-medium hover:underline text-sm border border-tm-red px-5 py-2 rounded-full hover:bg-tm-red hover:text-white transition">Logout</a>
             {% else %}
-                <a href="{{ url_for('auth.login_pasien') }}" class="bg-tm-red text-white px-6 py-2 rounded-full font-medium hover:bg-red-700 transition shadow-md">Login</a>
+                <a href="{{ url_for('auth.login_pasien') }}" class="bg-tm-red text-white px-6 py-2.5 rounded-full font-medium hover:bg-red-700 transition shadow-md">Login</a>
             {% endif %}
         </div>
+
       {% endif %}
     </nav>
   </header>
@@ -93,6 +137,25 @@
     </div>
   </footer>
   <script src="{{ url_for('static', filename='js/preline.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messages = document.querySelectorAll('.flash-message');
+        
+        if (messages.length > 0) {
+            messages.forEach(msg => {
+                setTimeout(() => {
+                    msg.classList.remove('opacity-100');
+                    msg.classList.add('opacity-0');
+                    msg.classList.add('-translate-y-2'); 
+
+                    setTimeout(() => {
+                        msg.remove();
+                    }, 500);
+                }, 3000); 
+            });
+        }
+    });
+  </script>
 </body>
 
 </html>
