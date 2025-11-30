@@ -2,7 +2,19 @@
 {% block title %}Reservasi - Telkomedika{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-6 max-w-5xl mb-20">
+<style>
+    .scrollbar-custom::-webkit-scrollbar { width: 8px; }
+    .scrollbar-custom::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .scrollbar-custom::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .doctor-radio:checked + .doctor-card {
+            border: 2px solid #E51B24;
+            background-color: #FEF2F2;
+        }
+    .check-indicator { display: none; }
+    .doctor-radio:checked + .doctor-card .check-indicator { display: block; }
+</style>
+<div class="container mx-auto px-6 py-6 max-w-5xl mb-20">
     
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -20,14 +32,14 @@
         {% endif %}
     {% endwith %}
 
-    <h1 class="text-3xl text-center font-light mb-10">Reservasi</h1>
+    <h1 class="text-2xl font-semibold mb-6 text-center">Reservasi</h1>
 
     <form id="reservationForm" method="POST" action="">
         
         <div class="flex justify-end mb-4 px-2">
             <label class="inline-flex items-center cursor-pointer select-none">
                 <input type="checkbox" id="autofill-toggle" class="sr-only peer">
-                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tm-red"></div>
+                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-2.5 rtl:peer-checked:after:-translate-x-3 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tm-red"></div>
                 <span class="ms-3 text-sm font-medium text-gray-600">Isi otomatis dari data akun</span>
             </label>
         </div>

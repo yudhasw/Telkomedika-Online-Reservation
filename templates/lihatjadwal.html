@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="flex flex-col min-h-screen">
-    <div class="container mx-auto px-6 py-8 max-w-5xl grow">
+    <div class="container mx-auto px-6 py-6 max-w-5xl grow">
         <h1 class="text-2xl font-semibold mb-6">Jadwal Dokter</h1>
 
         <div class="bg-white p-4 shadow-md rounded-lg mb-6 border border-gray-200">
@@ -14,15 +14,15 @@
                 <div class="relative">
                     <select id="time_filter" class="appearance-none w-32 pr-8 pl-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan cursor-pointer text-sm">
                         <option value="all">Semua Jam</option>
-                        <option value="pagi">Pagi (< 11:00)</option>
-                        <option value="siang">Siang (>= 11:00)</option>
+                        <option value="pagi">Pagi</option>
+                        <option value="siang">Siang</option>
                     </select>
                     <i class="fas fa-caret-down absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="filterPoli('Semua', this)" class="filter-btn bg-tm-red text-white px-4 py-1.5 rounded-lg text-sm transition font-medium">Semua</button>
+                <button onclick="filterPoli('Semua', this)" class="filter-btn bg-tm-red text-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition font-medium">Semua</button>
                 <button onclick="filterPoli('Umum', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
                     <i class="fas fa-user-md mr-2 text-tm-cyan"></i> Umum
                 </button>
