@@ -115,41 +115,11 @@ def form_reservasi():
 
     poli_id = request.args.get('poli_id')
     tanggal_str = request.args.get('tanggal')
+    jadwal = []
 
-    # 1. BASE QUERY DENGAN JOIN
-    query_jadwal = db.session.query(JadwalPemeriksaan).join(
-        ListJadwal, JadwalPemeriksaan.listjadwal_id == ListJadwal.listjadwal_id
-    ).join(
-        Dokter, ListJadwal.dokter_id == Dokter.dokter_id
-    ).join(
-        Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
-    )
 
-    # FILTER DASAR (TANGGAL >= HARI INI) --> DI-COMMENT AGAR SEMUA MUNCUL
-    # query_jadwal = query_jadwal.filter(JadwalPemeriksaan.tanggal >= date.today())
-
-    # FILTER POLI
-    if poli_id:
-        query_jadwal = query_jadwal.filter(ListJadwal.poliklinik_id == poli_id)
-
-    # FILTER TANGGAL SPESIFIK (JIKA USER MEMILIH TANGGAL DI FRONTEND)
     if tanggal_str:
-        print(f"DEBUG: Tanggal diterima dari frontend: {tanggal_str}") 
-        try:
-            tanggal_obj = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
-            
-            # Kita langsung filter saja tanpa validasi masa lalu/masa depan
-            query_jadwal = query_jadwal.filter(JadwalPemeriksaan.tanggal == tanggal_obj)
-
-        except ValueError:
-            print(f"ERROR: Format tanggal salah! Input: {tanggal_str}")
-            flash("Format tanggal tidak valid.", "danger")
-
-    # Urutkan berdasarkan Tanggal, lalu Jam Mulai
-    jadwal = query_jadwal.order_by(
-        JadwalPemeriksaan.tanggal.asc(), 
-        ListJadwal.jam_mulai.asc()
-    ).all()
+        jadwal = JadwalPemeriksaan.get_filtered_data(poli_id, tanggal_str)
 
     if request.method == 'POST':
         jadwal_id = request.form.get('jadwal_id')
@@ -201,7 +171,6 @@ def form_reservasi():
         poli_id=poli_id, 
         tanggal=tanggal_str
     )
-
 
 def nomorUrut(jadwal_id):
     jadwal = JadwalPemeriksaan.query.get(jadwal_id)
