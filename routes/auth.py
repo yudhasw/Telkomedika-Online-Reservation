@@ -10,7 +10,7 @@ auth_bp = Blueprint("auth", __name__)
 def homepageGuest():
     if current_user.is_authenticated:
         role = session.get("role") 
-        
+
         if role == "pasien":
             return redirect(url_for('pasien.homepage'))
         elif role == "admin":
@@ -31,7 +31,6 @@ def register():
             "confirm_password" : request.form.get('confirm_password'), 
         }
 
-        # Validasi
         ok, msg, cleaned = auth_services.validate_register(data)
 
         if not ok:
