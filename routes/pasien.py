@@ -19,93 +19,82 @@ def homepage():
         flash(f"Terjadi kesalahan: {e}", "danger")
         return render_template('dashboard.html', pasien=pasien)
 
-# @pasien_bp.route("/jadwal-dokter")
-# @login_required
-# def jadwalDokter():
-#     pasien = current_user
 
-#     poli_id = request.args.get('poli_id')
-#     tanggal_str = request.args.get('tanggal')
-
-#     # QUERY DASAR TANPA FILTER POLI DAN TANGGAL
-#     query_filter_Jadwal = JadwalPemeriksaan.query.filter(JadwalPemeriksaan.tanggal >= date.today())
-
-#     if poli_id:
-#         query_filter_Jadwal = query_filter_Jadwal.filter(JadwalPemeriksaan.poli_id == poli_id)
-
-#     if tanggal_str:
-#         tanggal = date.strptime(tanggal_str, '%Y-%m-%d').date()
-#         query_filter_Jadwal = query_filter_Jadwal.filter(JadwalPemeriksaan.tanggal == tanggal)
-
-#     # SORTING JADWAL SESUAI WAKTU (listjadwal)
-#     jadwal = query_filter_Jadwal.order_by(JadwalPemeriksaan.listjadwal_id.asc()).all()
-
-#     return render_template('jadwal.html', jadwal=jadwal)
-
-
-@pasien_bp.route("/profile", methods=['GET', 'POST'])
+@pasien_bp.route("/profile", methods=['GET'])
 @login_required
 def profile():
-    pasien = current_user
-
-    if request.method == 'POST':
-        nama = request.form.get('nama')
-        email = request.form.get('email')
-        nomor_hp = request.form.get('nomor_hp')
-        jenis_kelamin = request.form.get('jenis_kelamin')
-        tanggal_lahir = request.form.get('tanggal_lahir')
-
-        try:
-            pasien.nama = nama or pasien.nama
-            pasien.email = email or pasien.email
-            pasien.nomor_hp = nomor_hp or pasien.nomor_hp
-            pasien.jenis_kelamin = jenis_kelamin or pasien.jenis_kelamin
-            pasien.tanggal_lahir = tanggal_lahir or pasien.tanggal_lahir
-
-            db.session.commit()
-            flash("Profil berhasil diperbarui.", "success")
-            return redirect(url_for('pasien.homepage'))
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Error updating profile: {e}")
-            flash(f"Terjadi kesalahan: {e}", "danger")
-
-    return render_template('profile.html', pasien=pasien)
+    return render_template('profile.html', pasien=current_user)
 
 
-@pasien_bp.route("/changepassword", methods=['GET', 'POST'])
+@pasien_bp.route("/profile/edit", methods=['POST'])
+@login_required
+def profile_edit():
+    pasien = Pasien.query.get(current_user.pasien_id)
+    
+    nama = request.form.get('nama')
+    email = request.form.get('email')
+    nomor_hp = request.form.get('nomor_hp')
+    jenis_kelamin = request.form.get('jenis_kelamin')
+    tanggal_lahir = request.form.get('tanggal_lahir')
+    
+    # Logika Upload Foto (Jika ada)
+    # foto = request.files.get('foto_profil')
+    # if foto:
+    #     ... logic simpan foto ...
+
+    try:
+        pasien.nama = nama
+        pasien.email = email
+        pasien.nomor_hp = nomor_hp
+        pasien.jenis_kelamin = jenis_kelamin
+        pasien.tanggal_lahir = tanggal_lahir
+        
+        db.session.commit()
+        flash("Profil berhasil diperbarui.", "success")
+        
+        return redirect(url_for('pasien.profile', tab='profile'))
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Gagal update profil: {e}")
+        flash("Gagal memperbarui profil. Silakan coba lagi.", "danger")
+        
+        return redirect(url_for('pasien.profile', tab='edit'))
+
+
+@pasien_bp.route("/profile/change-password", methods=['POST'])
 @login_required
 def profile_updatepassword():
-    pasien = current_user
+    pasien = Pasien.query.get(current_user.pasien_id)
+    
+    old_pass = request.form.get('old-password')
+    new_pass = request.form.get('password')
+    conf_pass = request.form.get('conf-password')
 
-    if request.method == 'POST':
-        old_password = request.form.get('old-password')
-        new_password = request.form.get('password')
-        confirm_password = request.form.get('conf-password')
+    if not check_password_hash(pasien.password_hash, old_pass):
+        flash("Password lama salah.", "danger")
+        return redirect(url_for('pasien.profile', tab='password'))
 
-        if not new_password:
-            flash("Password baru kosong.", "warning")
-            return render_template('changepassword.html', pasien=pasien)
+    if new_pass != conf_pass:
+        flash("Konfirmasi password tidak cocok.", "danger")
+        return redirect(url_for('pasien.profile', tab='password'))
+        
+    if len(new_pass) < 8:
+        flash("Password baru minimal 8 karakter.", "danger")
+        return redirect(url_for('pasien.profile', tab='password'))
 
-        if new_password != confirm_password: 
-            flash("Password tidak sama!", 'warning')
-            return render_template('changepassword.html', pasien=pasien)
-
-        if not check_password_hash(pasien.password, old_password):
-            flash("Password lama salah.", "warning")
-            return render_template('changepassword.html', pasien=pasien)
-
-        try:
-            pasien.password = generate_password_hash(new_password)
-            db.session.commit()
-            flash("Password berhasil diperbarui.", "success")
-            return redirect(url_for('pasien.profile'))
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.error(f"Error updating password: {e}")
-            flash(f"Terjadi kesalahan: {e}", "danger")
-
-    return render_template('profile_updatepassword.html', pasien=pasien)
+    try:
+        pasien.password_hash = generate_password_hash(new_pass)
+        db.session.commit()
+        
+        flash("Password berhasil diubah. Silakan login ulang jika diperlukan.", "success")
+        return redirect(url_for('pasien.profile', tab='password'))
+        
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(f"Gagal ubah password: {e}")
+        flash("Terjadi kesalahan sistem.", "danger")
+        return redirect(url_for('pasien.profile', tab='password'))
 
 
 @pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
