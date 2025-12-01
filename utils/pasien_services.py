@@ -14,38 +14,46 @@ def nomorUrut(jadwal_id):
     return None
 
 def notifikasiReservasi(pasien, reservasi):
-    if not getattr(pasien, "email", None):
+    email_tujuan = pasien.get("email")
+    if not email_tujuan:
         current_app.logger.warning(
-            f"Pasien {pasien.pasien_id} tidak punya email, email tidak dikirim."
+            f"Data Pasien tidak punya email, email tidak dikirim."
         )
         return
 
     subject = "Konfirmasi Reservasi Pemeriksaan"
-    recipients = [pasien.email]
+    recipients = [email_tujuan]
+
+    nama_pasien = pasien.get("nama", "Pasien")
+    jadwal_reservasi = pasien.get("tanggal_reservasi")
 
     msg = Message(subject=subject, recipients=recipients)
 
     msg.body = (
-        f"Halo {pasien.nama},\n\n"
+        f"Halo {nama_pasien},\n\n"
         f"Reservasi Anda telah berhasil dibuat.\n"
         f"ID Reservasi : {reservasi.reservasi_id}\n"
-        f"Tanggal      : {reservasi.tanggal.strftime('%d-%m-%Y')}\n"
+        f"Tanggal      : {jadwal_reservasi.strftime('%d-%m-%Y')}\n"
         f"No Antrian   : {reservasi.no_urut}\n"
         f"Status       : {reservasi.status}\n\n"
-        f"Silakan datang sesuai jadwal.\n"
+        f"Silakan datang minimal 5 menit sebelum jadwal.\n"
         f"Terima kasih."
     )
 
     msg.html = f"""
-        <p>Halo <b>{pasien.nama}</b>,</p>
+        <p>Halo <b>{nama_pasien}</b>,</p>
         <p>Reservasi Anda telah <b>berhasil dibuat</b> dengan detail:</p>
         <ul>
             <li>ID Reservasi: <b>{reservasi.reservasi_id}</b></li>
-            <li>Tanggal: <b>{reservasi.tanggal_reservasi.strftime('%d-%m-%Y')}</b></li>
+            <li>Tanggal: <b>{jadwal_reservasi.strftime('%d-%m-%Y')}</b></li>
             <li>No Antrian: <b>{reservasi.no_urut}</b></li>
             <li>Status: <b>{reservasi.status}</b></li>
         </ul>
-        <p>Silakan datang sesuai jadwal. Terima kasih.</p>
+        <p>Silakan datang minimal 5 menit sebelum jadwal. Terima kasih.</p>
     """
-
-    mail.send(msg)
+    
+    try:
+        mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Gagal mengirim email: {e}")
+        raise e

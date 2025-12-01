@@ -163,7 +163,7 @@ def form_reservasi():
         
         # Kirim Notifikasi
         try:
-            pasien_services.notifikasiReservasi(pasien, reservasi)
+            pasien_services.notifikasiReservasi(data_pasien, reservasi)
         except Exception as e:
             current_app.logger.error(f"Gagal mengirim email: {e}")
             flash("Reservasi berhasil, namun notifikasi email gagal terkirim.", "warning")
