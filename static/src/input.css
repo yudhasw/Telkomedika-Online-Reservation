@@ -2,21 +2,33 @@
 
 @import "../../node_modules/preline/variants.css";
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
 @theme {
   --color-backgrond: hsl(var(--background));
   --color-foreground: hsl(var(--foreground))
 }
 
-@layer {
+@layer base {
+  html, body {
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+  }
+
   ::-webkit-scrollbar {
     display : none;
+    width: 0px;
+    background: transparent;
   }
 
   :root {
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
 
+  }
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 }
 
@@ -34,6 +46,12 @@
   .focus\:ring-custom {
     @apply focus:ring-2 focus:ring-blue-500/50;
   }
+ 
+  .slider-wrapper {
+      transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  
 }
 
 @utility container {

@@ -5,7 +5,15 @@ export default {
       "node_modules/preline/dist/*.js"
     ],
     theme: {
-      extend: {},
+      extend: {
+            colors: {
+                'tm-red': '#E51B24',
+                'tm-cyan': '#00A3C8',
+            },
+            fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+            }
+        }
     },
     plugins: [
       require('preline/plugin'),
