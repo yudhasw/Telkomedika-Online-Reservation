@@ -4,7 +4,6 @@
 
 {% block content %}
 <style>
-    /* 1. ANIMASI FADE IN (Halus & Pendek agar tidak goyang) */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -14,12 +13,10 @@
         animation: fadeIn 0.4s ease-out forwards;
     }
 
-    /* 2. STABILITAS LAYOUT */
     .anti-shift-container {
-        scrollbar-gutter: stable; /* Mencegah geser saat scrollbar muncul */
+        scrollbar-gutter: stable; 
     }
 
-    /* 3. SCROLLBAR CUSTOM */
     .scrollbar-custom::-webkit-scrollbar { width: 6px; }
     .scrollbar-custom::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-custom::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -228,10 +225,8 @@
 </div>
 
 <script>
-    // --- JAVASCRIPT FINAL (STABIL + ANIMASI) ---
     
     function switchTab(tabName) {
-        // ID Elemen
         const tabs = {
             'profile': document.getElementById('tab-profile'),
             'tickets': document.getElementById('tab-tickets'),
@@ -243,48 +238,39 @@
             'password': document.getElementById('section-password')
         };
 
-        // Style Class (Active vs Inactive)
         const inactiveStyle = "nav-stable pb-3 text-lg font-medium text-gray-500 border-b-2 border-transparent hover:text-tm-red transition-colors duration-200 outline-none focus:outline-none focus:ring-0";
         const activeStyle = "nav-stable pb-3 text-lg font-bold text-tm-red border-b-2 border-tm-red transition-colors duration-200 outline-none focus:outline-none focus:ring-0";
-        
-        // 1. Reset Style Tab
+
         for (const key in tabs) { if (tabs[key]) tabs[key].className = inactiveStyle; }
         if (tabs[tabName]) tabs[tabName].className = activeStyle;
 
-        // 2. Hide Semua Section & Reset Animasi
         for (const key in sections) {
             if (sections[key]) {
                 sections[key].classList.add('hidden');
                 sections[key].classList.remove('flex'); 
-                sections[key].classList.remove('animate-fade'); // Hapus class animasi
+                sections[key].classList.remove('animate-fade'); 
             }
         }
 
-        // 3. Show Section Target
         const target = sections[tabName];
         if (target) {
             target.classList.remove('hidden');
-            
-            // --- TRIGGER ANIMASI ---
-            // Force Reflow (Trik agar animasi main ulang)
+ 
             void target.offsetWidth; 
             target.classList.add('animate-fade');
 
-            // Logika Layout Flexbox
             if (tabName === 'tickets') {
-                target.classList.add('flex'); // Tiket butuh flex-col
-                
-                // Cek subtab default
+                target.classList.add('flex');
+ 
                 const vUpcoming = document.getElementById('view-upcoming');
                 const vHistory = document.getElementById('view-history');
                 if (vUpcoming && vHistory && vUpcoming.classList.contains('hidden') && vHistory.classList.contains('hidden')) {
                     switchTicketTab('upcoming');
                 }
             } else if (tabName === 'password') {
-                target.classList.add('flex'); // Password butuh flex center
+                target.classList.add('flex');
             }
-            
-            // Matikan edit mode jika pindah tab
+ 
             if (tabName !== 'profile' && typeof isEditing !== 'undefined' && isEditing) {
                 toggleEditMode();
             }
@@ -310,11 +296,10 @@
             viewUpcoming.classList.add('hidden');
             viewHistory.classList.remove('hidden');
         }
-        
-        // Animasi fade juga untuk subtab
+
         const activeView = subTabName === 'upcoming' ? viewUpcoming : viewHistory;
         activeView.classList.remove('animate-fade');
-        void activeView.offsetWidth; // Reflow
+        void activeView.offsetWidth; 
         activeView.classList.add('animate-fade');
     }
 
