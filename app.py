@@ -1,4 +1,4 @@
-from flask import Flask, session
+from flask import Flask, session, request, redirect, url_for
 from config import Config
 from models import db, Admin, Pasien
 from flask_login import LoginManager
@@ -17,7 +17,14 @@ register_routes(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login_pasien'
+# login_manager.login_view = 'auth.login_pasien'
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    if request.path.startswith('/admin'):
+        return redirect(url_for('auth.login_admin'))
+    
+    return redirect(url_for('auth.login_pasien'))
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -23,7 +23,27 @@ def homepage():
 @pasien_bp.route("/profile", methods=['GET'])
 @login_required
 def profile():
-    return render_template('profile.html', pasien=current_user)
+    try:
+        data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
+    except Exception as e:
+        current_app.logger.error(f"Error fetching reservation: {e}")
+        data_reservasi = []
+
+    upcoming = []
+    history = []
+    today = date.today()
+
+    if data_reservasi:
+        for res in data_reservasi:
+            # Pastikan field tanggal sesuai dengan model: res.tanggal_reservasi
+            
+            # Logic Upcoming: Status Aktif DAN Tanggal belum lewat
+            if res.status in ['Menunggu', 'Dikonfirmasi'] and res.tanggal_reservasi >= today:
+                upcoming.append(res)
+            else:
+                # Sisanya masuk History (Selesai, Batal, atau tanggal sudah lewat)
+                history.append(res)
+    return render_template('profile.html',upcoming=upcoming, pasien=current_user, history=history)
 
 
 @pasien_bp.route("/profile/edit", methods=['POST'])
@@ -97,6 +117,27 @@ def profile_updatepassword():
         return redirect(url_for('pasien.profile', tab='password'))
 
 
+# @pasien_bp.route("/profile/riwayat-reservasi")
+# @login_required
+# def profile_riwayat_reservasi():
+#     data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
+
+#     upcoming = []
+#     history = []
+
+#     for res in data_reservasi:
+#         # Logika pemisahan:
+#         # Upcoming = Status 'Menunggu' atau 'Dikonfirmasi' DAN Tanggal >= Hari ini
+#         # History  = Status 'Selesai', 'Batal', atau Tanggal < Hari ini
+        
+#         # Asumsi kolom di model Reservasi: res.status, res.tanggal
+#         if res.status in ['Menunggu', 'Dikonfirmasi']:
+#             upcoming.append(res)
+#         else:
+#             history.append(res)
+
+#     return redirect(url_for('pasien.profile', tab='tiket-reservasi'))
+
 @pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
 @login_required
 def form_reservasi():
@@ -150,7 +191,6 @@ def form_reservasi():
             flash(f"Gagal membuat reservasi: {msg}", "danger")
             return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
         
-        # Kirim Notifikasi
         try:
             pasien_services.notifikasiReservasi(data_pasien, reservasi)
         except Exception as e:
