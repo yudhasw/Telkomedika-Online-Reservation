@@ -9,6 +9,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
+            flash('Silakan login untuk mengakses.', 'warning')
             return redirect(url_for('auth.login_admin'))
         
         if session.get('role') != 'admin':

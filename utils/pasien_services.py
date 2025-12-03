@@ -2,6 +2,7 @@ from flask import current_app
 from flask_mail import Message
 from models import Reservasi, JadwalPemeriksaan
 from extensions import mail
+from datetime import datetime, timedelta
 
 
 def nomorUrut(jadwal_id):
@@ -27,16 +28,27 @@ def notifikasiReservasi(pasien, reservasi):
     nama_pasien = pasien.get("nama", "Pasien")
     jadwal_reservasi = pasien.get("tanggal_reservasi")
 
-    msg = Message(subject=subject, recipients=recipients)
+    try:
+        jam_mulai_dokter = reservasi.jadwalpemeriksaan.listjadwal.jam_mulai
+        waktu_start_praktek = datetime.combine(jadwal_reservasi, jam_mulai_dokter)
 
+        hasil_estimasi = waktu_start_praktek + timedelta(minutes=((reservasi.no_urut - 1) * 20))
+        perkiraan_waktu = hasil_estimasi.strftime("%H:%M")
+
+    except Exception as e:
+        current_app.logger.error(f"Gagal menghitung estimasi waktu: {e}")
+        perkiraan_waktu = "Sesuai Jadwal Praktek"
+
+    msg = Message(subject=subject, recipients=recipients)
     msg.body = (
         f"Halo {nama_pasien},\n\n"
         f"Reservasi Anda telah berhasil dibuat.\n"
-        f"ID Reservasi : {reservasi.reservasi_id}\n"
-        f"Tanggal      : {jadwal_reservasi.strftime('%d-%m-%Y')}\n"
-        f"No Antrian   : {reservasi.no_urut}\n"
-        f"Status       : {reservasi.status}\n\n"
-        f"Silakan datang minimal 5 menit sebelum jadwal.\n"
+        f"ID Reservasi  : {reservasi.reservasi_id}\n"
+        f"Tanggal       : {jadwal_reservasi.strftime('%d-%m-%Y')}\n"
+        f"No Antrian    : {reservasi.no_urut}\n"
+        f"Status        : {reservasi.status}\n"
+        f"Perkiraan Jam : {reservasi.status}\n\n"
+        f"Silakan datang minimal 15 menit sebelum jadwal.\n"
         f"Terima kasih."
     )
 
@@ -47,13 +59,14 @@ def notifikasiReservasi(pasien, reservasi):
             <li>ID Reservasi: <b>{reservasi.reservasi_id}</b></li>
             <li>Tanggal: <b>{jadwal_reservasi.strftime('%d-%m-%Y')}</b></li>
             <li>No Antrian: <b>{reservasi.no_urut}</b></li>
+            <li>Perkiraan Dilayani: <b>{perkiraan_waktu} WIB</b></li>
             <li>Status: <b>{reservasi.status}</b></li>
         </ul>
-        <p>Silakan datang minimal 5 menit sebelum jadwal. Terima kasih.</p>
+        <p><i>*Waktu di atas adalah estimasi. Mohon datang 15 menit lebih awal.</i></p>
+        <p>Terima kasih telah menggunakan layanan kami.</p>
     """
     
     try:
         mail.send(msg)
     except Exception as e:
         current_app.logger.error(f"Gagal mengirim email: {e}")
-        raise e

@@ -118,7 +118,7 @@
                             <a href="{{ url_for('pasien.profile') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
                                 <i class="fas fa-user-circle mr-3 w-5 text-center text-gray-400 group-hover:text-tm-red"></i> Profil Saya
                             </a>
-                            <a href="{{ url_for('pasien.profile_updatepassword') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
+                            <a href="{{ url_for('pasien.profile', tab='password') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
                                 <i class="fas fa-key mr-3 w-5 text-center text-gray-400 group-hover:text-tm-red"></i> Ubah Password
                             </a>
                             <a href="{{ url_for('pasien.profile', tab='tickets') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">

@@ -6,13 +6,23 @@ from extensions import mail
 from routes import register_routes
 
 app = Flask(__name__)
+
 app.config.from_object(Config)
+
+app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'telkomedikahealth@gmail.com' 
+app.config['MAIL_PASSWORD'] = 'vyodujokyeqzfcos' 
+app.config['MAIL_DEFAULT_SENDER'] = ('TelkoMedika System', 'telkomedikahealth@gmail.com')
 
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 db.init_app(app)
 mail.init_app(app)
+
 register_routes(app)
 
 login_manager = LoginManager()

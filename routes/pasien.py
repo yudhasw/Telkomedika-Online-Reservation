@@ -4,13 +4,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import Reservasi, JadwalPemeriksaan, Pasien, ListJadwal, Poliklinik, Dokter, db
 from datetime import date
 from utils import pasien_services
+from extensions import admin_required, pasien_required
 
 
 pasien_bp = Blueprint("pasien", __name__)
 
 
 @pasien_bp.route("/home")
-@login_required
+@pasien_required
 def homepage():
     try:
         pasien = current_user
@@ -21,7 +22,7 @@ def homepage():
 
 
 @pasien_bp.route("/profile", methods=['GET'])
-@login_required
+@pasien_required
 def profile():
     try:
         data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
@@ -47,7 +48,7 @@ def profile():
 
 
 @pasien_bp.route("/profile/edit", methods=['POST'])
-@login_required
+@pasien_required
 def profile_edit():
     pasien = Pasien.query.get(current_user.pasien_id)
     
@@ -83,7 +84,7 @@ def profile_edit():
 
 
 @pasien_bp.route("/profile/change-password", methods=['POST'])
-@login_required
+@pasien_required
 def profile_updatepassword():
     pasien = Pasien.query.get(current_user.pasien_id)
     
@@ -139,7 +140,7 @@ def profile_updatepassword():
 #     return redirect(url_for('pasien.profile', tab='tiket-reservasi'))
 
 @pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
-@login_required
+@pasien_required
 def form_reservasi():
     pasien = current_user
 
