@@ -19,3 +19,9 @@ params = urllib.parse.quote_plus(
 SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = "2hVPX6kZ5Q"
+
+MAIL_USERNAME = 'yudha.sw2006@gmail.com'
+MAIL_PASSWORD = 'epfi qbva jmrr prrc'
+MAIL_SERVER= 'smtp.gmail.com'
+MAIL_PORT=587
+MAIL_USE_TLS=True

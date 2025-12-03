@@ -1,5 +1,5 @@
 from flask import Flask, session
-from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
+from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY, MAIL_USERNAME, MAIL_PASSWORD, MAIL_SERVER, MAIL_PORT, MAIL_USE_TLS
 from models import db, Admin, Pasien
 from flask_login import LoginManager
 from extensions import mail
@@ -18,6 +18,12 @@ register_routes(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'auth.login_pasien'
+
+app.config['MAIL_SERVER'] = MAIL_SERVER
+app.config['MAIL_PORT'] = MAIL_PORT
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
 
 mail.init_app(app)
 
