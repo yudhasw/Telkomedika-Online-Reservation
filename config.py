@@ -21,3 +21,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = "2hVPX6kZ5Q"
+
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'telkomedikahealth@gmail.com'
+    MAIL_PASSWORD = 'vyodujokyeqzfcos'
+    MAIL_DEFAULT_SENDER = ('TelkoMedika System', 'telkomedikahealth@gmail.com')
