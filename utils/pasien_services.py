@@ -2,7 +2,7 @@ from flask import current_app
 from flask_mail import Message
 from models import Reservasi, JadwalPemeriksaan
 from extensions import mail
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 
 def nomorUrut(jadwal_id):
@@ -70,3 +70,18 @@ def notifikasiReservasi(pasien, reservasi):
         mail.send(msg)
     except Exception as e:
         current_app.logger.error(f"Gagal mengirim email: {e}")
+
+def get_next_date(hari_target):
+    days_map = {'Senin': 0, 'Selasa': 1, 'Rabu': 2, 'Kamis': 3, 'Jumat': 4, 'Sabtu': 5, 'Minggu': 6}
+    
+    today = date.today()
+    target_day_idx = days_map.get(hari_target, 0)
+    current_day_idx = today.weekday()
+    
+    days_ahead = target_day_idx - current_day_idx
+    
+    if days_ahead <= 0: 
+        days_ahead += 7
+        
+    next_date = today + timedelta(days=days_ahead)
+    return next_date.strftime('%Y-%m-%d')

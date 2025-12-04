@@ -112,7 +112,6 @@ def logout():
     return redirect(url_for("auth.login_pasien"))
 
 @auth_bp.route('/login/forgot-password')
-@login_required
 def forgot_password(user):
    
    return render_template('forgotPassword.html')

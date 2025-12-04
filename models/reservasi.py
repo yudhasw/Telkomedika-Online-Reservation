@@ -36,6 +36,14 @@ class Reservasi(db.Model):
     
     return None
 
+  def set_status(self, status):
+    try:
+      self.status = status
+      db.session.commit()
+      return True, None
+    except Exception as e:
+      db.session.rollback()
+      return False, str(e)
 
   def findAll():
     # logic disini

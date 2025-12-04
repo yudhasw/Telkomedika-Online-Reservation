@@ -31,10 +31,10 @@ class JadwalPemeriksaan(db.Model):
       return sisa if sisa > 0 else 0
 
   @classmethod
-  def get_filtered_data(cls, poli_id, tanggal_str):
+  def get_filtered_data(cls, poli_id=None, tanggal_str=None):
         if not tanggal_str:
-          return []
-      
+            return []
+
         try:
             tanggal_obj = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
         except ValueError:
@@ -43,18 +43,45 @@ class JadwalPemeriksaan(db.Model):
         days_map = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
         nama_hari = days_map[tanggal_obj.weekday()]
 
-        query = db.session.query(cls).join(
-              ListJadwal, cls.listjadwal_id == ListJadwal.listjadwal_id
-          ).join(
-              Dokter, ListJadwal.dokter_id == Dokter.dokter_id
-          ).join(
-              Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
-          ).filter(     
-              ListJadwal.hari == nama_hari
-          )
-    
+        query_template = ListJadwal.query.filter_by(hari=nama_hari)
+        
         if poli_id:
-          query = query.filter(ListJadwal.poliklinik_id == poli_id)
+            query_template = query_template.filter_by(poliklinik_id=poli_id)
+            
+        templates = query_template.all()
+
+        jadwal_baru_dibuat = False
+        
+        for template in templates:
+            existing_jadwal = cls.query.filter_by(
+                listjadwal_id=template.listjadwal_id,
+                tanggal=tanggal_obj
+            ).first()
+
+            if not existing_jadwal:
+                new_jadwal = cls(
+                    listjadwal_id=template.listjadwal_id,
+                    tanggal=tanggal_obj,
+                    kuota=10 
+                )
+                db.session.add(new_jadwal)
+                jadwal_baru_dibuat = True
+        
+        if jadwal_baru_dibuat:
+            db.session.commit()
+
+        query = db.session.query(cls).join(
+            ListJadwal, cls.listjadwal_id == ListJadwal.listjadwal_id
+        ).join(
+            Dokter, ListJadwal.dokter_id == Dokter.dokter_id
+        ).join(
+            Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
+        ).filter(
+            cls.tanggal == tanggal_obj
+        )
+
+        if poli_id:
+            query = query.filter(ListJadwal.poliklinik_id == poli_id)
 
         return query.order_by(ListJadwal.jam_mulai.asc()).all()
 
