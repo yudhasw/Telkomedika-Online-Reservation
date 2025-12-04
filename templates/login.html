@@ -49,6 +49,11 @@
                 </div>
                 {% endif %}
             {% endwith %}
+                <div class="flex justify-end mb-4">
+                    <a href="{{ url_for('auth.forgot_password') }}" class="text-sm font-medium text-tm-red hover:underline">
+                        Lupa Password?
+                    </a>
+                </div>
                 <div class="pt-4">
                     <button type="submit" class="w-full h-14 bg-tm-red text-white text-lg font-bold rounded-full shadow-lg hover:bg-red-700 transition transform-gpu hover:scale-[1.01] active:scale-95">
                         Login
