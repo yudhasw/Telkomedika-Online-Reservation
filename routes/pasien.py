@@ -1,16 +1,17 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import current_user, login_required
-from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Reservasi, JadwalPemeriksaan, Pasien, ListJadwal, Poliklinik, Dokter, db
-from datetime import date, datetime
-from extensions import mail
+from datetime import date
+from utils import pasien_services
+from extensions import admin_required, pasien_required
+
 
 pasien_bp = Blueprint("pasien", __name__)
 
 
 @pasien_bp.route("/home")
-@login_required
+@pasien_required
 def homepage():
     try:
         pasien = current_user
@@ -21,13 +22,33 @@ def homepage():
 
 
 @pasien_bp.route("/profile", methods=['GET'])
-@login_required
+@pasien_required
 def profile():
-    return render_template('profile.html', pasien=current_user)
+    try:
+        data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
+    except Exception as e:
+        current_app.logger.error(f"Error fetching reservation: {e}")
+        data_reservasi = []
+
+    upcoming = []
+    history = []
+    today = date.today()
+
+    if data_reservasi:
+        for res in data_reservasi:
+            # Pastikan field tanggal sesuai dengan model: res.tanggal_reservasi
+            
+            # Logic Upcoming: Status Aktif DAN Tanggal belum lewat
+            if res.status in ['Menunggu', 'Dikonfirmasi'] and res.tanggal_reservasi >= today:
+                upcoming.append(res)
+            else:
+                # Sisanya masuk History (Selesai, Batal, atau tanggal sudah lewat)
+                history.append(res)
+    return render_template('profile.html',upcoming=upcoming, pasien=current_user, history=history)
 
 
 @pasien_bp.route("/profile/edit", methods=['POST'])
-@login_required
+@pasien_required
 def profile_edit():
     pasien = Pasien.query.get(current_user.pasien_id)
     
@@ -63,7 +84,7 @@ def profile_edit():
 
 
 @pasien_bp.route("/profile/change-password", methods=['POST'])
-@login_required
+@pasien_required
 def profile_updatepassword():
     pasien = Pasien.query.get(current_user.pasien_id)
     
@@ -97,8 +118,29 @@ def profile_updatepassword():
         return redirect(url_for('pasien.profile', tab='password'))
 
 
+# @pasien_bp.route("/profile/riwayat-reservasi")
+# @login_required
+# def profile_riwayat_reservasi():
+#     data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
+
+#     upcoming = []
+#     history = []
+
+#     for res in data_reservasi:
+#         # Logika pemisahan:
+#         # Upcoming = Status 'Menunggu' atau 'Dikonfirmasi' DAN Tanggal >= Hari ini
+#         # History  = Status 'Selesai', 'Batal', atau Tanggal < Hari ini
+        
+#         # Asumsi kolom di model Reservasi: res.status, res.tanggal
+#         if res.status in ['Menunggu', 'Dikonfirmasi']:
+#             upcoming.append(res)
+#         else:
+#             history.append(res)
+
+#     return redirect(url_for('pasien.profile', tab='tiket-reservasi'))
+
 @pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
-@login_required
+@pasien_required
 def form_reservasi():
     pasien = current_user
 
@@ -112,6 +154,13 @@ def form_reservasi():
 
     if request.method == 'POST':
         jadwal_id = request.form.get('jadwal_id')
+        data_pasien = {
+            "nama"  : request.form.get('nama'),
+            "email"  : request.form.get('email'),
+            "phone"  : request.form.get('telepon'),
+            "tanggal_pelayanan"  : request.form.get('tanggal-pelayanan'),
+            "tanggal_reservasi"  : date.today(),
+        }
 
         # Validasi Input
         if not jadwal_id:
@@ -120,7 +169,7 @@ def form_reservasi():
 
         # Cek Ketersediaan Nomor Urut
         try:
-            no_urut = nomorUrut(jadwal_id) 
+            no_urut = pasien_services.nomorUrut(jadwal_id) 
         except Exception as e:
             current_app.logger.error(f"Gagal mendapatkan nomor urut: {e}")
             flash('Terjadi kesalahan sistem saat mengambil nomor antrian.', 'danger')
@@ -143,9 +192,8 @@ def form_reservasi():
             flash(f"Gagal membuat reservasi: {msg}", "danger")
             return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
         
-        # Kirim Notifikasi
         try:
-            notifikasiReservasi(pasien, reservasi)
+            pasien_services.notifikasiReservasi(data_pasien, reservasi)
         except Exception as e:
             current_app.logger.error(f"Gagal mengirim email: {e}")
             flash("Reservasi berhasil, namun notifikasi email gagal terkirim.", "warning")
@@ -161,51 +209,6 @@ def form_reservasi():
         tanggal=tanggal_str
     )
 
-def nomorUrut(jadwal_id):
-    jadwal = JadwalPemeriksaan.query.get(jadwal_id)
-    current_nomor_urut = Reservasi.query.filter_by(
-        jadwal_id=jadwal_id
-    ).count()
-    if current_nomor_urut < jadwal.kuota:
-        return current_nomor_urut+1
-    return None
-
-def notifikasiReservasi(pasien, reservasi):
-    if not getattr(pasien, "email", None):
-        current_app.logger.warning(
-            f"Pasien {pasien.pasien_id} tidak punya email, email tidak dikirim."
-        )
-        return
-
-    subject = "Konfirmasi Reservasi Pemeriksaan"
-    recipients = [pasien.email]
-
-    msg = Message(subject=subject, recipients=recipients)
-
-    msg.body = (
-        f"Halo {pasien.nama},\n\n"
-        f"Reservasi Anda telah berhasil dibuat.\n"
-        f"ID Reservasi : {reservasi.reservasi_id}\n"
-        f"Tanggal      : {reservasi.tanggal.strftime('%d-%m-%Y')}\n"
-        f"No Antrian   : {reservasi.no_urut}\n"
-        f"Status       : {reservasi.status}\n\n"
-        f"Silakan datang sesuai jadwal.\n"
-        f"Terima kasih."
-    )
-
-    msg.html = f"""
-        <p>Halo <b>{pasien.nama}</b>,</p>
-        <p>Reservasi Anda telah <b>berhasil dibuat</b> dengan detail:</p>
-        <ul>
-            <li>ID Reservasi: <b>{reservasi.reservasi_id}</b></li>
-            <li>Tanggal: <b>{reservasi.tanggal_reservasi.strftime('%d-%m-%Y')}</b></li>
-            <li>No Antrian: <b>{reservasi.no_urut}</b></li>
-            <li>Status: <b>{reservasi.status}</b></li>
-        </ul>
-        <p>Silakan datang sesuai jadwal. Terima kasih.</p>
-    """
-
-    mail.send(msg)
 
 @pasien_bp.route('/jadwal-dokter')
 def jadwal_dokter():

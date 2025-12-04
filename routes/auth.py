@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Admin, Pasien
 from utils import auth_services
+from extensions import admin_required
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -41,7 +42,7 @@ def register():
         
         try:
             password_hash = generate_password_hash(cleaned['password'])
-            
+
             Pasien.create(
                 nama=cleaned['nama'], 
                 email=cleaned['email'], 
@@ -82,13 +83,13 @@ def login_pasien():
   return render_template('login.html')
 
 @auth_bp.route('/login-admin')
+@admin_required
 def login_admin():
   if request.method == "POST":
     email = request.form.get('email')
     password = request.form.get('password')
 
     user = Admin.query.filter_by(email=email).first()
-    role = 'admin'
 
     if user and check_password_hash(user.password_hash, password):
        session["role"] = "admin"
@@ -111,6 +112,7 @@ def logout():
     return redirect(url_for("auth.login_pasien"))
 
 @auth_bp.route('/login/forgot-password')
+@login_required
 def forgot_password(user):
    
    return render_template('forgotPassword.html')

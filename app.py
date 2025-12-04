@@ -1,25 +1,32 @@
-from flask import Flask, session
-from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, SECRET_KEY
+from flask import Flask, session, request, redirect, url_for
+from config import Config
 from models import db, Admin, Pasien
 from flask_login import LoginManager
 from extensions import mail
 from routes import register_routes
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = SQLALCHEMY_TRACK_MODIFICATIONS
-app.config["SECRET_KEY"] = SECRET_KEY
+
+app.config.from_object(Config)
+
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
 db.init_app(app)
+mail.init_app(app)
+
 register_routes(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'auth.login_pasien'
+# login_manager.login_view = 'auth.login_pasien'
 
-mail.init_app(app)
+@login_manager.unauthorized_handler
+def unauthorized():
+    if request.path.startswith('/admin'):
+        return redirect(url_for('auth.login_admin'))
+    
+    return redirect(url_for('auth.login_pasien'))
 
 @login_manager.user_loader
 def load_user(user_id):

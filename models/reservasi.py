@@ -26,6 +26,15 @@ class Reservasi(db.Model):
     except SQLAlchemyError as e:
       db.session.rollback
       return None, str(e)
+  
+  def get_reservation_data(pasien_id):
+    data = Reservasi.query.filter_by(pasien_id=pasien_id)\
+        .order_by(Reservasi.tanggal_reservasi.desc()).all()
+
+    if data:
+      return data
+    
+    return None
 
 
   def findAll():

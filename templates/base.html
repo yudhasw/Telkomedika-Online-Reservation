@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Telkomedika{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/telkomedika-logo-mini.png') }}" type="image/x-icon">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -54,7 +55,6 @@
 <body class="font-sans text-gray-800 bg-white flex flex-col min-h-screen">
   <header class="sticky top-0 z-50 bg-white w-full border-b border-gray-100 shadow-sm">
     <nav class="sticky container mx-auto px-6 py-3 flex items-center bg-white">
-        
         <div class="flex items-center mr-12">
           {% if request.endpoint not in ['auth.login_pasien', 'auth.register'] %}
             <a href="{{ url_for('pasien.homepage') }}">
@@ -99,10 +99,48 @@
         </div>
         <div class="ml-auto">
             {% if current_user.is_authenticated %}
-                <span class="text-gray-600 mr-4 text-sm font-medium">Halo, {{ current_user.nama }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="text-tm-red font-medium hover:underline text-sm border border-tm-red px-5 py-2 rounded-full hover:bg-tm-red hover:text-white transition">Logout</a>
+                <div class="relative group h-full flex items-center">  
+                    <button class="flex items-center gap-3 focus:outline-none h-full">
+                        <div class="hidden md:flex items-center gap-2 text-right">
+                            <span class="text-sm font-bold text-gray-800">{{ current_user.nama }}</span>
+                            <i class="fas fa-caret-down text-xs text-gray-500 pb-0.5"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow-md border-2 border-white">
+                            <i class="fas fa-user text-lg"></i>
+                        </div>
+                    </button>
+                    <div class="absolute right-0 top-full w-60 pt-4 hidden group-hover:block z-50 animate-fade-in-down">  
+                        <div class="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">      
+                            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                                <p class="text-sm text-gray-900 font-bold truncate">{{ current_user.nama }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ current_user.email }}</p>
+                            </div>
+                            <a href="{{ url_for('pasien.profile') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
+                                <i class="fas fa-user-circle mr-3 w-5 text-center text-gray-400 group-hover:text-tm-red"></i> Profil Saya
+                            </a>
+                            <a href="{{ url_for('pasien.profile', tab='password') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
+                                <i class="fas fa-key mr-3 w-5 text-center text-gray-400 group-hover:text-tm-red"></i> Ubah Password
+                            </a>
+                            <a href="{{ url_for('pasien.profile', tab='tickets') }}" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red transition flex items-center">
+                                <i class="fas fa-receipt mr-3 w-5 text-center text-gray-400 group-hover:text-tm-red"></i> Riwayat Reservasi
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-tm-red font-bold hover:bg-red-50 transition flex items-center">
+                                <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Keluar
+                            </a>
+                        </div>
+                    </div>
+                </div>
             {% else %}
-                <a href="{{ url_for('auth.login_pasien') }}" class="bg-tm-red text-white px-6 py-2.5 rounded-full font-medium hover:bg-red-700 transition shadow-md">Login</a>
+                <a href="{{ url_for('auth.register') }}" 
+                   class="text-gray-600 hover:text-tm-red font-medium text-sm transition px-4 py-2">
+                   Daftar
+                </a>
+
+                <a href="{{ url_for('auth.login_pasien') }}" 
+                   class="bg-tm-red text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-red-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                   Masuk
+                </a>
             {% endif %}
         </div>
 
