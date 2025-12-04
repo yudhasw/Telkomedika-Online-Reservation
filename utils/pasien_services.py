@@ -1,8 +1,10 @@
+import re
 from flask import current_app
 from flask_mail import Message
 from models import Reservasi, JadwalPemeriksaan
 from extensions import mail
 from datetime import datetime, timedelta, date
+from models import Admin, Pasien
 
 
 def nomorUrut(jadwal_id):
@@ -85,3 +87,88 @@ def get_next_date(hari_target):
         
     next_date = today + timedelta(days=days_ahead)
     return next_date.strftime('%Y-%m-%d')
+
+def validate_profile_update(data, current_user_id):
+    errors = {
+        "nama": None,
+        "email": None,
+        "phone": None,
+        "tanggal_lahir": None,
+        "jenis_kelamin": None
+    }
+
+    cleaned = {
+        "nama": (data.get("nama") or "").strip(),
+        "email": (data.get("email") or "").strip(),
+        "phone": (data.get("nomor_hp") or ""),
+        "tgl_lahir": (data.get("tanggal_lahir") or ""),
+        "jenis_kelamin": (data.get("jenis_kelamin") or ""),
+    }
+
+    nama = cleaned["nama"]
+    if not nama:
+        errors["nama"] = "Nama tidak boleh kosong."
+    elif len(nama) < 3:
+        errors["nama"] = "Nama minimal 3 karakter."
+
+    email = cleaned["email"]
+    if not email:
+        errors["email"] = "Email tidak boleh kosong."
+    elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        errors["email"] = "Format email tidak valid."
+    else:
+        existing_user = Pasien.query.filter_by(email=email).first()
+        if existing_user and existing_user.pasien_id != current_user_id:
+            errors["email"] = "Email sudah digunakan oleh pengguna lain."
+
+    phone = cleaned["phone"]
+    if not phone:
+        errors["phone"] = "Nomor Hp tidak boleh kosong."
+    else:
+        phone = phone.strip().replace(" ", "").replace("-", "")
+        cleaned["phone"] = phone
+
+        if not re.match(r"^(08\d{8,13}|\+628\d{7,12})$", phone):
+            errors["phone"] = "Format nomor HP tidak valid (contoh: 0812...)"
+        elif re.search(r"[A-Za-z]", phone):
+            errors["phone"] = "Nomor HP harus berupa angka"
+
+    if not cleaned["tgl_lahir"]:
+        errors["tanggal_lahir"] = "Tanggal lahir wajib diisi."
+    
+    if not cleaned["jenis_kelamin"]:
+        errors["jenis_kelamin"] = "Jenis kelamin wajib dipilih."
+
+    if any(value is not None for value in errors.values()):
+        return False, errors, cleaned
+    
+    return True, errors, cleaned
+
+def validate_manual_reservation(data):
+
+    errors = []
+
+    nama = (data.get("nama") or "").strip()
+    if not nama:
+        errors.append("Nama pasien wajib diisi.")
+    elif len(nama) < 3:
+        errors.append("Nama pasien minimal 3 karakter.")
+
+    email = (data.get("email") or "").strip()
+    if not email:
+        errors.append("Email wajib diisi untuk pengiriman tiket.")
+    elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        errors.append("Format email tidak valid.")
+
+    phone = (data.get("phone") or "").strip().replace(" ", "").replace("-", "")
+    if not phone:
+        errors.append("Nomor HP wajib diisi.")
+    elif not re.match(r"^(08\d{8,13}|\+628\d{7,12})$", phone):
+        errors.append("Format nomor HP tidak valid (Gunakan 08xx atau +628xx).")
+    elif re.search(r"[A-Za-z]", phone):
+        errors.append("Nomor HP harus berupa angka.")
+
+    if errors:
+        return False, errors
+    
+    return True, []

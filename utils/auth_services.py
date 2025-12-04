@@ -2,6 +2,31 @@ import re
 from models import Admin, Pasien
 from extensions import mail, Message
 
+
+def validate_password_strength(password, confirm_password):
+    if not password:
+        return False, "Password tidak boleh kosong."
+    
+    if len(password) < 8:
+        return False, "Password minimal 8 karakter."
+    
+    if not re.search(r"[0-9]", password):
+        return False, "Password harus mengandung minimal 1 angka."
+    
+    if not re.search(r"[A-Z]", password):
+        return False, "Password harus mengandung huruf kapital."
+    
+    if not re.search(r"[a-z]", password):
+        return False, "Password harus mengandung huruf kecil."
+    
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False, "Password harus mengandung minimal 1 simbol unik (!@#$%)."
+
+    if password != confirm_password:
+        return False, "Konfirmasi password tidak cocok."
+
+    return True, None
+
 def validate_register(data):
     errors = {
         "nama" : None,
@@ -35,13 +60,9 @@ def validate_register(data):
     elif Pasien.query.filter_by(email=email).first():
         errors["email"] = "Email sudah digunakan."
 
-    password = cleaned["password"]
-    if not password:
-        errors["password"] = "Password tidak boleh kosong."
-    elif len(password) < 8:
-        errors["password"] = "Password minimal 8 karakter."
-    elif not re.search(r"[0-9]", password):
-        errors["password"] = "Password harus berisi minimal 1 angka."
+    is_pass_valid, pass_error = validate_password_strength(cleaned["password"], cleaned["confirm"])
+    if not is_pass_valid:
+        errors["password"] = pass_error
     
     phone = cleaned["phone"]
     if not phone:
@@ -55,9 +76,6 @@ def validate_register(data):
         elif re.search(r"[A-Za-z]", phone):  
              errors["phone"] = "Nomor HP harus berupa angka"
 
-    confirm_password = cleaned["confirm"]
-    if password != confirm_password:
-        errors["confirm"] = "Konfirmasi password tidak cocok."
 
     if any(value is not None for value in errors.values()):
         return False, errors, cleaned
@@ -71,7 +89,10 @@ def send_otp_email(target_email, otp_code, kategori='register'):
         if kategori == 'login':
             intro = "Kami mendeteksi percobaan masuk ke akun TelkoMedika Anda."
             action_msg = "Gunakan kode berikut untuk menyelesaikan proses Login:"
-        else:
+        elif kategori == 'reset':
+            intro = "Kami menerima permintaan untuk mereset kata sandi akun Anda."
+            action_msg = "Gunakan kode berikut untuk melanjutkan proses reset password:"
+        else: 
             intro = "Terima kasih telah mendaftar di TelkoMedika."
             action_msg = "Gunakan kode berikut untuk memverifikasi pendaftaran akun Anda:"
 

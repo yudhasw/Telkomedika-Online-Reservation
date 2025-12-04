@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+import random
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
 from flask_login import current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Reservasi, JadwalPemeriksaan, Pasien, ListJadwal, Poliklinik, Dokter, db
-from datetime import date
-from utils import pasien_services
+from datetime import date, datetime, timedelta
+from utils import pasien_services, auth_services
 from extensions import pasien_required
 
 
@@ -48,18 +49,45 @@ def profile():
 def profile_edit():
     pasien = Pasien.query.get(current_user.pasien_id)
     
-    nama = request.form.get('nama')
-    email = request.form.get('email')
-    nomor_hp = request.form.get('nomor_hp')
-    jenis_kelamin = request.form.get('jenis_kelamin')
-    tanggal_lahir = request.form.get('tanggal_lahir')
+    data = {
+        "nama": request.form.get('nama'),
+        "email": request.form.get('email'),
+        "nomor_hp": request.form.get('nomor_hp'),
+        "jenis_kelamin": request.form.get('jenis_kelamin'),
+        "tanggal_lahir": request.form.get('tanggal_lahir')
+    }
+    is_valid, errors, cleaned_data = pasien_services.validate_profile_update(data, current_user.pasien_id)
 
+    if not is_valid:
+        for err_msg in errors.values():
+            if err_msg:
+                flash(f"{err_msg}", "danger")
+        
+        return redirect(url_for('pasien.profile', tab='edit'))
     try:
-        pasien.nama = nama
-        pasien.email = email
-        pasien.nomor_hp = nomor_hp
-        pasien.jenis_kelamin = jenis_kelamin
-        pasien.tanggal_lahir = tanggal_lahir
+        pasien.nama = cleaned_data['nama']
+        pasien.nomor_hp = cleaned_data['phone']
+        pasien.jenis_kelamin = cleaned_data['jenis_kelamin']
+        pasien.tanggal_lahir = cleaned_data['tgl_lahir']
+
+        new_email = cleaned_data['email']
+
+        if new_email != pasien.email:
+            otp_code = str(random.randint(1000, 9999))
+  
+            session['pending_new_email'] = new_email
+            session['change_email_otp'] = otp_code
+            session['change_email_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
+            
+            if auth_services.send_otp_email(new_email, otp_code, 'register'): 
+                db.session.commit()
+                
+                flash("Kami mengirimkan kode verifikasi ke email baru Anda. Mohon verifikasi untuk menyimpan perubahan email.", "info")
+                return redirect(url_for('auth.verify_email_change'))
+            else:
+                db.session.rollback()
+                flash("Gagal mengirim kode verifikasi ke email baru.", "danger")
+                return redirect(url_for('pasien.profile', tab='edit'))
         
         db.session.commit()
         flash("Profil berhasil diperbarui.", "success")
@@ -87,12 +115,10 @@ def profile_updatepassword():
         flash("Password lama salah.", "danger")
         return redirect(url_for('pasien.profile', tab='password'))
 
-    if new_pass != conf_pass:
-        flash("Konfirmasi password tidak cocok.", "danger")
-        return redirect(url_for('pasien.profile', tab='password'))
-        
-    if len(new_pass) < 8:
-        flash("Password baru minimal 8 karakter.", "danger")
+    strong, err_msg = auth_services.validate_password_strength(new_pass, conf_pass)
+
+    if not strong:
+        flash(err_msg, 'danger')
         return redirect(url_for('pasien.profile', tab='password'))
 
     try:
@@ -113,7 +139,6 @@ def profile_updatepassword():
 @pasien_required
 def form_reservasi():
     pasien = current_user
-
     poli_id = request.args.get('poli_id')
     tanggal_str = request.args.get('tanggal')
     jadwal = []
@@ -126,10 +151,18 @@ def form_reservasi():
         data_pasien = {
             "nama"  : request.form.get('nama'),
             "email"  : request.form.get('email'),
-            "phone"  : request.form.get('telepon'),
+            "phone"  : request.form.get('nomor_hp'),
             "tanggal_pelayanan"  : request.form.get('tanggal-pelayanan'),
-            "tanggal_reservasi"  : date.today(),
+            "tanggal_reservasi"  : request.form.get('tanggal-pelayanan'),
         }
+
+        is_valid, error_list = pasien_services.validate_manual_reservation(data_pasien)
+
+        if not is_valid:
+            for err in error_list:
+                if err:
+                    flash(err, 'danger')
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
 
         if not jadwal_id:
             flash('Silakan pilih jadwal terlebih dahulu.', 'warning')

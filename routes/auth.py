@@ -3,9 +3,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import Admin, Pasien
+from models import Admin, Pasien, db
 from utils import auth_services
-from extensions import admin_required, mail, Message
+from extensions import admin_required, pasien_required, mail, Message
 from datetime import datetime, timedelta
 
 auth_bp = Blueprint("auth", __name__)
@@ -274,7 +274,164 @@ def logout():
 
     return redirect(url_for("auth.login_pasien"))
 
-@auth_bp.route('/login/forgot-password')
-def forgot_password(user):
+@auth_bp.route('/forgot-password', methods=["GET", "POST"])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = Pasien.query.filter_by(email=email).first()
+        
+        if user:
+            otp_code = str(random.randint(1000, 9999))
+            
+            session['reset_email'] = email
+            session['reset_otp'] = otp_code
+            session['reset_otp_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
+            
+            if auth_services.send_otp_email(email, otp_code, 'login'): 
+                flash('Kode OTP untuk reset password telah dikirim.', 'info')
+                return redirect(url_for('auth.verify_forgot_otp'))
+            else:
+                flash('Gagal mengirim email.', 'danger')
+        else:
+            flash('Email tidak ditemukan.', 'danger')
+            
+    return render_template('forgotPassword.html')  
    
-   return render_template('forgotPassword.html')
+@auth_bp.route('/forgot-password/verify', methods=['GET', 'POST'])
+def verify_forgot_otp():
+    email = session.get('reset_email')
+    if not email:
+        return redirect(url_for('auth.forgot_password'))
+
+    if request.method == 'POST':
+        input_otp = request.form.get('otp_full')
+        real_otp = session.get('reset_otp')
+        expired_at = session.get('reset_otp_expired')
+        
+        if datetime.now().timestamp() > expired_at:
+            flash('OTP Kadaluarsa.', 'danger')
+            return redirect(url_for('auth.forgot_password'))
+            
+        if input_otp == real_otp:
+            session['reset_verified'] = True 
+            return redirect(url_for('auth.reset_password_form'))
+        else:
+            flash('Kode OTP Salah.', 'danger')
+
+    return render_template(
+        'verify_otp.html',
+        email=email,
+        target_url=url_for('auth.verify_forgot_otp'),
+        resend_url=url_for('auth.resend_forgot_otp')
+    )
+
+@auth_bp.route('/forgot-password/resend')
+def resend_forgot_otp():
+    email = session.get('reset_email')
+    if email:
+        new_otp = str(random.randint(1000, 9999))
+        session['reset_otp'] = new_otp
+        session['reset_otp_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
+        
+        auth_services.send_otp_email(email, new_otp, 'login')
+        flash("Kode OTP baru dikirim.", "success")
+        return redirect(url_for('auth.verify_forgot_otp'))
+    return redirect(url_for('auth.forgot_password'))
+
+@auth_bp.route('/reset-password', methods=['GET', 'POST'])
+def reset_password_form():
+    if not session.get('reset_verified') or not session.get('reset_email'):
+        return redirect(url_for('auth.forgot_password'))
+        
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm = request.form.get('confirm_password')
+
+        is_valid, error_msg = auth_services.validate_password_strength(password, confirm)
+        
+        if not is_valid:
+            flash(error_msg, 'danger')
+            return render_template('resetPassword.html')
+        
+        email = session.get('reset_email')
+        user = Pasien.query.filter_by(email=email).first()
+
+        if user:
+            try:
+                hashed_password = generate_password_hash(password)
+                success = user.set_password(hashed_password)
+                if success:
+                    session.pop('reset_email', None)
+                    session.pop('reset_otp', None)
+                    session.pop('reset_otp_expired', None)
+                    session.pop('reset_verified', None)
+
+                    flash('Password berhasil diubah. Silakan login dengan password baru.', 'success')
+                    return redirect(url_for('auth.login_pasien'))
+                else:
+                    flash("Terjadi kesalahan saat mengubah password.", "danger")
+            except Exception as e:
+                flash("Terjadi kesalahan database.", "danger")
+        else:
+            flash('Email anda tidak ditemukan.', 'danger')
+
+    return render_template('resetPassword.html')
+
+@auth_bp.route("/profile/verify-email", methods=["GET", "POST"])
+@pasien_required 
+def verify_email_change():
+    pending_email = session.get('pending_new_email')
+    
+    if not pending_email:
+        flash("Tidak ada permintaan ganti email.", "warning")
+        return redirect(url_for('pasien.profile'))
+
+    if request.method == "POST":
+        input_otp = request.form.get("otp_full")
+        real_otp = session.get("change_email_otp")
+        expired_at = session.get("change_email_expired")
+        
+        if datetime.now().timestamp() > expired_at:
+            flash("OTP Kadaluarsa. Silakan ulang proses edit profil.", "danger")
+            return redirect(url_for('pasien.profile', tab='edit'))
+
+        if input_otp == real_otp:
+            try:
+                user = Pasien.query.get(current_user.pasien_id)
+                user.email = pending_email 
+                db.session.commit()
+
+                session.pop('pending_new_email', None)
+                session.pop('change_email_otp', None)
+                session.pop('change_email_expired', None)
+                
+                flash("Email berhasil diubah!", "success")
+                return redirect(url_for('pasien.profile', tab='profile'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Gagal menyimpan email baru: {e}", "danger")
+                return redirect(url_for('pasien.profile', tab='edit'))
+        else:
+            flash("Kode OTP Salah.", "danger")
+
+    return render_template(
+        'verify_otp.html',
+        email=pending_email, 
+        target_url=url_for('auth.verify_email_change'),
+        resend_url=url_for('auth.resend_email_change_otp') 
+    )
+
+@auth_bp.route("/profile/resend-email-otp")
+@login_required
+def resend_email_change_otp():
+    pending_email = session.get('pending_new_email')
+    if pending_email:
+        new_otp = str(random.randint(1000, 9999))
+        session['change_email_otp'] = new_otp
+        session['change_email_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
+  
+        auth_services.send_otp_email(pending_email, new_otp, 'register')
+        flash("Kode OTP baru dikirim ke email baru Anda.", "success")
+        return redirect(url_for('auth.verify_email_change'))
+    
+    return redirect(url_for('pasien.profile'))
