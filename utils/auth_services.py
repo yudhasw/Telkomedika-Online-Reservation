@@ -1,5 +1,6 @@
 import re
 from models import Admin, Pasien
+from extensions import mail, Message
 
 def validate_register(data):
     errors = {
@@ -62,6 +63,39 @@ def validate_register(data):
         return False, errors, cleaned
     
     return True, errors, cleaned
+
+def send_otp_email(target_email, otp_code, kategori='register'):
+    try:
+        subject = "Kode Verifikasi (OTP) - TelkoMedika"
+ 
+        if kategori == 'login':
+            intro = "Kami mendeteksi percobaan masuk ke akun TelkoMedika Anda."
+            action_msg = "Gunakan kode berikut untuk menyelesaikan proses Login:"
+        else:
+            intro = "Terima kasih telah mendaftar di TelkoMedika."
+            action_msg = "Gunakan kode berikut untuk memverifikasi pendaftaran akun Anda:"
+
+        msg = Message(
+            subject=subject,
+            sender="telkomedikahealth@gmail.com",
+            recipients=[target_email]
+        )
+        msg.body = f"""
+        Halo,
+        
+        {intro}
+        {action_msg}
+        
+        {otp_code}
+        
+        Kode ini bersifat rahasia dan berlaku selama 2 menit.
+        Jangan berikan kode ini kepada siapapun, termasuk pihak TelkoMedika.
+        """
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error mengirim email: {e}")
+        return False
 
 # import re
 # from models import Admin, Pasien

@@ -1,4 +1,4 @@
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from functools import wraps
 from flask import redirect, url_for, flash, session
 from flask_login import current_user
