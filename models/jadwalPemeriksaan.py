@@ -21,14 +21,24 @@ class JadwalPemeriksaan(db.Model):
     db.session.add(jadwal)
     db.session.commit()
 
-  @property
-  def terisi(self):
-      return db.session.query(Reservasi).filter_by(jadwal_id=self.jadwal_id).count()
+  def get_sisa_kuota(self, tanggal_target):
+        if not tanggal_target:
+            return 0
+            
+        target_date = tanggal_target
+        if isinstance(tanggal_target, str):
+            try:
+                target_date = datetime.strptime(tanggal_target, '%Y-%m-%d').date()
+            except ValueError:
+                return 0 
+        
+        terisi = db.session.query(Reservasi).filter_by(
+            jadwal_id=self.jadwal_id,
+            tanggal_reservasi=target_date,
+        ).count()
 
-  @property
-  def sisa_kuota(self):
-      sisa = self.kuota - self.terisi
-      return sisa if sisa > 0 else 0
+        sisa = self.kuota - terisi
+        return sisa if sisa > 0 else 0
 
   @classmethod
   def get_filtered_data(cls, poli_id, tanggal_str):

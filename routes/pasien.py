@@ -152,8 +152,8 @@ def form_reservasi():
             "nama"  : request.form.get('nama'),
             "email"  : request.form.get('email'),
             "phone"  : request.form.get('nomor_hp'),
-            "tanggal_pelayanan"  : request.form.get('tanggal-pelayanan'),
-            "tanggal_reservasi"  : request.form.get('tanggal-pelayanan'),
+            "tanggal_pelayanan"  : request.form.get('tanggal_pelayanan'),
+            "tanggal_reservasi"  : request.form.get('tanggal_pelayanan'),
         }
 
         is_valid, error_list = pasien_services.validate_manual_reservation(data_pasien)
@@ -167,9 +167,15 @@ def form_reservasi():
         if not jadwal_id:
             flash('Silakan pilih jadwal terlebih dahulu.', 'warning')
             return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+        
+        try:
+            tanggal_fix = datetime.strptime(data_pasien.get("tanggal_reservasi"), '%Y-%m-%d').date()
+        except ValueError:
+            flash("Format tanggal tidak valid.", "danger")
+            return redirect(url_for('pasien.form_reservasi'))
 
         try:
-            no_urut = pasien_services.nomorUrut(jadwal_id) 
+            no_urut = pasien_services.nomorUrut(jadwal_id, tanggal_fix)
         except Exception as e:
             current_app.logger.error(f"Gagal mendapatkan nomor urut: {e}")
             flash('Terjadi kesalahan sistem saat mengambil nomor antrian.', 'danger')
@@ -178,13 +184,14 @@ def form_reservasi():
         if not no_urut:
             flash('Mohon maaf, Kuota untuk jadwal ini sudah penuh.', 'warning')
             return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
-
+        
         reservasi, msg = Reservasi.create(
             pasien_id=pasien.pasien_id,
             jadwal_id=jadwal_id,
             no_urut=no_urut,
-            tanggal=date.today(), 
-            status='Menunggu'
+            tanggal=tanggal_fix, 
+            status='Menunggu',
+            is_reminded=0
         )
 
         if msg:

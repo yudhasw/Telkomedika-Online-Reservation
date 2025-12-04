@@ -9,16 +9,18 @@ class Reservasi(db.Model):
   no_urut = db.Column(db.Integer, nullable=False)
   tanggal_reservasi = db.Column(db.Date, nullable=False)
   status = db.Column(db.String(50), default='Menunggu')
+  is_reminded = db.Column(db.Boolean, default=False)
   
   @classmethod
-  def create(cls, pasien_id, jadwal_id, no_urut, tanggal, status):
+  def create(cls, pasien_id, jadwal_id, no_urut, tanggal, status, is_reminded):
     try:
       reservasi = Reservasi(
         pasien_id=pasien_id, 
         jadwal_id=jadwal_id, 
         no_urut=no_urut, 
         tanggal_reservasi=tanggal, 
-        status=status
+        status=status,
+        is_reminded=is_reminded
       )
       db.session.add(reservasi)
       db.session.commit()

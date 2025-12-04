@@ -7,13 +7,20 @@ from datetime import datetime, timedelta, date
 from models import Admin, Pasien
 
 
-def nomorUrut(jadwal_id):
+def nomorUrut(jadwal_id, tanggal_pelayanan):
     jadwal = JadwalPemeriksaan.query.get(jadwal_id)
+    
+    if not jadwal:
+        return None
+
     current_nomor_urut = Reservasi.query.filter_by(
-        jadwal_id=jadwal_id
+        jadwal_id=jadwal_id,
+        tanggal_reservasi=tanggal_pelayanan  
     ).count()
+
     if current_nomor_urut < jadwal.kuota:
-        return current_nomor_urut+1
+        return current_nomor_urut + 1
+    
     return None
 
 def notifikasiReservasi(pasien, reservasi):
@@ -28,7 +35,7 @@ def notifikasiReservasi(pasien, reservasi):
     recipients = [email_tujuan]
 
     nama_pasien = pasien.get("nama", "Pasien")
-    jadwal_reservasi = pasien.get("tanggal_reservasi")
+    jadwal_reservasi = reservasi.tanggal_reservasi
 
     try:
         jam_mulai_dokter = reservasi.jadwalpemeriksaan.listjadwal.jam_mulai
@@ -46,7 +53,7 @@ def notifikasiReservasi(pasien, reservasi):
         f"Halo {nama_pasien},\n\n"
         f"Reservasi Anda telah berhasil dibuat.\n"
         f"ID Reservasi  : {reservasi.reservasi_id}\n"
-        f"Tanggal       : {jadwal_reservasi.strftime('%d-%m-%Y')}\n"
+        f"Tanggal       : {jadwal_reservasi}\n"
         f"No Antrian    : {reservasi.no_urut}\n"
         f"Status        : {reservasi.status}\n"
         f"Perkiraan Jam : {reservasi.status}\n\n"
