@@ -4,6 +4,7 @@ from .dokter import Dokter
 from .poliklinik import Poliklinik
 from datetime import datetime
 from .reservasi import Reservasi
+import locale
 
 class JadwalPemeriksaan(db.Model):
   __tablename__ = 'jadwalpemeriksaan'
@@ -20,40 +21,52 @@ class JadwalPemeriksaan(db.Model):
     db.session.add(jadwal)
     db.session.commit()
 
-  @property
-  def terisi(self):
-      return db.session.query(Reservasi).filter_by(jadwal_id=self.jadwal_id).count()
+  def get_sisa_kuota(self, tanggal_target):
+        if not tanggal_target:
+            return 0
+            
+        target_date = tanggal_target
+        if isinstance(tanggal_target, str):
+            try:
+                target_date = datetime.strptime(tanggal_target, '%Y-%m-%d').date()
+            except ValueError:
+                return 0 
+        
+        terisi = db.session.query(Reservasi).filter_by(
+            jadwal_id=self.jadwal_id,
+            tanggal_reservasi=target_date,
+        ).count()
 
-  @property
-  def sisa_kuota(self):
-      sisa = self.kuota - self.terisi
-      return sisa if sisa > 0 else 0
+        sisa = self.kuota - terisi
+        return sisa if sisa > 0 else 0
 
   @classmethod
-  def get_filtered_data(cls, poli_id=None, tanggal_str=None):
+  def get_filtered_data(cls, poli_id, tanggal_str):
+        if not tanggal_str:
+          return []
+      
+        try:
+            tanggal_obj = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
+        except ValueError:
+            return []
 
-      query = db.session.query(cls).join(
-          ListJadwal, cls.listjadwal_id == ListJadwal.listjadwal_id
-      ).join(
-          Dokter, ListJadwal.dokter_id == Dokter.dokter_id
-      ).join(
-          Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
-      )
-      # 2. FILTER POLI
-      if poli_id:
+        days_map = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
+        nama_hari = days_map[tanggal_obj.weekday()]
+
+        query = db.session.query(cls).join(
+              ListJadwal, cls.listjadwal_id == ListJadwal.listjadwal_id
+          ).join(
+              Dokter, ListJadwal.dokter_id == Dokter.dokter_id
+          ).join(
+              Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
+          ).filter(     
+              ListJadwal.hari == nama_hari
+          )
+    
+        if poli_id:
           query = query.filter(ListJadwal.poliklinik_id == poli_id)
-      # 3. FILTER TANGGAL
-      if tanggal_str:
-          try:
-              tanggal_obj = datetime.strptime(tanggal_str, '%Y-%m-%d').date()
-              query = query.filter(cls.tanggal == tanggal_obj)
-          except ValueError:
-              pass
 
-      return query.order_by(
-          cls.tanggal.asc(), 
-          ListJadwal.jam_mulai.asc()
-      ).all()
+        return query.order_by(ListJadwal.jam_mulai.asc()).all()
 
   def findAll():
     # logic disini

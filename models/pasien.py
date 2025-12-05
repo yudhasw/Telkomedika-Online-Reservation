@@ -56,6 +56,15 @@ class Pasien(db.Model, UserMixin):
     except SQLAlchemyError as e:
       db.session.rollback
       return None, str(e)
+    
+  def set_password(self, password_hash):
+    try:
+      self.password_hash = password_hash
+      db.session.commit()
+      return True
+    except Exception as e:
+      db.session.rollback()
+      return False
   
   def remove():
     # logic disini
