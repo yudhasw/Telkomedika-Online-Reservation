@@ -9,6 +9,13 @@ class Admin(db.Model, UserMixin):
   email = db.Column("email_admin", db.String(255), unique=True, nullable=False)
   password_hash = db.Column("password_hash", db.String(255), nullable=False)
 
+  @property
+  def id(self):
+      return self.admin_id
+
+  def __repr__(self):
+      return f"<Admin {self.nama}>"
+  
   def create_admin(nama, email, password):
     hashed_pass = generate_password_hash(password)
     admin = Admin(nama=nama, email=email, password_hash=hashed_pass)

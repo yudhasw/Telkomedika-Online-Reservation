@@ -18,7 +18,7 @@ def homepageGuest():
         if role == "pasien":
             return redirect(url_for('pasien.homepage'))
         elif role == "admin":
-            return redirect(url_for('main.dashboard_admin'))
+            return redirect(url_for('admin.dashboard'))
         
     return render_template('dashboardGuest.html', user=current_user)
 
@@ -245,8 +245,7 @@ def resend_login_otp():
     
     return redirect(url_for('auth.login_pasien'))
 
-@auth_bp.route('/login-admin')
-@admin_required
+@auth_bp.route('/login-admin', methods=['GET', 'POST'])
 def login_admin():
   if request.method == "POST":
     email = request.form.get('email')
@@ -254,12 +253,12 @@ def login_admin():
 
     user = Admin.query.filter_by(email=email).first()
 
-    if user and check_password_hash(user.password_hash, password):
+    if user and user.password_hash == password:
        session["role"] = "admin"
        login_user(user)
        flash("Login berhasil!", 'success')
 
-       return redirect(url_for('main.dashboard_admin'))
+       return redirect(url_for('admin.manage_jadwal_dokter'))
     else:
        flash('Username atau password salah.', 'danger')
        return redirect(url_for('auth.login_admin'))

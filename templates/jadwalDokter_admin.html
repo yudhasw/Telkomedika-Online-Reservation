@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Jadwal Dokter - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .schedule-cell {
+            transition: all 0.2s;
+            cursor: pointer;
+            height: 60px;
+            vertical-align: middle;
+            font-size: 0.85rem;
+        }
+        .schedule-cell:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .has-schedule {
+            background-color: white !important;
+            color: black;
+            font-weight: bold;
+            border-radius: 4px;
+            padding: 4px;
+            margin: 2px;
+            display: inline-block;
+            width: 90%;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8 font-sans">
+
+    <div class="max-w-full mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Admin Input Jadwal Praktik</h1>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-teal-600 text-white text-sm uppercase">
+                        <th class="p-3 border border-teal-700 w-1/4 text-left">Nama Dokter</th>
+                        <th class="p-3 border border-teal-700 w-1/12 text-left">Spesialisasi</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Senin</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Selasa</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Rabu</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Kamis</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Jumat</th>
+                        <th class="p-3 border border-teal-700 text-center w-[10%]">Sabtu</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-teal-800 text-white text-sm" id="doctorTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+        <div class="mt-6 text-right">
+            <button onclick="saveAllSchedule()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-bold shadow-lg">
+                Simpan Perubahan ke Database
+            </button>
+        </div>
+    </div>
+
+    <div id="timeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-80 shadow-2xl transform transition-all scale-100 text-gray-800">
+            <h3 class="text-lg font-bold mb-1 border-b pb-2">Set Jadwal</h3>
+            <p class="text-xs text-gray-500 mb-4">
+                Dokter: <span id="modalDoctorName" class="font-bold text-teal-600"></span><br>
+                Hari: <span id="modalDayName" class="font-bold text-teal-600"></span>
+            </p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-600">Jam Mulai</label>
+                    <input type="time" id="startTime" class="w-full border p-2 rounded focus:ring-2 focus:ring-teal-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-600">Jam Selesai</label>
+                    <input type="time" id="endTime" class="w-full border p-2 rounded focus:ring-2 focus:ring-teal-500 outline-none">
+                </div>
+            </div>
+
+            <div class="flex justify-between mt-6">
+                <button onclick="deleteSchedule()" class="text-red-500 hover:text-red-700 text-sm font-medium">Hapus</button>
+                <div class="space-x-2">
+                    <button onclick="closeModal()" class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded">Batal</button>
+                    <button onclick="confirmSchedule()" class="px-3 py-1 bg-teal-600 text-white rounded hover:bg-teal-700">Set</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PERBAIKAN: Ganti nama variabel 'doctors' menjadi 'doctorsData' agar unik
+        const doctorsData = JSON.parse('{{ doctors | tojson | safe }}') || [];
+        const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        let currentCell = null;
+
+        // 2. RENDER TABEL
+        const tableBody = document.getElementById('doctorTableBody');
+
+        function renderTable() {
+            tableBody.innerHTML = '';
+            // Gunakan 'doctorsData' disini
+            doctorsData.forEach(doc => {
+                const row = document.createElement('tr');
+                row.className = "border-b border-teal-700 hover:bg-teal-700 transition";
+
+                // Kolom Info Dokter
+                row.innerHTML = `
+                    <td class="p-3 bg-white text-gray-800 border-r border-teal-700 font-medium">${doc.name}</td>
+                    <td class="p-3 bg-white text-gray-800 border-r border-teal-700">${doc.spec || '-'}</td>
+                `;
+
+                // Kolom Grid Hari
+                days.forEach(day => {
+                    const cell = document.createElement('td');
+                    cell.className = "schedule-cell border-r border-teal-700 text-center";
+                    cell.dataset.doctorId = doc.id;
+                    cell.dataset.doctorName = doc.name;
+                    cell.dataset.day = day;
+                    cell.onclick = function() { openModal(this); };
+                    
+                    // Cek apakah ada jadwal di hari ini dari database
+                    if (doc.schedules && doc.schedules[day]) {
+                        const timeStr = doc.schedules[day]; // "09:00 - 12:00"
+                        const [start, end] = timeStr.split(' - ');
+                        setCellContent(cell, start, end);
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function setCellContent(cell, start, end) {
+            cell.innerHTML = `<div class="has-schedule">${start} - ${end}</div>`;
+            cell.dataset.start = start;
+            cell.dataset.end = end;
+        }
+
+        // 3. MODAL LOGIC
+        const modal = document.getElementById('timeModal');
+        const startTimeInput = document.getElementById('startTime');
+        const endTimeInput = document.getElementById('endTime');
+
+        function openModal(cell) {
+            currentCell = cell;
+            document.getElementById('modalDayName').innerText = cell.dataset.day;
+            document.getElementById('modalDoctorName').innerText = cell.dataset.doctorName;
+
+            if (cell.dataset.start) {
+                startTimeInput.value = cell.dataset.start;
+                endTimeInput.value = cell.dataset.end;
+            } else {
+                startTimeInput.value = '';
+                endTimeInput.value = '';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() { modal.classList.add('hidden'); currentCell = null; }
+
+        function confirmSchedule() {
+            if (!startTimeInput.value || !endTimeInput.value) return alert("Isi kedua jam!");
+            setCellContent(currentCell, startTimeInput.value, endTimeInput.value);
+            closeModal();
+        }
+
+        function deleteSchedule() {
+            if (currentCell) {
+                currentCell.innerHTML = '';
+                delete currentCell.dataset.start;
+                delete currentCell.dataset.end;
+            }
+            closeModal();
+        }
+
+        // 4. SIMPAN DATA KE BACKEND
+        async function saveAllSchedule() {
+            const btn = document.querySelector('button[onclick="saveAllSchedule()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Menyimpan...";
+            btn.disabled = true;
+
+            const schedulesByDoctor = {};
+
+            document.querySelectorAll('.schedule-cell').forEach(cell => {
+                if (cell.dataset.start) {
+                    const docId = cell.dataset.doctorId;
+                    if (!schedulesByDoctor[docId]) {
+                        schedulesByDoctor[docId] = [];
+                    }
+                    schedulesByDoctor[docId].push({
+                        day: cell.dataset.day,
+                        start: cell.dataset.start,
+                        end: cell.dataset.end
+                    });
+                }
+            });
+
+            try {
+                const promises = Object.keys(schedulesByDoctor).map(docId => {
+                    return fetch('/admin/jadwal/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            doctor_id: docId,
+                            schedule_list: schedulesByDoctor[docId]
+                        })
+                    });
+                });
+
+                await Promise.all(promises);
+                alert("Semua jadwal berhasil disimpan!");
+            } catch (error) {
+                console.error(error);
+                alert("Terjadi kesalahan saat menyimpan.");
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // Jalankan
+        renderTable();
+    </script>
+</body>
+</html>
