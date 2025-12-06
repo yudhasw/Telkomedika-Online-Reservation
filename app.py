@@ -32,7 +32,7 @@ login_manager.init_app(app)
 def scheduled_task():
     send_reminder_job(app)
 
-@scheduler.task('cron', id="auto_generate_schedules", day_of_week='sun', hour=0, minute=0)
+@scheduler.task('cron', id="auto_generate_schedules", day_of_week='sun', hour=23, minute=59)
 def auto_generate_schedules():
     print("--- [CRON] Menjalankan Auto Generate Mingguan ---")
     _process_generate_jadwal(target_minggu='next')
