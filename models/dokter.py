@@ -17,7 +17,7 @@ class Dokter(db.Model):
             "name": self.nama_dokter,
             "poli": self.spesialisasi
         }
-
+    
     @staticmethod
     def create(nama, spesialis):
         try:
@@ -36,6 +36,7 @@ class Dokter(db.Model):
     @staticmethod
     def findOne(id):
         return Dokter.query.get(id)
+    
     
     def update(self, nama, spesialis):
         try:

@@ -2,173 +2,159 @@
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Telkomedika{% endblock %}</title>
-  <link rel="icon" href="{{ url_for('static', filename='img/telkomedika-logo-mini.png') }}" type="image/x-icon">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='dist/output.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script>
-    tailwind.config = {
-          theme: {
-              extend: {
-                  colors: {
-                      'tm-red': '#E51B24',
-                      'tm-cyan': '#00A3C8',
-                      'tm-gray': '#666666',
-                  },
-                  fontFamily: {
-                      sans: ['Inter', 'sans-serif'],
-                  }
-              }
-          }
-      }
-  </script>
-  <style>
-    .nav-stable {
-        display: inline-flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Telkomedika Admin{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/telkomedika-logo-mini.png') }}" type="image/x-icon">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    .nav-stable::after {
-        content: attr(data-text); 
-        content: attr(data-text) / ""; 
-        height: 0;
-        visibility: hidden;
-        overflow: hidden;
-        user-select: none;
-        pointer-events: none;
-        font-weight: 700;
-    }
-
-    @media (min-width: 768px) {
-        .nav-stable::after {
-            content: attr(data-text);
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tm-red': '#E51B24',
+                        'tm-dark-red': '#c4131b',
+                        'tm-cyan': '#00A3C8',
+                        'tm-gray': '#666666',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
         }
-    }
-</style>
+    </script>
 </head>
-<body class="font-sans text-gray-800 bg-white flex flex-col min-h-screen">
-  <header class="sticky top-0 z-50 bg-white w-full border-b border-gray-100 shadow-sm">
-    <nav class="sticky container mx-auto px-6 py-3 flex items-center bg-white">
-        <div class="flex items-center mr-12">
-          {% if request.endpoint not in ['auth.login_admin', 'auth.register'] %}
-            <a href="{{ url_for('admin.dashboard') }}">
-                <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-16 w-auto object-contain">
-            </a>
-          {% else %}
-            <a href="{{ url_for('auth.homepageGuest') }}">
-                <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-16 w-auto object-contain">
-            </a>
-          {% endif %}
+
+<body class="font-sans text-gray-800 bg-gray-50 flex flex-col min-h-screen">
+
+    <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('admin.dashboard') }}" class="flex-shrink-0 flex items-center gap-2">
+                        <img class="h-10 w-auto" src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Telkomedika">
+                        <span class="hidden md:block font-bold text-xl text-gray-800 tracking-tight">Portal<span class="text-tm-red">Admin</span></span>
+                    </a>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('admin.dashboard') }}" 
+                       class="{{ 'text-tm-red border-b-2 border-tm-red' if request.endpoint == 'admin.dashboard' else 'text-gray-500 hover:text-tm-red hover:border-b-2 hover:border-gray-300' }} px-1 pt-1 text-sm font-medium transition duration-150 h-full flex items-center">
+                        Dashboard
+                    </a>
+                    
+                    <div class="relative group h-full flex items-center">
+                        <button class="text-gray-500 group-hover:text-tm-red px-1 pt-1 text-sm font-medium inline-flex items-center h-full border-b-2 border-transparent group-hover:border-gray-300 transition duration-150">
+                            <span>Manajemen</span>
+                            <i class="fas fa-chevron-down ml-2 text-xs transition-transform group-hover:rotate-180"></i>
+                        </button>
+                        <div class="absolute top-full left-0 w-48 bg-white shadow-lg rounded-b-lg border border-gray-100 py-2 hidden group-hover:block transform transition-all duration-200 origin-top">
+                            <a href="{{ url_for('admin.jadwal') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red">Atur Jadwal Dokter</a>
+                            <a href="{{ url_for('admin.data_dokter') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red">Data Dokter</a>
+                            </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    {% if current_user.is_authenticated %}
+                        <div class="relative group">
+                            <button class="flex items-center gap-2 text-sm focus:outline-none transition duration-150 ease-in-out">
+                                <span class="hidden md:block font-semibold text-gray-700">{{ current_user.nama }}</span>
+                                <div class="h-9 w-9 rounded-full bg-tm-red text-white flex items-center justify-center shadow-md">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </button>
+                            
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100 hidden group-hover:block z-50">
+                                <div class="px-4 py-2 border-b border-gray-100">
+                                    <p class="text-xs text-gray-500">Login sebagai</p>
+                                    <p class="text-sm font-bold text-gray-900 truncate">{{ current_user.nama }}</p>
+                                </div>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="flex items-center md:hidden">
+                        <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-tm-red">
+                            <span class="sr-only">Open main menu</span>
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="hidden md:hidden bg-white border-t border-gray-200" id="mobile-menu">
+            <div class="pt-2 pb-3 space-y-1 px-4">
+                <a href="{{ url_for('admin.dashboard') }}" class="block pl-3 pr-4 py-2 border-l-4 border-tm-red text-base font-medium text-tm-red bg-red-50">Dashboard</a>
+                <a href="{{ url_for('admin.jadwal') }}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Atur Jadwal</a>
+                <a href="{{ url_for('admin.data_dokter') }}" class="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800">Data Dokter</a>
+                <a href="{{ url_for('auth.logout') }}" class="block pl-3 pr-4 py-2 text-base font-medium text-red-600 hover:bg-red-50">Logout</a>
+            </div>
         </div>
-      {% if request.endpoint not in ['auth.login_admin', 'auth.register'] %}
-        <div class="hidden md:flex space-x-8 items-center font-medium text-gray-600">
-            <a href="{{ url_for('admin.dashboard') }}" 
-               data-text="Beranda" 
-               class="nav-stable {{ 'text-tm-red font-semibold' if request.endpoint == 'admin.dashboard' else 'hover:text-tm-red transition'}}">
-              Beranda
-            </a>
-            <div class="relative group">
-                <button class="flex items-center hover:text-tm-red focus:outline-none transition py-2 pr-10 ">
-                    <span class="nav-stable" data-text="Layanan">Layanan</span> 
-                    <i class="fas fa-caret-down ml-2 absolute left-14.5 top-2/3 transform -translate-y-1/2"></i>
-                </button>
-                <div class="absolute top-full left-0 pt-4 w-48 hidden group-hover:block z-50">
+    </header>
+
+    <div class="fixed top-20 right-5 z-50 w-full max-w-sm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% set bg_color = 'bg-green-500' if category == 'success' else 'bg-red-500' %}
+              {% set icon = 'fa-check-circle' if category == 'success' else 'fa-exclamation-circle' %}
+              
+              <div class="flash-message mb-3 flex items-center w-full max-w-xs p-4 text-white {{ bg_color }} rounded-lg shadow-lg transform transition-all duration-500 ease-in-out opacity-100 translate-y-0" role="alert">
+                  <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-white rounded-lg bg-white bg-opacity-20">
+                      <i class="fas {{ icon }}"></i>
+                  </div>
+                  <div class="ml-3 text-sm font-normal">{{ message }}</div>
+                  <button type="button" class="ml-auto -mx-1.5 -my-1.5 bg-transparent text-white rounded-lg p-1.5 hover:bg-white hover:bg-opacity-20 inline-flex h-8 w-8" onclick="this.parentElement.remove()">
+                      <i class="fas fa-times"></i>
+                  </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+    </div>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+  
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" alt="Logo" class="h-8 w-auto grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition">
+                    <span class="text-sm text-gray-500">© 2025 Telkomedika. All rights reserved.</span>
+                </div>
+                <div class="text-sm text-gray-400">
+                    Sistem Informasi Manajemen Jadwal Dokter
                 </div>
             </div>
         </div>
-        <div class="ml-auto">
-            {% if current_user.is_authenticated %}
-                <div class="relative group h-full flex items-center">  
-                    <button class="flex items-center gap-3 focus:outline-none h-full">
-                        <div class="hidden md:flex items-center gap-2 text-right">
-                            <span class="text-sm font-bold text-gray-800">{{ current_user.nama }}</span>
-                            <i class="fas fa-caret-down text-xs text-gray-500 pb-0.5"></i>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center shadow-md border-2 border-white">
-                            <i class="fas fa-user text-lg"></i>
-                        </div>
-                    </button>
-                    <div class="absolute right-0 top-full w-60 pt-4 hidden group-hover:block z-50 animate-fade-in-down">  
-                        <div class="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden">      
-                            <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
-                                <p class="text-sm text-gray-900 font-bold truncate">{{ current_user.nama }}</p>
-                            </div>
-                            <div class="border-t border-gray-100 my-1"></div>
-                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2.5 text-sm text-tm-red font-bold hover:bg-red-50 transition flex items-center">
-                                <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Keluar
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <a href="{{ url_for('auth.register') }}" 
-                   class="text-gray-600 hover:text-tm-red font-medium text-sm transition px-4 py-2">
-                   Daftar
-                </a>
+    </footer>
 
-                <a href="{{ url_for('auth.login_admin') }}" 
-                   class="bg-tm-red text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-red-700 transition shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                   Masuk
-                </a>
-            {% endif %}
-        </div>
-
-      {% endif %}
-    </nav>
-  </header>
-  <main class="w-full grow">
-    {% block content %}
-    {% endblock %}
-  </main>
-  
-  <footer class="w-full bg-white border-t border-black-500 py-8">
-    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
-      <div class="mb-4 md:mb-0">
-        <img 
-          src="{{ url_for('static', filename='img/telkomedika-logo.png') }}" 
-          alt="Logo TelkoMedika" 
-          class="h-14 w-auto object-contain"
-        >
-      </div>
-      <div class="text-center md:text-left text-gray-600 text-xs md:text-sm font-sans">
-        <h3 class="font-bold text-gray-900 uppercase mb-1">
-          PT. SARANA USAHA SEJAHTERA INSANPALAPA
-        </h3>
-        <p class="leading-relaxed">
-          Gedung OPMC Telkom<br>
-          Jl. Letjen Suprapto No.17, RT.9/RW.7, Cemp. Putih Tim., Kec. Cemp. Putih,<br>
-          Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta 10510
-        </p>
-      </div>
-
-    </div>
-  </footer>
-  <script src="{{ url_for('static', filename='js/preline.js') }}"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const messages = document.querySelectorAll('.flash-message');
-        
-        if (messages.length > 0) {
-            messages.forEach(msg => {
-                setTimeout(() => {
-                    msg.classList.remove('opacity-100');
-                    msg.classList.add('opacity-0');
-                    msg.classList.add('-translate-y-2'); 
-
-                    setTimeout(() => {
-                        msg.remove();
-                    }, 500);
-                }, 3000); 
-            });
-        }
-    });
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.flash-message');
+                alerts.forEach(alert => {
+                    alert.classList.remove('opacity-100', 'translate-y-0');
+                    alert.classList.add('opacity-0', '-translate-y-2');
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 4000); // Hilang setelah 4 detik
+        });
+    </script>
 </body>
-
 </html>

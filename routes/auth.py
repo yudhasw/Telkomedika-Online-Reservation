@@ -258,12 +258,12 @@ def login_admin():
        login_user(user)
        flash("Login berhasil!", 'success')
 
-       return redirect(url_for('admin.manage_jadwal_dokter'))
+       return redirect(url_for('admin.dashboard'))
     else:
        flash('Username atau password salah.', 'danger')
        return redirect(url_for('auth.login_admin'))
 
-  return render_template('login_admin.html')
+  return render_template('admin_login.html')
 
 @auth_bp.route('/logout')
 @login_required
