@@ -5,7 +5,7 @@ import uuid
 class Reservasi(db.Model):
   reservasi_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
   pasien_id = db.Column(db.Integer, db.ForeignKey('pasien.pasien_id'), nullable=False)
-  jadwal_id = db.Column(db.Integer, db.ForeignKey('jadwalpemeriksaan.jadwal_id'), nullable=False)
+  jadwal_id = db.Column(db.String(36), db.ForeignKey('jadwalpemeriksaan.jadwal_id'), nullable=False)
   no_urut = db.Column(db.Integer, nullable=False)
   tanggal_reservasi = db.Column(db.Date, nullable=False)
   status = db.Column(db.String(50), default='Menunggu')

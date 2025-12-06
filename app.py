@@ -5,7 +5,8 @@ from flask_login import LoginManager
 from extensions import mail
 from routes import register_routes
 from flask_apscheduler import APScheduler
-from utils.scheduler import send_reminder_job
+from utils.scheduler import send_reminder_job,     _process_generate_jadwal
+
 
 app = Flask(__name__)
 
@@ -30,6 +31,11 @@ login_manager.init_app(app)
 @scheduler.task('cron', id='do_reminder', hour=7, minute=0)
 def scheduled_task():
     send_reminder_job(app)
+
+@scheduler.task('cron', id="auto_generate_schedules", day_of_week='sun', hour=23, minute=59)
+def auto_generate_schedules():
+    print("--- [CRON] Menjalankan Auto Generate Mingguan ---")
+    _process_generate_jadwal(target_minggu='next')
 
 @login_manager.unauthorized_handler
 def unauthorized():
