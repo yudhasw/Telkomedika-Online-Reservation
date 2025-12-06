@@ -243,8 +243,6 @@ def batalkan_reservasi(reservasi_id):
 
 @pasien_bp.route('/jadwal-dokter')
 def jadwal_dokter():
-    list_jadwal = ListJadwal.get_data()
+    list_jadwal = JadwalPemeriksaan.get_all_data()
 
     return render_template('lihatjadwal.html', data=list_jadwal, get_next_date=pasien_services.get_next_date)
-
-

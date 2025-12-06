@@ -15,7 +15,7 @@ def nomorUrut(jadwal_id, tanggal_pelayanan):
 
     current_nomor_urut = Reservasi.query.filter_by(
         jadwal_id=jadwal_id,
-        tanggal_reservasi=tanggal_pelayanan  
+        tanggal_reservasi=tanggal_pelayanan 
     ).count()
 
     if current_nomor_urut < jadwal.kuota:
@@ -38,7 +38,7 @@ def notifikasiReservasi(pasien, reservasi):
     jadwal_reservasi = reservasi.tanggal_reservasi
 
     try:
-        jam_mulai_dokter = reservasi.jadwalpemeriksaan.listjadwal.jam_mulai
+        jam_mulai_dokter = reservasi.jadwalpemeriksaan.jam_mulai
         waktu_start_praktek = datetime.combine(jadwal_reservasi, jam_mulai_dokter)
 
         hasil_estimasi = waktu_start_praktek + timedelta(minutes=((reservasi.no_urut - 1) * 20))

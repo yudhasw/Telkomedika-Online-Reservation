@@ -9,15 +9,20 @@ import locale
 class JadwalPemeriksaan(db.Model):
   __tablename__ = 'jadwalpemeriksaan'
   jadwal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  listjadwal_id = db.Column(db.String(255), db.ForeignKey('listjadwal.listjadwal_id'), nullable=False)
   tanggal = db.Column(db.Date, nullable=False)
   kuota = db.Column(db.Integer, nullable=False)
+  hari = db.Column(db.String(20), nullable=False)
+  dokter_id = db.Column(db.Integer, db.ForeignKey('dokter.dokter_id'), nullable=False)
+  poliklinik_id = db.Column(db.Integer, db.ForeignKey('poliklinik.poliklinik_id'), nullable=False)
+  jam_mulai = db.Column("jam_mulai", db.Time, nullable=False)
+  jam_selesai = db.Column("jam_selesai", db.Time, nullable=False)
 
-  listjadwal = db.relationship('ListJadwal', backref='jadwal_pemeriksaan')
   reservasi = db.relationship('Reservasi', backref='jadwalpemeriksaan')
+  dokter = db.relationship('Dokter', backref='jadwal_pemeriksaan')
+  poliklinik = db.relationship('Poliklinik', backref='jadwal_pemeriksaan')
 
   def create(tanggal, list_jadwal, kuota):
-    jadwal = JadwalPemeriksaan(tanggal=tanggal, listjadwal_id=list_jadwal, kuota=kuota)
+    jadwal = JadwalPemeriksaan(tanggal=tanggal, listjadwal_id=list_jadwal, kuota=kuota, )
     db.session.add(jadwal)
     db.session.commit()
 
@@ -54,19 +59,21 @@ class JadwalPemeriksaan(db.Model):
         nama_hari = days_map[tanggal_obj.weekday()]
 
         query = db.session.query(cls).join(
-              ListJadwal, cls.listjadwal_id == ListJadwal.listjadwal_id
-          ).join(
-              Dokter, ListJadwal.dokter_id == Dokter.dokter_id
-          ).join(
-              Poliklinik, ListJadwal.poliklinik_id == Poliklinik.poliklinik_id
-          ).filter(     
-              ListJadwal.hari == nama_hari
-          )
+            Dokter, cls.dokter_id == Dokter.dokter_id
+        ).join(
+            Poliklinik, cls.poliklinik_id == Poliklinik.poliklinik_id
+        ).filter(     
+            cls.hari == nama_hari
+        )
     
         if poli_id:
-          query = query.filter(ListJadwal.poliklinik_id == poli_id)
+          query = query.filter(cls.poliklinik_id == poli_id)
 
-        return query.order_by(ListJadwal.jam_mulai.asc()).all()
+        return query.order_by(cls.jam_mulai.asc()).all()
+  
+  @classmethod
+  def get_all_data(cls):
+      return db.session.query(cls).join(Dokter).join(Poliklinik).order_by(cls.hari, cls.jam_mulai).all()
 
   def findAll():
     # logic disini
