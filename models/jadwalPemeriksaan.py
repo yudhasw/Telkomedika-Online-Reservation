@@ -9,6 +9,7 @@ import locale
 class JadwalPemeriksaan(db.Model):
   __tablename__ = 'jadwalpemeriksaan'
   jadwal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+  listjadwal_id = db.Column(db.String(255), db.ForeignKey('listjadwal.listjadwal_id'), nullable=False)
   tanggal = db.Column(db.Date, nullable=False)
   kuota = db.Column(db.Integer, nullable=False)
   hari = db.Column(db.String(20), nullable=False)
@@ -17,6 +18,7 @@ class JadwalPemeriksaan(db.Model):
   jam_mulai = db.Column("jam_mulai", db.Time, nullable=False)
   jam_selesai = db.Column("jam_selesai", db.Time, nullable=False)
 
+  listjadwal = db.relationship('ListJadwal', backref='jadwal_pemeriksaan')
   reservasi = db.relationship('Reservasi', backref='jadwalpemeriksaan')
   dokter = db.relationship('Dokter', backref='jadwal_pemeriksaan')
   poliklinik = db.relationship('Poliklinik', backref='jadwal_pemeriksaan')
@@ -90,4 +92,3 @@ class JadwalPemeriksaan(db.Model):
   def remove():
     # logic disini 
     return True
-

@@ -1,11 +1,12 @@
 from . import db
 from sqlalchemy.exc import SQLAlchemyError
 import uuid
+from datetime import datetime, timedelta, date
 
 class Reservasi(db.Model):
   reservasi_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
   pasien_id = db.Column(db.Integer, db.ForeignKey('pasien.pasien_id'), nullable=False)
-  jadwal_id = db.Column(db.Integer, db.ForeignKey('jadwalpemeriksaan.jadwal_id'), nullable=False)
+  jadwal_id = db.Column(db.String(36), db.ForeignKey('jadwalpemeriksaan.jadwal_id'), nullable=False)
   no_urut = db.Column(db.Integer, nullable=False)
   tanggal_reservasi = db.Column(db.Date, nullable=False)
   status = db.Column(db.String(50), default='Menunggu')
@@ -28,6 +29,23 @@ class Reservasi(db.Model):
     except SQLAlchemyError as e:
       db.session.rollback
       return None, str(e)
+  
+  @property
+  def estimasi_waktu(self):
+      try:
+          jam_mulai = self.jadwalpemeriksaan.jam_mulai
+     
+          dummy_date = date.today()
+          start_dt = datetime.combine(dummy_date, jam_mulai)
+
+          tambahan_menit = (self.no_urut - 1) * 20
+      
+          estimasi_dt = start_dt + timedelta(minutes=tambahan_menit)
+ 
+          return estimasi_dt.strftime("%H:%M")
+          
+      except Exception as e:
+          return "Sesuai Antrian"
   
   def get_reservation_data(pasien_id):
     data = Reservasi.query.filter_by(pasien_id=pasien_id)\

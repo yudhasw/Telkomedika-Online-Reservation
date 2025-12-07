@@ -37,16 +37,7 @@ def notifikasiReservasi(pasien, reservasi):
     nama_pasien = pasien.get("nama", "Pasien")
     jadwal_reservasi = reservasi.tanggal_reservasi
 
-    try:
-        jam_mulai_dokter = reservasi.jadwalpemeriksaan.jam_mulai
-        waktu_start_praktek = datetime.combine(jadwal_reservasi, jam_mulai_dokter)
-
-        hasil_estimasi = waktu_start_praktek + timedelta(minutes=((reservasi.no_urut - 1) * 20))
-        perkiraan_waktu = hasil_estimasi.strftime("%H:%M")
-
-    except Exception as e:
-        current_app.logger.error(f"Gagal menghitung estimasi waktu: {e}")
-        perkiraan_waktu = "Sesuai Jadwal Praktek"
+    perkiraan_waktu = reservasi.estimasi_waktu
 
     msg = Message(subject=subject, recipients=recipients)
     msg.body = (
