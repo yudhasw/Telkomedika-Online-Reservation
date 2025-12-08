@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const timeFilter = document.getElementById('time_filter');
 
   function applyFilters() {
-      const activeBtn = document.querySelector('.filter-btn.bg-tm-red');
-      const category = activeBtn ? activeBtn.innerText.trim() : 'Semua';
-  
+      const activePoliBtn = document.querySelector('.filter-poli-btn.bg-tm-red');
+      const poliCategory = activePoliBtn ? activePoliBtn.getAttribute('data-value') : 'Semua';
+ 
       const activeHariBtn = document.querySelector('.filter-hari-btn.bg-tm-red');
-      const hariCategory = activeHariBtn ? activeHariBtn.innerText.trim() : 'Semua';
+      const hariCategory = activeHariBtn ? activeHariBtn.getAttribute('data-value') : 'Semua';
 
       const searchTerm = searchInput.value.toLowerCase();
       const selectedTime = timeFilter.value; 
@@ -21,15 +21,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = card.querySelector('.doctor-name').innerText.toLowerCase();
             const jamMulaiStr = card.getAttribute('data-jam'); 
 
-            let matchCategory = (category === 'Semua');
-            if (!matchCategory) {
-                if (category === 'Umum' && poli.toLowerCase().includes('umum')) matchCategory = true;
-                if (category.includes('Gigi') && poli.toLowerCase().includes('gigi')) matchCategory = true;
+            let matchPoli = (poliCategory === 'Semua');
+            if (!matchPoli && poli) {
+                if (poli.toLowerCase().includes(poliCategory.toLowerCase())) {
+                    matchPoli = true;
+                }
             }
 
             let matchHari = (hariCategory === 'Semua');
-            if (!matchHari) {
-                if (hari === hariCategory) matchHari = true;
+            if (!matchHari && hari) {
+                if (hari === hariCategory) {
+                    matchHari = true;
+                }
             }
 
             const matchSearch = name.includes(searchTerm);
@@ -44,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (matchCategory && matchHari && matchSearch && matchTime) {
+            if (matchPoli && matchHari && matchSearch && matchTime) {
                 card.style.display = 'flex';
             } else {
                 card.style.display = 'none';
@@ -53,11 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.filterPoli = function(kategori, btn) {
-      document.querySelectorAll('.filter-btn').forEach(b => {
+      document.querySelectorAll('.filter-poli-btn').forEach(b => {
           b.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
-          b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+          b.classList.add('bg-white', 'text-gray-600', 'border-gray-300');
       });
-      btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+      btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300');
       btn.classList.add('bg-tm-red', 'text-white', 'border-transparent');
 
       applyFilters();

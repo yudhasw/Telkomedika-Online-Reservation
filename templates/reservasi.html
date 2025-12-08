@@ -102,16 +102,20 @@
 
         <div class="bg-gray-100 rounded-3xl p-6 md:p-8 shadow-inner mb-8">
             <h2 class="text-lg font-bold mb-6">Jadwal Dokter</h2>
+            
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-1">
+                    <button type="button" onclick="filterPoli('Semua', this)" 
+                        class="filter-poli-btn bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition whitespace-nowrap">
+                        Semua
+                    </button>
 
-            <div class="flex gap-3 mb-6 overflow-x-auto pb-2">
-                <button type="button" onclick="filterPoli('Semua', this)" class="filter-btn bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition whitespace-nowrap">Semua</button>
-                <button type="button" onclick="filterPoli('Umum', this)" class="filter-btn bg-white text-gray-600 px-6 py-2 rounded-lg text-sm font-medium shadow-sm flex items-center hover:bg-gray-50 transition whitespace-nowrap">
-                    <i class="fas fa-user-md text-tm-red mr-2"></i> Umum
-                </button>
-                <button type="button" onclick="filterPoli('Gigi', this)" class="filter-btn bg-white text-gray-600 px-6 py-2 rounded-lg text-sm font-medium shadow-sm flex items-center hover:bg-gray-50 transition whitespace-nowrap">
-                    <i class="fas fa-tooth text-tm-red mr-2"></i> Spesialis Gigi
-                </button>
-            </div>
+                    {% for p in all_poli %}
+                    <button type="button" onclick="filterPoli('{{ p.nama_poli }}', this)" 
+                        class="filter-poli-btn bg-white text-gray-600 px-6 py-2 rounded-lg text-sm font-medium shadow-sm flex items-center hover:bg-gray-50 transition whitespace-nowrap">
+                        <i class="fas fa-hospital-user mr-2 text-tm-red"></i> {{ p.nama_poli[11:] }}
+                    </button>
+                    {% endfor %}
+                </div>
 
             <div id="doctorList" class="max-h-[500px] overflow-y-auto pr-2 scrollbar-custom space-y-4">
                 

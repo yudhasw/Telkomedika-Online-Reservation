@@ -340,6 +340,81 @@ def update_dokter():
 @admin_bp.route('/admin/data-dokter/delete/<int:id>', methods=['DELETE'])
 @admin_required
 def delete_dokter(id):
+<<<<<<< HEAD
+    return redirect(url_for('admin.data_dokter'))
+
+# =========================================================
+# MANAJEMEN RESERVASI PASIEN
+# =========================================================
+
+@admin_bp.route('/admin/reservasi', methods=['GET'])
+@admin_required
+def reservasi_list():
+    status_filter = request.args.get('status', 'all')
+    date_filter = request.args.get('date', '')
+
+    query = Reservasi.query
+
+    if status_filter != 'all':
+        query = query.filter(Reservasi.status == status_filter)
+    
+  
+    if date_filter:
+        try:
+            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
+            query = query.filter(Reservasi.tanggal_reservasi == filter_date)
+        except ValueError:
+            pass
+
+    reservasi_data = query.order_by(Reservasi.tanggal_reservasi.asc(), Reservasi.created_at.desc() if hasattr(Reservasi, 'created_at') else Reservasi.reservasi_id.asc()).all()
+
+    return render_template(
+        'admin_reservasi.html', 
+        reservasi_list=reservasi_data,
+        current_status=status_filter,
+        current_date=date_filter
+    )
+
+@admin_bp.route('/admin/reservasi/update-status', methods=['POST'])
+@admin_required
+def update_reservasi_status():
+    try:
+        data = request.get_json()
+        reservasi_id = data.get('id')
+        new_status = data.get('status')
+        
+        reservasi = Reservasi.query.get(reservasi_id)
+        if not reservasi:
+            flash(f'Reservasi tidak ditemukan', 'danger')
+ 
+        reservasi.status = new_status
+        db.session.commit()
+       
+        flash(f'Status berhasil diubah menjadi {new_status}', 'success')
+        return jsonify({'status': 'success', 'message': f'Status berhasil diubah menjadi {new_status}'})
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(str(e), 'danger')
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@admin_bp.route('/admin/reservasi/delete/<string:reservasi_id>', methods=['DELETE'])
+@admin_required
+def delete_reservasi(reservasi_id):
+    try:
+        reservasi = Reservasi.query.get(reservasi_id)
+        if not reservasi:
+            flash("Data reservasi tidak ditemukan", 'danger')
+            
+        db.session.delete(reservasi)
+        db.session.commit()
+        flash("Data reservasi berhasil dihapus permanen.", 'success')
+        return jsonify({'status': 'success', 'message': 'Data reservasi berhasil dihapus permanen.'})
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(str(e), 'danger')
+=======
     try:
         dokter = Dokter.query.get(id)
         if not dokter:
@@ -440,78 +515,5 @@ def delete_poli(id):
         return jsonify({'status': 'success', 'message': 'Data Poliklinik berhasil dihapus.'})
     except Exception as e:
         db.session.rollback()
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-    return redirect(url_for('admin.data_dokter'))
-
-# =========================================================
-# MANAJEMEN RESERVASI PASIEN
-# =========================================================
-
-@admin_bp.route('/admin/data-reservasi', methods=['GET'])
-@admin_required
-def reservasi_list():
-    status_filter = request.args.get('status', 'all')
-    date_filter = request.args.get('date', '')
-
-    query = Reservasi.query
-
-    if status_filter != 'all':
-        query = query.filter(Reservasi.status == status_filter)
-    
-  
-    if date_filter:
-        try:
-            filter_date = datetime.strptime(date_filter, '%Y-%m-%d').date()
-            query = query.filter(Reservasi.tanggal_reservasi == filter_date)
-        except ValueError:
-            pass
-
-    reservasi_data = query.order_by(Reservasi.tanggal_reservasi.asc(), Reservasi.created_at.desc() if hasattr(Reservasi, 'created_at') else Reservasi.reservasi_id.asc()).all()
-
-    return render_template(
-        'admin_reservasi.html', 
-        reservasi_list=reservasi_data,
-        current_status=status_filter,
-        current_date=date_filter,
-    )
-
-@admin_bp.route('/admin/reservasi/update-status', methods=['POST'])
-@admin_required
-def update_reservasi_status():
-    try:
-        data = request.get_json()
-        reservasi_id = data.get('id')
-        new_status = data.get('status')
-        
-        reservasi = Reservasi.query.get(reservasi_id)
-        if not reservasi:
-            flash(f'Reservasi tidak ditemukan', 'danger')
- 
-        reservasi.status = new_status
-        db.session.commit()
-       
-        flash(f'Status berhasil diubah menjadi {new_status}', 'success')
-        return jsonify({'status': 'success', 'message': f'Status berhasil diubah menjadi {new_status}'})
-        
-    except Exception as e:
-        db.session.rollback()
-        flash(str(e), 'danger')
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-@admin_bp.route('/admin/reservasi/delete/<string:reservasi_id>', methods=['DELETE'])
-@admin_required
-def delete_reservasi(reservasi_id):
-    try:
-        reservasi = Reservasi.query.get(reservasi_id)
-        if not reservasi:
-            flash("Data reservasi tidak ditemukan", 'danger')
-            
-        db.session.delete(reservasi)
-        db.session.commit()
-        flash("Data reservasi berhasil dihapus permanen.", 'success')
-        return jsonify({'status': 'success', 'message': 'Data reservasi berhasil dihapus permanen.'})
-        
-    except Exception as e:
-        db.session.rollback()
-        flash(str(e), 'danger')
+>>>>>>> 3ac98600848934123bb0bd5ccf77a579fb034c6c
         return jsonify({'status': 'error', 'message': str(e)}), 500

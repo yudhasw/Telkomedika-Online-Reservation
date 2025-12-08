@@ -4,12 +4,11 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto space-y-6">
-
-
     <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Daftar Reservasi Pasien</h1>
-            <p class="text-gray-500 mt-1 text-sm">Kelola antrian dan status pemeriksaan pasien.</p>
+            <h1 class="text-2xl font-bold text-gray-800">Manajemen Reservasi Pasien</h1>
+            <p class="text-gray-500 mt-1 ">Kelola antrian dan status pemeriksaan pasien.</p>
         </div>
         
         <form method="GET" action="{{ url_for('admin.reservasi_list') }}" class="flex flex-wrap gap-3 items-center">
@@ -39,9 +38,17 @@
     </div>
 
     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="bg-[#E51B24] text-white p-5 flex justify-between items-center">
+            <h2 class="font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-receipt"></i> Daftar Reservasi
+            </h2>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full text-white border border-white/30">
+                Total: {{ reservasi_list|length }}
+            </span>
+        </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-bold border-b border-gray-200">
+                <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-bold border-b border-gray-100">
                     <tr>
                         <th class="p-4">Pasien</th>
                         <th class="p-4">Jadwal & Dokter</th>
@@ -141,7 +148,6 @@
 </div>
 
 <script>
-    // 1. UPDATE STATUS
     async function updateStatus(id, newStatus) {
         if(!confirm(`Ubah status reservasi ini menjadi '${newStatus}'?`)) return;
 
@@ -162,7 +168,6 @@
         }
     }
 
-    // 2. DELETE RESERVASI
     async function deleteReservasi(id) {
         if(!confirm("PERINGATAN: Menghapus data ini bersifat permanen.\n\nApakah Anda yakin ingin menghapus data reservasi ini?")) return;
 

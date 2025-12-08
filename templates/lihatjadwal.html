@@ -22,10 +22,10 @@
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-sm font-medium text-gray-700 mr-6 min-w-[60px]">Hari:</span>
-                        <button onclick="filterHari('Semua', this)" class="filter-hari-btn bg-tm-red text-white border border-transparent px-4 py-1.5 rounded-lg text-sm hover:shadow-md transition font-medium shadow-sm">Semua</button>
+                        <button onclick="filterHari('Semua', this)" data-value="Semua" class="filter-hari-btn bg-tm-red text-white border border-transparent px-4 py-1.5 rounded-lg text-sm hover:shadow-md transition font-medium shadow-sm">Semua</button>
                         
                         {% for h in ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] %}
-                        <button onclick="filterHari('{{ h }}', this)" class="filter-hari-btn bg-white text-gray-600 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 hover:border-tm-cyan hover:text-tm-cyan transition font-medium">
+                        <button onclick="filterHari('{{ h }}', this)" data-value="{{ h }}" class="filter-hari-btn bg-white text-gray-600 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 hover:border-tm-cyan hover:text-tm-cyan transition font-medium">
                             {{ h }}
                         </button>
                         {% endfor %}
@@ -34,13 +34,23 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="filterPoli('Semua', this)" class="filter-btn bg-tm-red text-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition font-medium">Semua</button>
-                <button onclick="filterPoli('Umum', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
-                    <i class="fas fa-user-md mr-2 text-tm-cyan"></i> Umum
-                </button>
-                <button onclick="filterPoli('Gigi', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
-                    <i class="fas fa-tooth mr-2 text-tm-cyan"></i> Spesialis Gigi
-                </button>
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm text-gray-700 mr-2 min-w-[60px]">Poli:</span>
+                        
+                        <button onclick="filterPoli('Semua', this)" data-value="Semua" 
+                            class="filter-poli-btn bg-tm-red text-white border border-transparent px-6 py-2 rounded-lg text-sm hover:shadow-md transition font-medium shadow-sm">
+                            Semua
+                        </button>
+
+                        {% for p in all_poli %}
+                        <button onclick="filterPoli('{{ p.nama_poli }}', this)" data-value="{{ p.nama_poli }}"
+                            class="filter-poli-btn bg-white text-gray-600 border border-gray-300 px-6 py-2 rounded-lg text-sm hover:bg-gray-50 transition flex items-center font-medium">
+                            <i class="fas fa-hospital-user mr-2 text-tm-cyan"></i> {{ p.nama_poli[11:] }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <div class="relative grow max-w-xs ml-auto md:ml-4">
                     <input type="text" id="search_dokter" placeholder="Cari nama dokter..."

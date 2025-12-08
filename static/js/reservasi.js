@@ -124,7 +124,7 @@ applyDateBtn.addEventListener('click', function() {
 });
 
 function filterPoli(kategori, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => {
+    document.querySelectorAll('.filter-poli-btn').forEach(b => {
         b.classList.remove('bg-blue-600', 'text-white');
         b.classList.add('bg-white', 'text-gray-600');
     });
