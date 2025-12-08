@@ -64,19 +64,3 @@ class Reservasi(db.Model):
     except Exception as e:
       db.session.rollback()
       return False, str(e)
-
-  def findAll():
-    # logic disini
-    return True
-
-  def findOne():
-    # logic disini 
-    return True
-  
-  def update():
-    # Logout logic disini 
-    return True
-  
-  def remove():
-    # Logout logic disini 
-    return True

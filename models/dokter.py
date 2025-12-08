@@ -11,7 +11,6 @@ class Dokter(db.Model):
     poliklinik = db.relationship("Poliklinik", back_populates="dokter_list")
     list_jadwal = db.relationship("ListJadwal", back_populates="dokter")
     
-    # Helper untuk mengubah objek database menjadi dictionary (agar bisa dibaca Javascript)
     def to_dict(self):
         return {
             "id": self.dokter_id,

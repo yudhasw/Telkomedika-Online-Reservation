@@ -76,19 +76,3 @@ class JadwalPemeriksaan(db.Model):
   @classmethod
   def get_all_data(cls):
       return db.session.query(cls).join(Dokter).join(Poliklinik).order_by(cls.hari, cls.jam_mulai).all()
-
-  def findAll():
-    # logic disini
-    return True
-
-  def findOne():
-    # logic disini 
-    return True
-  
-  def update():
-    # logic disini 
-    return True
-  
-  def remove():
-    # logic disini 
-    return True

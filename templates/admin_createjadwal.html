@@ -4,39 +4,35 @@
 
 {% block content %}
 <style>
-    /* Custom Style untuk Grid Cell */
     .schedule-cell {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         height: 70px;
         vertical-align: middle;
         position: relative;
-        background-color: #ffffff; /* Default putih */
+        background-color: #ffffff; 
     }
-    
-    /* Hover Effect: Merah Sangat Muda */
+ 
     .schedule-cell:hover {
-        background-color: #fef2f2; /* Red-50 */
+        background-color: #fef2f2; 
     }
-    
-    /* Plus Sign saat Hover */
+
     .schedule-cell:hover::after {
         content: '+';
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        color: #dc2626; /* Red-600 */
+        color: #dc2626; 
         font-size: 1.5rem;
         opacity: 0.5;
     }
     
-    /* Style Kotak yang SUDAH TERISI */
     .has-schedule {
-        background-color: #fee2e2; /* Red-100 (Agak terang) */
-        color: #7f1d1d; /* Red-900 (Font Gelap) */
+        background-color: #fee2e2; 
+        color: #7f1d1d; 
         font-weight: 700;
-        border: 1px solid #fca5a5; /* Red-300 */
+        border: 1px solid #fca5a5; 
         border-radius: 6px;
         padding: 6px 8px;
         font-size: 0.75rem;
@@ -45,7 +41,6 @@
         width: 90%;
     }
     
-    /* Hapus tanda plus jika sudah ada jadwal */
     .schedule-cell:has(.has-schedule):hover::after {
         content: ''; 
     }
@@ -137,10 +132,8 @@
         tableBody.innerHTML = '';
         doctorsData.forEach(doc => {
             const row = document.createElement('tr');
-            // Border dipergelap (gray-300)
             row.className = "hover:bg-gray-100 transition border-b border-gray-300 last:border-0";
-            
-            // Info Dokter - Sticky Left
+     
             row.innerHTML = `
                 <td class="p-4 border-r border-gray-300 bg-white sticky left-0 z-10 font-bold text-gray-800 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                     ${doc.name}
@@ -152,7 +145,6 @@
 
             days.forEach(day => {
                 const cell = document.createElement('td');
-                // Border cell dipergelap
                 cell.className = "schedule-cell border-r border-gray-300 text-center";
                 cell.dataset.doctorId = doc.id;
                 cell.dataset.doctorName = doc.name;
@@ -211,7 +203,6 @@
         closeModal();
     }
 
-    // --- LOGIC SAVE ASYNC ---
     async function saveAllSchedule() {
         const btn = document.querySelector('button[onclick="saveAllSchedule()"]');
         const originalText = btn.innerHTML; 
@@ -263,7 +254,6 @@
         }
     }
 
-    // --- LOGIC GENERATE MANUAL ---
     async function triggerManualGenerate(scope) {
         if (!confirm("Buat jadwal untuk MINGGU DEPAN berdasarkan template ini?")) return;
         

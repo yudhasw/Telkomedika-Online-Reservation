@@ -66,9 +66,7 @@ class Pasien(db.Model, UserMixin):
       db.session.rollback()
       return False
   
-  def remove():
-    # logic disini
-    return True
+
 
 
  
