@@ -8,27 +8,28 @@
     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-800">Monitoring Jadwal Dokter</h1>
-            <p class="text-gray-500 mt-1">Pantau ketersediaan jadwal minggu ini dan minggu depan.</p>
+            <p class="text-gray-500 mt-1">Pantau ketersediaan jadwal dokter yang aktif saat ini.</p>
         </div>
         <div class="flex gap-3">
             <a href="{{ url_for('admin.dashboard') }}" class="px-5 py-2.5 rounded-lg text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium transition">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali
             </a>
-            <a href="{{ url_for('admin.create_jadwal') }}" class="px-5 py-2.5 rounded-lg text-white bg-tm-red hover:bg-cyan-700 font-bold shadow-lg shadow-cyan-500/30 transition transform hover:-translate-y-0.5">
-                <i class="fas fa-calendar-plus mr-2"></i> Atur Jadwal & Generate
+            <a href="{{ url_for('admin.create_jadwal') }}" class="px-5 py-2.5 rounded-lg text-white bg-[#E51B24] hover:bg-red-700 font-bold shadow-lg shadow-red-500/30 transition transform hover:-translate-y-0.5">
+                <i class="fas fa-calendar-plus mr-2"></i> Template Jadwal
             </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="w-full">
         
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
-            <div class="bg-gradient-to-r from-teal-600 to-teal-700 text-white p-5 flex justify-between items-center">
+            
+            <div class="bg-[#E51B24] text-white p-5 flex justify-between items-center">
                 <div>
                     <h2 class="font-bold text-lg flex items-center gap-2">
                         <i class="fas fa-calendar-week"></i> Minggu Ini
                     </h2>
-                    <p class="text-xs text-teal-100 mt-0.5">{{ label_ini }}</p>
+                    <p class="text-xs text-red-100 mt-0.5 font-medium">{{ label_ini }}</p>
                 </div>
             </div>
             
@@ -37,29 +38,29 @@
                 <table class="w-full text-left text-sm">
                     <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-100">
                         <tr>
-                            <th class="p-4">Hari/Tgl</th>
-                            <th class="p-4">Dokter</th>
-                            <th class="p-4">Jam</th>
-                            <th class="p-4 text-center">Kuota</th>
-                            <th class="p-4 text-center">Aksi</th>
+                            <th class="p-4 w-[15%]">Hari/Tgl</th>
+                            <th class="p-4 w-[25%]">Dokter</th>
+                            <th class="p-4 w-[20%]">Jam</th>
+                            <th class="p-4 w-[15%] text-center">Kuota</th>
+                            <th class="p-4 w-[15%] text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         {% for j in jadwal_ini %}
-                        <tr class="hover:bg-teal-50/50 transition duration-150 group">
+                        <tr class="hover:bg-red-50/30 transition duration-150 group">
                             <td class="p-4">
                                 <div class="font-bold text-gray-800">{{ j.hari }}</div>
-                                <div class="text-xs text-gray-400">{{ j.tanggal.strftime('%d-%m') }}</div>
+                                <div class="text-xs text-gray-400">{{ j.tanggal.strftime('%d-%m-%Y') }}</div>
                             </td>
                             <td class="p-4">
                                 <div class="font-medium text-gray-900">{{ j.dokter.nama_dokter }}</div>
-                                <div class="text-xs text-teal-600 bg-teal-50 px-2 py-0.5 rounded inline-block mt-1">{{ j.poliklinik.nama_poli }}</div>
+                                <div class="text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded inline-block mt-1">{{ j.poliklinik.nama_poli }}</div>
                             </td>
                             <td class="p-4 font-mono text-gray-600 text-xs">
                                 {{ j.jam_mulai.strftime('%H:%M') }} - {{ j.jam_selesai.strftime('%H:%M') }}
                             </td>
                             <td class="p-4 text-center">
-                                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                                <span class="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full border border-green-200">
                                     {{ j.kuota }}
                                 </span>
                             </td>
@@ -84,85 +85,13 @@
                     <div class="bg-gray-50 p-4 rounded-full mb-3">
                         <i class="fas fa-calendar-times text-3xl"></i>
                     </div>
-                    <p>Jadwal kosong.</p>
+                    <p class="font-medium">Tidak ada jadwal aktif minggu ini.</p>
+                    <p class="text-sm mt-1">Silakan buat template baru atau generate jadwal susulan.</p>
                 </div>
                 {% endif %}
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
-            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-5 flex justify-between items-center">
-                <div>
-                    <h2 class="font-bold text-lg flex items-center gap-2">
-                        <i class="fas fa-calendar-alt"></i> Minggu Depan
-                    </h2>
-                    <p class="text-xs text-indigo-100 mt-0.5">{{ label_depan }}</p>
-                </div>
-                {% if jadwal_depan %}
-                <button onclick="deleteWeek('next')" class="text-xs bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-lg backdrop-blur-sm transition border border-white/30" title="Reset Jadwal">
-                    <i class="fas fa-trash-alt mr-1"></i> Reset
-                </button>
-                {% endif %}
-            </div>
-            
-            <div class="overflow-x-auto flex-grow">
-                {% if jadwal_depan %}
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-100">
-                        <tr>
-                            <th class="p-4">Hari/Tgl</th>
-                            <th class="p-4">Dokter</th>
-                            <th class="p-4">Jam</th>
-                            <th class="p-4 text-center">Kuota</th>
-                            <th class="p-4 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        {% for j in jadwal_depan %}
-                        <tr class="hover:bg-indigo-50/50 transition duration-150 group">
-                            <td class="p-4">
-                                <div class="font-bold text-gray-800">{{ j.hari }}</div>
-                                <div class="text-xs text-gray-400">{{ j.tanggal.strftime('%d-%m') }}</div>
-                            </td>
-                            <td class="p-4">
-                                <div class="font-medium text-gray-900">{{ j.dokter.nama_dokter }}</div>
-                                <div class="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded inline-block mt-1">{{ j.poliklinik.nama_poli }}</div>
-                            </td>
-                            <td class="p-4 font-mono text-gray-600 text-xs">
-                                {{ j.jam_mulai.strftime('%H:%M') }} - {{ j.jam_selesai.strftime('%H:%M') }}
-                            </td>
-                            <td class="p-4 text-center">
-                                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                                    {{ j.kuota }}
-                                </span>
-                            </td>
-                            <td class="p-4 text-center">
-                                <div class="flex justify-center gap-2">
-                                    <button onclick="openEditModal('{{ j.jadwal_id }}', '{{ j.dokter.nama_dokter }}', '{{ j.jam_mulai.strftime('%H:%M') }}', '{{ j.jam_selesai.strftime('%H:%M') }}', '{{ j.kuota }}')" 
-                                            class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition border border-blue-200" title="Edit">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button onclick="deleteItem('{{ j.jadwal_id }}')" 
-                                            class="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition border border-red-200" title="Hapus">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <div class="flex flex-col items-center justify-center h-64 text-gray-400">
-                    <div class="bg-gray-50 p-4 rounded-full mb-3">
-                        <i class="fas fa-robot text-3xl"></i>
-                    </div>
-                    <p class="text-sm">Belum ada jadwal.</p>
-                    <p class="text-xs mt-1">Sistem akan generate otomatis hari Minggu.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
     </div>
 </div>
 
@@ -184,24 +113,24 @@
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Mulai</label>
-                    <input type="time" id="editJamMulai" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-tm-cyan focus:border-tm-cyan">
+                    <input type="time" id="editJamMulai" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-[#E51B24] focus:border-[#E51B24]">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Selesai</label>
-                    <input type="time" id="editJamSelesai" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-tm-cyan focus:border-tm-cyan">
+                    <input type="time" id="editJamSelesai" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-[#E51B24] focus:border-[#E51B24]">
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Kuota</label>
-                <input type="number" id="editKuota" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-tm-cyan focus:border-tm-cyan">
+                <input type="number" id="editKuota" class="w-full border-gray-300 border px-3 py-2 rounded-lg focus:ring-[#E51B24] focus:border-[#E51B24]">
                 <p class="text-[10px] text-gray-400 mt-1">*Kosongkan untuk hitung otomatis.</p>
             </div>
         </div>
 
         <div class="flex justify-end gap-3 mt-8">
             <button onclick="closeEditModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg transition text-sm font-medium">Batal</button>
-            <button onclick="submitEdit()" class="px-4 py-2 bg-tm-cyan text-white rounded-lg hover:bg-cyan-700 font-bold transition shadow-lg shadow-cyan-500/30 text-sm">Simpan</button>
+            <button onclick="submitEdit()" class="px-4 py-2 bg-[#E51B24] text-white rounded-lg hover:bg-red-700 font-bold transition shadow-lg shadow-red-500/30 text-sm">Simpan</button>
         </div>
     </div>
 </div>
@@ -212,7 +141,6 @@
         if(!confirm("Yakin ingin menghapus jadwal dokter ini secara permanen?")) return;
         
         try {
-            // Menggunakan template literal untuk URL yang benar
             const res = await fetch(`/admin/jadwal/delete/${id}`, { method: 'DELETE' });
             const data = await res.json();
             
@@ -229,8 +157,7 @@
 
     // 2. DELETE SATU MINGGU (Reset Bulk)
     async function deleteWeek(scope) {
-        const label = scope === 'current' ? 'MINGGU INI' : 'MINGGU DEPAN';
-        if(!confirm(`PERINGATAN: Anda akan menghapus SEMUA jadwal untuk ${label}.\n\nApakah Anda yakin ingin me-reset jadwal ini?`)) return;
+        if(!confirm(`PERINGATAN: Anda akan menghapus SEMUA jadwal Minggu Ini.\n\nApakah Anda yakin?`)) return;
         
         try {
             const res = await fetch("{{ url_for('admin.delete_jadwal_week') }}", {
