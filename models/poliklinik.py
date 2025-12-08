@@ -8,6 +8,7 @@ class Poliklinik(db.Model):
 
   # Relasi ke ListJadwal (Sudah Benar)
   list_jadwal = db.relationship("ListJadwal", back_populates="poliklinik")
+  dokter_list = db.relationship("Dokter", back_populates="poliklinik")
   
   @classmethod
   def create(cls, nama_poli, deskripsi):
