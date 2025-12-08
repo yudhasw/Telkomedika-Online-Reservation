@@ -272,22 +272,98 @@ def update_jadwal_item():
         return jsonify({'status': 'error', 'message': str(e)}), 500
     
 # =========================================================
-# ATUR DATA DOKTER
+# ATUR DATA DOKTER (CRUD)
 # =========================================================
 
 @admin_bp.route('/admin/data-dokter', methods=['GET'])
 @admin_required
 def data_dokter():
-    return render_template('admin_datadokter.html')
-
+    # Ambil semua data dokter
+    dokters = Dokter.query.order_by(Dokter.nama_dokter.asc()).all()
+    # Ambil data poliklinik untuk dropdown spesialisasi
+    polis = Poliklinik.query.all()
+    
+    return render_template('admin_datadokter.html', dokters=dokters, polis=polis)
 
 @admin_bp.route('/admin/data-dokter/add', methods=['POST'])
 @admin_required
 def add_dokter():
-    return redirect(url_for('admin.data_dokter'))
+    try:
+        data = request.get_json()
+        nama = data.get('nama')
+        poli_id = data.get('poli_id') # Ambil ID Poli
+        
+        # Validasi sederhana
+        if not nama or not poli_id:
+            return jsonify({'status': 'error', 'message': 'Nama dan Poli wajib diisi'}), 400
+            
+        # Ambil nama poli untuk disimpan di kolom string (backup)
+        poli = Poliklinik.query.get(poli_id)
+        nama_spesialisasi = poli.nama_poli if poli else "Umum"
 
+        # Panggil method create yang baru
+        success, msg = Dokter.create(nama, nama_spesialisasi, poli_id)
+        
+        if success:
+            return jsonify({'status': 'success', 'message': 'Berhasil menambahkan dokter baru.'})
+        else:
+            return jsonify({'status': 'error', 'message': msg}), 500
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
-@admin_bp.route('/admin/data-dokter/delete/<int:id>', methods=['POST'])
+@admin_bp.route('/admin/data-dokter/update', methods=['POST'])
+@admin_required
+def update_dokter():
+    try:
+        data = request.get_json()
+        
+        # Ambil data dari frontend
+        id = data.get('id')
+        nama = data.get('nama')
+        poli_id = data.get('poli_id') # Mengambil ID Poli
+        
+        # Validasi input sederhana
+        if not id or not nama or not poli_id:
+            return jsonify({'status': 'error', 'message': 'Data tidak lengkap (ID, Nama, dan Poli wajib diisi)'}), 400
+
+        # Cari dokter yang akan diedit
+        dokter = Dokter.query.get(id)
+        if not dokter:
+            return jsonify({'status': 'error', 'message': 'Dokter tidak ditemukan'}), 404
+            
+        # Cari Nama Poli berdasarkan ID untuk disimpan di kolom string 'spesialisasi'
+        # (Ini menjaga agar kolom lama 'spesialisasi' tetap sinkron dengan relasi baru)
+        poli = Poliklinik.query.get(poli_id)
+        nama_spesialisasi = poli.nama_poli if poli else "Umum"
+
+        # Lakukan Update ke Database
+        dokter.nama_dokter = nama
+        dokter.spesialisasi = nama_spesialisasi # Update string label
+        dokter.poliklinik_id = poli_id          # Update Foreign Key relasi
+        
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Data dokter berhasil diperbarui.'})
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error Update Dokter: {e}") # Print error di terminal untuk debugging
+        return jsonify({'status': 'error', 'message': f'Gagal update: {str(e)}'}), 500
+
+@admin_bp.route('/admin/data-dokter/delete/<int:id>', methods=['DELETE'])
 @admin_required
 def delete_dokter(id):
-    return redirect(url_for('admin.data_dokter'))
+    try:
+        dokter = Dokter.query.get(id)
+        if not dokter:
+            return jsonify({'status': 'error', 'message': 'Dokter tidak ditemukan'}), 404
+        
+        # Cek apakah dokter punya jadwal aktif (Foreign Key Check)
+        if len(dokter.list_jadwal) > 0:
+             return jsonify({'status': 'error', 'message': 'Gagal hapus: Dokter ini masih memiliki jadwal praktek. Hapus jadwalnya terlebih dahulu.'}), 409
+
+        db.session.delete(dokter)
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': 'Data dokter berhasil dihapus.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
