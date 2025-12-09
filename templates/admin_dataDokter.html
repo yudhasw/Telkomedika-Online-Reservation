@@ -167,7 +167,6 @@
         idInput.value = id;
         namaInput.value = nama;
 
-        // Set dropdown value
         if (spesialisasi) {
             spesialisasiInput.value = spesialisasi;
         } else {
@@ -213,7 +212,6 @@
             const data = await res.json();
 
             if (res.ok) {
-                // alert(data.message); 
                 window.location.reload();
             } else {
                 alert("Gagal: " + data.message);
@@ -248,7 +246,6 @@
         }
     }
 
-    // Close modal on click outside
     window.onclick = function (event) {
         if (event.target == modal) {
             closeModal();

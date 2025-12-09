@@ -19,21 +19,43 @@
                     </select>
                     <i class="fas fa-caret-down absolute right-3 top-2/3 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                 </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm font-medium text-gray-700 mr-6 min-w-[60px]">Hari:</span>
+                        <button onclick="filterHari('Semua', this)" data-value="Semua" class="filter-hari-btn bg-tm-red text-white border border-transparent px-4 py-1.5 rounded-lg text-sm hover:shadow-md transition font-medium shadow-sm">Semua</button>
+                        
+                        {% for h in ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] %}
+                        <button onclick="filterHari('{{ h }}', this)" data-value="{{ h }}" class="filter-hari-btn bg-white text-gray-600 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-50 hover:border-tm-cyan hover:text-tm-cyan transition font-medium">
+                            {{ h }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="filterPoli('Semua', this)" class="filter-btn bg-tm-red text-white border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition font-medium">Semua</button>
-                <button onclick="filterPoli('Umum', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
-                    <i class="fas fa-user-md mr-2 text-tm-cyan"></i> Umum
-                </button>
-                <button onclick="filterPoli('Gigi', this)" class="filter-btn bg-white text-gray-700 border border-gray-300 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-100 transition flex items-center font-medium">
-                    <i class="fas fa-tooth mr-2 text-tm-cyan"></i> Spesialis Gigi
-                </button>
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm text-gray-700 mr-2 min-w-[60px]">Poli:</span>
+                        
+                        <button onclick="filterPoli('Semua', this)" data-value="Semua" 
+                            class="filter-poli-btn bg-tm-red text-white border border-transparent px-6 py-2 rounded-lg text-sm hover:shadow-md transition font-medium shadow-sm">
+                            Semua
+                        </button>
+
+                        {% for p in all_poli %}
+                        <button onclick="filterPoli('{{ p.nama_poli }}', this)" data-value="{{ p.nama_poli }}"
+                            class="filter-poli-btn bg-white text-gray-600 border border-gray-300 px-6 py-2 rounded-lg text-sm hover:bg-gray-50 transition flex items-center font-medium">
+                            <i class="fas fa-hospital-user mr-2 text-tm-cyan"></i> {{ p.nama_poli[11:] }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <div class="relative grow max-w-xs ml-auto md:ml-4">
                     <input type="text" id="search_dokter" placeholder="Cari nama dokter..."
                             class="w-full pl-4 pr-10 py-1.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-tm-cyan text-sm">
-                    <i id="search_close" class="fas fa-times absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hidden"></i>
+                    <i id="search_close" class="fas fa-times absolute right-3 bottom-2.5 transform  text-gray-400 cursor-pointer hidden"></i>
                 </div>
             </div>
         </div>
@@ -50,7 +72,8 @@
                 {% for item in data %}
                 <div class="doctor-card flex flex-col md:flex-row items-center border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200 bg-white" 
                         data-spesialis="{{ item.poliklinik.nama_poli }}" 
-                        data-jam="{{ item.jam_mulai }}">
+                        data-jam="{{ item.jam_mulai }}"
+                        data-hari="{{ item.hari }}">
                     
                     <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mr-0 md:mr-6 mb-4 md:mb-0 flex-shrink-0">
                         <i class="fas fa-user-doctor text-4xl text-gray-400"></i>
@@ -70,7 +93,7 @@
                         <a href="{{ url_for('pasien.form_reservasi', 
                                     poli_id=item.poliklinik_id, 
                                     tanggal=get_next_date(item.hari),
-                                    preselect=item.listjadwal_id) }}" 
+                                    preselect=item.jadwal_id) }}" 
                             class="bg-tm-red text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-red-700 transition text-center shadow-sm">
                             Buat Reservasi
                         </a>
@@ -83,78 +106,5 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('search_dokter');
-        const searchClose = document.getElementById('search_close');
-        const timeFilter = document.getElementById('time_filter');
-
-        function applyFilters() {
-            const activeBtn = document.querySelector('.filter-btn.bg-tm-red');
-            const category = activeBtn ? activeBtn.innerText.trim() : 'Semua';
-            const searchTerm = searchInput.value.toLowerCase();
-            const selectedTime = timeFilter.value; 
-
-            const cards = document.querySelectorAll('.doctor-card');
-
-            cards.forEach(card => {
-                const poli = card.getAttribute('data-spesialis');
-                const name = card.querySelector('.doctor-name').innerText.toLowerCase();
-                const jamMulaiStr = card.getAttribute('data-jam'); 
-
-                let matchCategory = (category === 'Semua');
-                if (!matchCategory) {
-                    if (category === 'Umum' && poli.toLowerCase().includes('umum')) matchCategory = true;
-                    if (category.includes('Gigi') && poli.toLowerCase().includes('gigi')) matchCategory = true;
-                }
-
-                const matchSearch = name.includes(searchTerm);
-
-                let matchTime = true;
-                if (selectedTime !== 'all') {
-                    const jam = parseInt(jamMulaiStr.split(':')[0]);
-                    if (selectedTime === 'pagi') {
-                        matchTime = (jam < 11);
-                    } else if (selectedTime === 'siang') {
-                        matchTime = (jam >= 11);
-                    }
-                }
-
-                if (matchCategory && matchSearch && matchTime) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        window.filterPoli = function(kategori, btn) {
-            document.querySelectorAll('.filter-btn').forEach(b => {
-                b.classList.remove('bg-tm-red', 'text-white', 'border-transparent');
-                b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
-            });
-            btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-            btn.classList.add('bg-tm-red', 'text-white', 'border-transparent');
-
-            applyFilters();
-        }
-
-        searchInput.addEventListener('input', () => {
-            if (searchInput.value.length > 0) {
-                searchClose.classList.remove('hidden');
-            } else {
-                searchClose.classList.add('hidden');
-            }
-            applyFilters();
-        });
-
-        searchClose.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClose.classList.add('hidden');
-            applyFilters();
-        });
-
-        timeFilter.addEventListener('change', applyFilters);
-    });
-</script>
+<script src="{{ url_for('static', filename='js/lihatjadwal.js') }}"></script>
 {% endblock %}

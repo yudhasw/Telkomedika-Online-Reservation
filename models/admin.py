@@ -27,11 +27,3 @@ class Admin(db.Model, UserMixin):
     if admin:
       return True
     return False 
-  
-  def update():
-    # Logout logic disini 
-    return True
-  
-  def remove():
-    # Logout logic disini 
-    return True

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Telkomedika Admin{% endblock %}</title>
     <link rel="icon" href="{{ url_for('static', filename='img/telkomedika-logo-mini.png') }}" type="image/x-icon">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,6 +29,22 @@
             }
         }
     </script>
+    <style>
+        html, body {
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
+
+        ::-webkit-scrollbar {
+            display : none;
+            width: 0px;
+            background: transparent;
+        }
+        * {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+    </style>
 </head>
 
 <body class="font-sans text-gray-800 bg-gray-50 flex flex-col min-h-screen">
@@ -58,13 +73,14 @@
                         <div class="absolute top-full left-0 w-48 bg-white shadow-lg rounded-b-lg border border-gray-100 py-2 hidden group-hover:block transform transition-all duration-200 origin-top">
                             <a href="{{ url_for('admin.jadwal') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red">Atur Jadwal Dokter</a>
                             <a href="{{ url_for('admin.data_dokter') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red">Data Dokter</a>
-                            </div>
+                            <a href="{{ url_for('admin.reservasi_list') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-tm-red">Data Reservasi</a>
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-4">
                     {% if current_user.is_authenticated %}
-                        <div class="relative group">
+                        <div class="relative group h-full flex items-center">
                             <button class="flex items-center gap-2 text-sm focus:outline-none transition duration-150 ease-in-out">
                                 <span class="hidden md:block font-semibold text-gray-700">{{ current_user.nama }}</span>
                                 <div class="h-9 w-9 rounded-full bg-tm-red text-white flex items-center justify-center shadow-md">
@@ -72,7 +88,7 @@
                                 </div>
                             </button>
                             
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100 hidden group-hover:block z-50">
+                            <div class="absolute right-0 top-full w-48 bg-white rounded-md shadow-lg py-1 border border-gray-100 hidden group-hover:block z-50">
                                 <div class="px-4 py-2 border-b border-gray-100">
                                     <p class="text-xs text-gray-500">Login sebagai</p>
                                     <p class="text-sm font-bold text-gray-900 truncate">{{ current_user.nama }}</p>
@@ -153,7 +169,7 @@
                     alert.classList.add('opacity-0', '-translate-y-2');
                     setTimeout(() => alert.remove(), 500);
                 });
-            }, 4000); // Hilang setelah 4 detik
+            }, 4000); 
         });
     </script>
 </body>

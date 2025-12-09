@@ -26,7 +26,6 @@ register_routes(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-# login_manager.login_view = 'auth.login_pasien'
 
 @scheduler.task('cron', id='do_reminder', hour=7, minute=0)
 def scheduled_task():

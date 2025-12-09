@@ -200,7 +200,7 @@
             if (res.ok) {
                 window.location.reload();
             } else {
-                alert(data.message); // Menampilkan pesan jika gagal karena ada relasi
+                alert(data.message); 
             }
         } catch (err) {
             console.error(err);
@@ -208,7 +208,6 @@
         }
     }
 
-    // Close modal on click outside
     window.onclick = function(event) {
         if (event.target == modal) {
             closeModal();

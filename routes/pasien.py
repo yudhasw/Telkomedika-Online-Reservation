@@ -143,6 +143,8 @@ def form_reservasi():
     tanggal_str = request.args.get('tanggal')
     jadwal = []
 
+    all_poli = Poliklinik.get_all_data()
+
     if tanggal_str:
         jadwal = JadwalPemeriksaan.get_filtered_data(poli_id, tanggal_str)
 
@@ -162,11 +164,11 @@ def form_reservasi():
             for err in error_list:
                 if err:
                     flash(err, 'danger')
-            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str, all_poli=all_poli)
 
         if not jadwal_id:
             flash('Silakan pilih jadwal terlebih dahulu.', 'warning')
-            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str, all_poli=all_poli)
         
         try:
             tanggal_fix = datetime.strptime(data_pasien.get("tanggal_reservasi"), '%Y-%m-%d').date()
@@ -179,11 +181,11 @@ def form_reservasi():
         except Exception as e:
             current_app.logger.error(f"Gagal mendapatkan nomor urut: {e}")
             flash('Terjadi kesalahan sistem saat mengambil nomor antrian.', 'danger')
-            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str, all_poli=all_poli)
 
         if not no_urut:
             flash('Mohon maaf, Kuota untuk jadwal ini sudah penuh.', 'warning')
-            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str)
+            return render_template('reservasi.html', pasien=pasien, jadwal=jadwal, poli_id=poli_id, tanggal=tanggal_str, all_poli=all_poli)
         
         reservasi, msg = Reservasi.create(
             pasien_id=pasien.pasien_id,
@@ -212,7 +214,8 @@ def form_reservasi():
         pasien=pasien, 
         jadwal=jadwal, 
         poli_id=poli_id, 
-        tanggal=tanggal_str
+        tanggal=tanggal_str,
+        all_poli=all_poli
     )
 
 @pasien_bp.route("/reservasi/cancel/<string:reservasi_id>", methods=['POST'])
@@ -243,8 +246,7 @@ def batalkan_reservasi(reservasi_id):
 
 @pasien_bp.route('/jadwal-dokter')
 def jadwal_dokter():
-    list_jadwal = ListJadwal.get_data()
+    list_jadwal = JadwalPemeriksaan.get_all_data()
+    all_poli = Poliklinik.get_all_data()
 
-    return render_template('lihatjadwal.html', data=list_jadwal, get_next_date=pasien_services.get_next_date)
-
-
+    return render_template('lihatjadwal.html', data=list_jadwal, get_next_date=pasien_services.get_next_date, all_poli=all_poli)

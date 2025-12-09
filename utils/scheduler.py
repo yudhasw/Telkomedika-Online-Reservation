@@ -29,12 +29,12 @@ def send_reminder_job(app):
                         recipients=[res.pasien.email]
                     )
                     
-                    dokter_nama = res.jadwalpemeriksaan.listjadwal.dokter.nama_dokter
-                    poli_nama = res.jadwalpemeriksaan.listjadwal.poliklinik.nama_poli
+                    dokter_nama = res.jadwalpemeriksaan.dokter.nama_dokter
+                    poli_nama = res.jadwalpemeriksaan.poliklinik.nama_poli
                     jadwal_reservasi = res.tanggal_reservasi
 
                     try:
-                        jam_mulai_dokter = res.jadwalpemeriksaan.listjadwal.jam_mulai
+                        jam_mulai_dokter = res.jadwalpemeriksaan.jam_mulai
                         waktu_start_praktek = datetime.combine(jadwal_reservasi, jam_mulai_dokter)
 
                         hasil_estimasi = waktu_start_praktek + timedelta(minutes=((res.no_urut - 1) * 20))

@@ -1,6 +1,7 @@
 from . import db
 from sqlalchemy.exc import SQLAlchemyError
 import uuid
+from datetime import datetime, timedelta, date
 
 class Reservasi(db.Model):
   reservasi_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
@@ -29,6 +30,23 @@ class Reservasi(db.Model):
       db.session.rollback
       return None, str(e)
   
+  @property
+  def estimasi_waktu(self):
+      try:
+          jam_mulai = self.jadwalpemeriksaan.jam_mulai
+     
+          dummy_date = date.today()
+          start_dt = datetime.combine(dummy_date, jam_mulai)
+
+          tambahan_menit = (self.no_urut - 1) * 20
+      
+          estimasi_dt = start_dt + timedelta(minutes=tambahan_menit)
+ 
+          return estimasi_dt.strftime("%H:%M")
+          
+      except Exception as e:
+          return "Sesuai Antrian"
+  
   def get_reservation_data(pasien_id):
     data = Reservasi.query.filter_by(pasien_id=pasien_id)\
         .order_by(Reservasi.tanggal_reservasi.desc()).all()
@@ -46,19 +64,3 @@ class Reservasi(db.Model):
     except Exception as e:
       db.session.rollback()
       return False, str(e)
-
-  def findAll():
-    # logic disini
-    return True
-
-  def findOne():
-    # logic disini 
-    return True
-  
-  def update():
-    # Logout logic disini 
-    return True
-  
-  def remove():
-    # Logout logic disini 
-    return True

@@ -136,7 +136,6 @@
 </div>
 
 <script>
-    // 1. DELETE SATU ITEM (Baris Tertentu)
     async function deleteItem(id) {
         if(!confirm("Yakin ingin menghapus jadwal dokter ini secara permanen?")) return;
         
@@ -155,7 +154,6 @@
         }
     }
 
-    // 2. DELETE SATU MINGGU (Reset Bulk)
     async function deleteWeek(scope) {
         if(!confirm(`PERINGATAN: Anda akan menghapus SEMUA jadwal Minggu Ini.\n\nApakah Anda yakin?`)) return;
         
@@ -179,7 +177,6 @@
         }
     }
 
-    // 3. LOGIKA EDIT MODAL
     const editModal = document.getElementById('editModal');
     
     function openEditModal(id, nama, jamMulai, jamSelesai, kuota) {
@@ -202,7 +199,6 @@
         const jamSelesai = document.getElementById('editJamSelesai').value;
         const kuota = document.getElementById('editKuota').value;
         
-        // Validasi sederhana
         if(jamSelesai <= jamMulai) {
             alert("Jam Selesai harus lebih besar dari Jam Mulai");
             return;
@@ -233,7 +229,6 @@
         }
     }
 
-    // Tutup modal jika klik di luar area modal
     window.onclick = function(event) {
         if (event.target == editModal) {
             closeEditModal();

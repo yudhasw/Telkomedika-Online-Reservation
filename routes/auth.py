@@ -269,9 +269,15 @@ def login_admin():
 @login_required
 def logout():
     logout_user()
-    session.clear()
 
-    return redirect(url_for("auth.login_pasien"))
+    role = session['role']
+    if role == 'admin':
+        session.clear()
+        return redirect(url_for("auth.login_admin"))
+    else:
+        session.clear()
+        return redirect(url_for("auth.login_pasien"))
+    
 
 @auth_bp.route('/forgot-password', methods=["GET", "POST"])
 def forgot_password():
