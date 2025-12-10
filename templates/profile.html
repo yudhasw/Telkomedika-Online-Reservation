@@ -16,6 +16,30 @@
     .scrollbar-custom::-webkit-scrollbar-track { background: transparent; }
     .scrollbar-custom::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+   
+    @media (max-width: 767px) {
+       
+        .container.mx-auto.px-6.py-8 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    
+        .bg-gray-100.rounded-\[2rem\].p-6.md\:p-12 {
+            padding: 1.5rem; 
+            min-height: auto; 
+            border-radius: 1.5rem; 
+        }
+        
+        .flex.border-b.border-gray-200.mb-8.overflow-x-auto.gap-8.px-2 {
+            gap: 1.5rem; 
+            margin-bottom: 1rem;
+            -webkit-overflow-scrolling: touch; 
+            padding-bottom: 0.5rem;
+        }
+    }
 </style>
 
 <div class="container mx-auto px-6 py-8 max-w-5xl">
@@ -38,15 +62,15 @@
 
     <div class="flex border-b border-gray-200 mb-8 overflow-x-auto gap-8 px-2">
         <button onclick="switchTab('profile')" id="tab-profile" data-text="Tentang Saya"
-           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0">
+           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0 whitespace-nowrap">
            Tentang Saya
         </button>
         <button onclick="switchTab('tickets')" id="tab-tickets" data-text="Riwayat Reservasi"
-           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0">
+           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0 whitespace-nowrap">
            Riwayat Reservasi
         </button>
         <button onclick="switchTab('password')" id="tab-password" data-text="Ubah Sandi"
-           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0">
+           class="nav-stable pb-3 text-lg transition-colors duration-200 outline-none focus:outline-none focus:ring-0 whitespace-nowrap">
            Ubah Sandi
         </button>
     </div>
@@ -57,9 +81,15 @@
             <button onclick="toggleEditMode()" id="edit-toggle-btn" class="absolute top-0 right-0 text-2xl text-gray-700 hover:text-tm-red transition p-2 z-10 focus:outline-none outline-none">
                 <i class="fas fa-pen" id="icon-mode"></i> 
             </button>
+            <form action="{{ url_for('pasien.profile_edit') }}" method="POST" id="profile-form" class="flex flex-col md:flex-row gap-8 md:gap-12 h-full pt-8 md:pt-0">
+                
+                <div class="flex-shrink-0 flex flex-col items-center justify-start order-1 md:order-2 pt-0 md:pt-4 md:w-1/3">
+                    <div class="w-40 h-40 md:w-56 md:h-56 bg-black rounded-full flex items-center justify-center text-white text-7xl md:text-9xl mb-6 shadow-lg border-4 border-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
 
-            <form action="{{ url_for('pasien.profile_edit') }}" method="POST" id="profile-form" class="flex flex-col md:flex-row gap-12 h-full">
-                <div class="flex-grow space-y-5">
+                <div class="flex-grow space-y-4 md:space-y-5 order-2 md:order-1">
                     <div>
                         <label class="block text-sm font-medium mb-2 ml-1 text-gray-700">Nama</label>
                         <input type="text" name="nama" value="{{ pasien.nama }}" readonly class="profile-input w-full px-6 py-3 rounded-full border border-gray-400 bg-transparent text-gray-800 focus:outline-none focus:ring-1 focus:ring-tm-red transition-colors">
@@ -95,32 +125,23 @@
                     </div>
 
                 </div>
-                
-                <div class="flex-shrink-0 flex flex-col items-center justify-start pt-4 md:w-1/3">
-                    <div class="w-56 h-56 bg-black rounded-full flex items-center justify-center text-white text-9xl mb-6 shadow-lg border-4 border-white">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
             </form>
         </div>
 
         <div id="section-tickets" class="hidden h-full flex-col">
             
             <div class="flex justify-center mb-6">
-                <div class="bg-gray-200 p-1 rounded-full flex w-full max-w-md">
-                    <button onclick="switchTicketTab('upcoming')" id="subtab-upcoming" class="w-1/2 py-2 rounded-full text-sm font-bold transition-all shadow-sm bg-white text-tm-red outline-none focus:outline-none">
+                <div class="bg-gray-200 p-1 rounded-full flex w-full max-w-sm"> <button onclick="switchTicketTab('upcoming')" id="subtab-upcoming" class="w-1/2 py-2 rounded-full text-xs md:text-sm font-bold transition-all shadow-sm bg-white text-tm-red outline-none focus:outline-none">
                         Akan Datang
                         {% if upcoming|length > 0 %} <span class="ml-1 bg-red-100 text-tm-red text-[10px] px-1.5 py-0.5 rounded-full">{{ upcoming|length }}</span> {% endif %}
                     </button>
-                    <button onclick="switchTicketTab('history')" id="subtab-history" class="w-1/2 py-2 rounded-full text-sm font-medium transition-all text-gray-500 hover:text-gray-700 outline-none focus:outline-none">
+                    <button onclick="switchTicketTab('history')" id="subtab-history" class="w-1/2 py-2 rounded-full text-xs md:text-sm font-medium transition-all text-gray-500 hover:text-gray-700 outline-none focus:outline-none">
                         Riwayat
                     </button>
                 </div>
             </div>
 
-            <div class="flex-grow overflow-y-auto pr-2 max-h-[500px] space-y-4 scrollbar-custom animate-fade">
-                
-                <div id="view-upcoming">
+            <div class="flex-grow overflow-y-auto pr-2 max-h-[70vh] md:max-h-[500px] space-y-4 scrollbar-custom animate-fade"> <div id="view-upcoming">
                     {% if not upcoming %}
                         <div class="text-center py-12 flex flex-col items-center justify-center h-full text-gray-400">
                             <i class="far fa-calendar-times text-4xl mb-3"></i>
@@ -129,36 +150,33 @@
                         </div>
                     {% else %}
                         {% for res in upcoming %}
-                        <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 relative overflow-hidden group hover:border-tm-red transition">
-                            <div class="absolute top-0 left-0 w-1.5 h-full bg-tm-red"></div>
-                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pl-3">
+                        <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-200 relative overflow-hidden group hover:border-tm-red transition"> <div class="absolute top-0 left-0 w-1.5 h-full bg-tm-red"></div>
+                            <div class="flex flex-col md:flex-row justify-between items-start gap-4 pl-3">
                                 
-                                <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-tm-red shrink-0">
-                                        <i class="fas fa-user-doctor text-xl"></i>
+                                <div class="flex items-start gap-3 flex-grow"> <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-50 flex items-center justify-center text-tm-red shrink-0">
+                                        <i class="fas fa-user-doctor text-lg md:text-xl"></i>
                                     </div>
-                                    <div>
-                                        <h3 class="font-bold text-gray-900">{{ res.jadwalpemeriksaan.dokter.nama_dokter }}</h3>
-                                        <p class="text-sm text-tm-cyan font-medium">{{ res.jadwalpemeriksaan.poliklinik.nama_poli }}</p>
-                                        <p class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                    <div class="min-w-0"> <h3 class="font-bold text-sm md:text-base text-gray-900 truncate">{{ res.jadwalpemeriksaan.dokter.nama_dokter }}</h3>
+                                        <p class="text-xs md:text-sm text-tm-cyan font-medium">{{ res.jadwalpemeriksaan.poliklinik.nama_poli }}</p>
+                                        <p class="text-xs text-gray-500 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
                                             <span><i class="far fa-calendar mr-1"></i> {{ res.tanggal_reservasi.strftime('%d %B %Y') }}</span>
                                             <span><i class="far fa-clock mr-1"></i> {{ res.estimasi_waktu }}</span>
                                         </p>
                                     </div>
                                 </div>
 
-                                <div class="text-right ml-auto flex flex-col items-end gap-2">
-                                    <div>
-                                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 mb-1">
+                                <div class="w-full pt-2 md:w-auto text-left md:text-right flex flex-row md:flex-col items-center md:items-end justify-between border-t md:border-t-0 mt-2 md:mt-0 pt-2">
+                                    <div class="flex items-center gap-3">
+                                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 mb-0 md:mb-1">
                                             {{ res.status }}
                                         </div>
-                                        <p class="text-xs text-gray-400">Antrian: <span class="text-xl font-bold text-tm-red ml-1">{{ res.no_urut }}</span></p>
+                                        <p class="text-xs text-gray-400 whitespace-nowrap">Antrian: <span class="text-lg font-bold text-tm-red ml-1">{{ res.no_urut }}</span></p>
                                     </div>
 
                                     <button type="button" 
                                             data-cancel-url="{{ url_for('pasien.batalkan_reservasi', reservasi_id=res.reservasi_id) }}" 
                                             onclick="triggerCancelModal(this.getAttribute('data-cancel-url'))" 
-                                            class="text-xs text-red-500 hover:text-red-700 font-medium underline focus:outline-none transition">
+                                            class="text-xs text-red-500 hover:text-red-700 font-medium underline focus:outline-none transition mt-0 md:mt-2">
                                         Batalkan Reservasi
                                     </button>
                                 </div>
@@ -176,14 +194,14 @@
                     {% else %}
                         {% for res in history %}
                         <div class="bg-gray-50 rounded-xl p-4 border border-gray-200 opacity-80 hover:opacity-100 transition">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-bold text-gray-700 text-sm">{{ res.jadwalpemeriksaan.dokter.nama_dokter }}</h4>
+                            <div class="flex justify-between items-center gap-4">
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-gray-700 text-sm truncate">{{ res.jadwalpemeriksaan.dokter.nama_dokter }}</h4>
                                     <p class="text-xs text-gray-500 mt-1">
                                         {{ res.tanggal_reservasi.strftime('%d %B %Y') }} - {{ res.jadwalpemeriksaan.poliklinik.nama_poli }}
                                     </p>
                                 </div>
-                                <div>
+                                <div class="flex-shrink-0">
                                     {% if res.status == 'Selesai' %}
                                         <span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-700">Selesai</span>
                                     {% elif res.status == 'Dibatalkan' %}
@@ -202,8 +220,7 @@
         </div>
 
         <div id="section-password" class="hidden h-full flex items-center justify-center">
-            <form action="{{ url_for('pasien.profile_updatepassword') }}" method="POST" class="w-full max-w-lg space-y-6">
-                <div class="relative">
+            <form action="{{ url_for('pasien.profile_updatepassword') }}" method="POST" class="w-full max-w-sm space-y-6 px-4"> <div class="relative">
                     <label class="block text-sm font-medium mb-2 ml-1 text-gray-700">Old Password</label>
                     <input type="password" name="old-password" id="old-password" class="w-full px-6 py-3 rounded-full border border-gray-400 bg-white focus:outline-none focus:ring-1 focus:ring-tm-red transition pr-12">
                     <button type="button" onclick="togglePassword('old-password', this)" class="absolute right-5 top-[2.6rem] text-gray-500 hover:text-gray-700 focus:outline-none outline-none"><i class="fas fa-eye-slash"></i></button>
@@ -229,14 +246,13 @@
 
 <div id="cancelReservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black bg-opacity-75 transition-opacity duration-300 opacity-0">
     <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl sm:my-8 sm:w-full sm:max-w-md scale-95 transition-transform duration-300">
-            <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+        <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl sm:my-8 sm:w-full sm:max-w-xs scale-95 transition-transform duration-300"> <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
-                    <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <div class="mx-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
                         <i class="fas fa-exclamation-triangle text-red-600 text-lg"></i>
                     </div>
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                        <h3 class="text-lg font-bold leading-6 text-gray-900" id="modal-title">Batalkan Reservasi</h3>
+                        <h3 class="text-base font-bold leading-6 text-gray-900" id="modal-title">Batalkan Reservasi</h3>
                         <div class="mt-2">
                             <p class="text-sm text-gray-500">Apakah Anda yakin ingin membatalkan reservasi ini? Tindakan ini tidak dapat dikembalikan.</p>
                         </div>
