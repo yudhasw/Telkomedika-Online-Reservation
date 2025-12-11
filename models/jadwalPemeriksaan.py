@@ -2,7 +2,7 @@ from . import db
 from .listjadwal import ListJadwal
 from .dokter import Dokter
 from .poliklinik import Poliklinik
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from .reservasi import Reservasi
 import locale
 
@@ -60,12 +60,18 @@ class JadwalPemeriksaan(db.Model):
         days_map = {0: 'Senin', 1: 'Selasa', 2: 'Rabu', 3: 'Kamis', 4: 'Jumat', 5: 'Sabtu', 6: 'Minggu'}
         nama_hari = days_map[tanggal_obj.weekday()]
 
+        today = datetime.now().date()
+
+        week_start = today - timedelta(days=today.weekday())
+        week_end = week_start + timedelta(days=6)
+
         query = db.session.query(cls).join(
             Dokter, cls.dokter_id == Dokter.dokter_id
         ).join(
             Poliklinik, cls.poliklinik_id == Poliklinik.poliklinik_id
         ).filter(     
-            cls.hari == nama_hari
+            cls.hari == nama_hari, cls.tanggal >= week_start, cls.tanggal <= week_end
+            # cls.tanggal == tanggal_obj
         )
     
         if poli_id:
@@ -75,4 +81,10 @@ class JadwalPemeriksaan(db.Model):
   
   @classmethod
   def get_all_data(cls):
-      return db.session.query(cls).join(Dokter).join(Poliklinik).order_by(cls.hari, cls.jam_mulai).all()
+      
+      today = datetime.now().date()
+
+      week_start = today - timedelta(days=today.weekday())
+      week_end = week_start + timedelta(days=6)
+
+      return db.session.query(cls).join(Dokter).join(Poliklinik).filter(cls.tanggal >= week_start,cls.tanggal <= week_end).order_by(cls.hari, cls.jam_mulai).all()
