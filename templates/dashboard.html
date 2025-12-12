@@ -20,51 +20,58 @@
     {% endwith %}
 </div>
 
-<header class="relative bg-linear-to-r from-white to-gray-50 overflow-hidden min-h-[500px] flex items-center mt-[-1rem]">
+<header class="relative bg-gradient-to-r from-white to-gray-50 overflow-hidden">
+    
     <div id="slider-container" class="w-full overflow-hidden">
-        <div id="slider-wrapper" class="flex w-[300%]">
+        <div id="slider-wrapper" class="flex w-[300%] transition-transform duration-500 ease-in-out">
             
-            <div class="shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center">
-                <div class="w-full md:w-1/2 mb-10 md:mb-0">
-                    <h1 class="text-3xl md:text-4xl font-bold text-tm-red leading-tight mb-4">
-                        Punya pertanyaan <br>
-                        seputar layanan <br>
-                        kesehatan kami?
-                    </h1>
-                    <h2 class="text-2xl font-bold text-tm-cyan mb-6">
-                        Hubungi <br>
-                        <span class="text-4xl">TM Care</span>
-                    </h2>
-                    <a href="#" class="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-green-600 transition transform hover:scale-105">
-                        <i class="fab fa-whatsapp text-2xl mr-2"></i>
-                        TelkoMedika Care
-                    </a>
-                </div>
-                <div class="w-full md:w-1/2 relative">
-                    <div class="absolute inset-0 bg-tm-cyan rounded-full opacity-10 transform scale-105 translate-x-5"></div>
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                            alt="TM Care" 
-                            class="relative z-10 rounded-bl-[100px] w-full object-cover h-[400px] shadow-xl">
+            <div class="shrink-0 w-1/3 flex items-center justify-center">
+                <div class="container mx-auto px-6 py-10 md:py-0 min-h-[450px] md:min-h-[500px] flex flex-col-reverse md:flex-row items-center">
+                    <div class="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0 z-10">
+                        <h1 class="text-2xl md:text-4xl font-bold text-tm-red leading-tight mb-4">
+                            Punya pertanyaan <br class="hidden md:block">
+                            seputar layanan <br class="hidden md:block">
+                            kesehatan kami?
+                        </h1>
+                        <h2 class="text-xl md:text-2xl font-bold text-tm-cyan mb-6">
+                            Hubungi <br>
+                            <span class="text-3xl md:text-4xl">TM Care</span>
+                        </h2>
+                        <a href="#" class="inline-flex items-center bg-green-500 text-white px-6 py-3 rounded-full font-bold shadow-lg hover:bg-green-600 transition transform hover:scale-105 text-sm md:text-base">
+                            <i class="fab fa-whatsapp text-xl mr-2"></i>
+                            TelkoMedika Care
+                        </a>
+                    </div>
+                    <div class="w-full md:w-1/2 relative flex justify-center">
+                        <div class="absolute inset-0 bg-tm-cyan rounded-full opacity-10 transform scale-90 md:scale-105 translate-x-0 md:translate-x-5"></div>
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                             alt="TM Care" 
+                             class="relative z-10 rounded-3xl md:rounded-bl-[100px] w-4/5 md:w-full object-cover h-64 md:h-[400px] shadow-xl">
+                    </div>
                 </div>
             </div>
 
-            <div class="shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center justify-center bg-gray-50 h-[500px]">
-                <div class="text-center w-full md:w-2/3">
-                    <h2 class="text-4xl font-bold text-tm-cyan mb-4">Layanan Kesehatan Lengkap</h2>
-                    <p class="text-gray-600 mb-8 text-lg">Kami menyediakan berbagai spesialisasi dokter berpengalaman untuk kebutuhan kesehatan Anda dan keluarga.</p>
-                    <a href="{{ url_for('pasien.jadwal_dokter') }}" class="bg-tm-cyan text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-cyan-600 transition transform hover:-translate-y-1">
-                        Lihat Jadwal Dokter
-                    </a>
+            <div class="shrink-0 w-1/3 flex items-center justify-center bg-gray-50">
+                <div class="container mx-auto px-6 py-10 md:py-0 min-h-[450px] md:min-h-[500px] flex flex-col md:flex-row items-center justify-center">
+                    <div class="text-center w-full md:w-2/3">
+                        <h2 class="text-2xl md:text-4xl font-bold text-tm-cyan mb-4">Layanan Kesehatan Lengkap</h2>
+                        <p class="text-gray-600 mb-8 text-sm md:text-lg px-4 md:px-0">Kami menyediakan berbagai spesialisasi dokter berpengalaman untuk kebutuhan kesehatan Anda dan keluarga.</p>
+                        <a href="{{ url_for('pasien.jadwal_dokter') }}" class="bg-tm-cyan text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-cyan-600 transition transform hover:-translate-y-1 text-sm md:text-base">
+                            Lihat Jadwal Dokter
+                        </a>
+                    </div>
                 </div>
             </div>
             
-            <div class="shrink-0 w-1/3 container mx-auto px-6 flex flex-col md:flex-row items-center justify-center bg-red-50 h-[500px]">
+            <div class="shrink-0 w-1/3 flex items-center justify-center bg-red-50">
+                <div class="container mx-auto px-6 py-10 md:py-0 min-h-[450px] md:min-h-[500px] flex flex-col md:flex-row items-center justify-center">
                     <div class="text-center w-full md:w-2/3">
-                    <h2 class="text-4xl font-bold text-tm-red mb-4">Buat Janji Sekarang</h2>
-                    <p class="text-gray-600 mb-8 text-lg">Tanpa antri, tanpa ribet. Lakukan reservasi pemeriksaan langsung dari gadget Anda kapan saja.</p>
-                    <a href="{{ url_for('pasien.form_reservasi') }}" class="bg-tm-red text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-red-700 transition transform hover:-translate-y-1">
-                        Buat Reservasi
-                    </a>
+                        <h2 class="text-2xl md:text-4xl font-bold text-tm-red mb-4">Buat Janji Sekarang</h2>
+                        <p class="text-gray-600 mb-8 text-sm md:text-lg px-4 md:px-0">Tanpa antri, tanpa ribet. Lakukan reservasi pemeriksaan langsung dari gadget Anda kapan saja.</p>
+                        <a href="{{ url_for('pasien.form_reservasi') }}" class="bg-tm-red text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-red-700 transition transform hover:-translate-y-1 text-sm md:text-base">
+                            Buat Reservasi
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -72,33 +79,33 @@
     </div>
 
     <div id="slider-indicators" class="absolute bottom-5 left-206.5 transform flex gap-2">
-        <span data-slide="0" class="h-3 w-3 bg-tm-red rounded-full cursor-pointer hover:scale-125 transition"></span>
-        <span data-slide="1" class="h-3 w-3 bg-gray-300 rounded-full cursor-pointer hover:scale-125 transition"></span>
-        <span data-slide="2" class="h-3 w-3 bg-gray-300 rounded-full cursor-pointer hover:scale-125 transition"></span>
+        <span data-slide="0" class="h-2 w-2 md:h-3 md:w-3 bg-tm-red rounded-full cursor-pointer hover:scale-125 transition"></span>
+        <span data-slide="1" class="h-2 w-2 md:h-3 md:w-3 bg-gray-300 rounded-full cursor-pointer hover:scale-125 transition"></span>
+        <span data-slide="2" class="h-2 w-2 md:h-3 md:w-3 bg-gray-300 rounded-full cursor-pointer hover:scale-125 transition"></span>
     </div>
 </header>
 
-<section class="py-16 bg-white">
+<section class="py-12 md:py-16 bg-white">
     <div class="container mx-auto px-6 text-center">
-        <h2 class="text-2xl font-light text-gray-800 mb-2">Layanan <span class="font-normal">Telkomedika Online Reservation</span></h2>
-        <p class="text-xs text-gray-500 mb-10 max-w-2xl mx-auto">
+        <h2 class="text-xl md:text-2xl font-light text-gray-800 mb-2">Layanan <span class="font-normal">Telkomedika Online Reservation</span></h2>
+        <p class="text-xs md:text-sm text-gray-500 mb-10 max-w-2xl mx-auto">
             Layanan ini memudahkan Anda untuk melakukan pemesanan dan melihat jadwal dokter secara daring.
         </p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <a href="{{ url_for('pasien.form_reservasi') }}" class="relative group overflow-hidden rounded-2xl shadow-lg h-64 block">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <a href="{{ url_for('pasien.form_reservasi') }}" class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 block">
                 <img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Dokter Gigi" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
-                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition"></div>
-                <div class="absolute bottom-6 right-6 bg-tm-red text-white px-6 py-2 rounded-lg font-bold group-hover:bg-red-700 transition shadow-md flex items-center gap-2 transform group-hover:translate-x-[-5px]">
-                    Reservasi <i class="fas fa-arrow-right text-sm"></i>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80"></div>
+                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-tm-red text-white px-4 py-2 md:px-6 rounded-lg font-bold group-hover:bg-red-700 transition shadow-md flex items-center gap-2 transform group-hover:translate-x-[-5px] text-sm md:text-base">
+                    Reservasi <i class="fas fa-arrow-right text-xs"></i>
                 </div>
             </a>
 
-            <a href="{{ url_for('pasien.jadwal_dokter') }}" class="relative group overflow-hidden rounded-2xl shadow-lg h-64 block">
+            <a href="{{ url_for('pasien.jadwal_dokter') }}" class="relative group overflow-hidden rounded-2xl shadow-lg h-48 md:h-64 block">
                 <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Jadwal" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
-                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-80 group-hover:opacity-90 transition"></div>
-                <div class="absolute bottom-6 right-6 bg-tm-cyan text-white px-6 py-2 rounded-lg font-bold group-hover:bg-cyan-700 transition shadow-md flex items-center gap-2 transform group-hover:translate-x-[-5px]">
-                    Lihat Jadwal <i class="fas fa-calendar-alt text-sm"></i>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-80"></div>
+                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 bg-tm-cyan text-white px-4 py-2 md:px-6 rounded-lg font-bold group-hover:bg-cyan-700 transition shadow-md flex items-center gap-2 transform group-hover:translate-x-[-5px] text-sm md:text-base">
+                    Lihat Jadwal <i class="fas fa-calendar-alt text-xs"></i>
                 </div>
             </a>
         </div>
@@ -107,63 +114,63 @@
 
 <section class="py-12 bg-white mb-10">
     <div class="container mx-auto px-6">
-        <div class="text-center mb-12">
-            <p class="text-xs text-gray-500 mb-2">
+        <div class="text-center mb-10">
+            <p class="text-xs text-gray-500 mb-10 max-w-2xl mx-auto">
                 Kepercayaan adalah hal yang paling utama bagi kami serta menjadi motivasi<br>
                 untuk selalu mengupayakan yang terbaik, dengan berlandaskan kepada
             </p>
-            <h2 class="text-3xl font-bold text-tm-cyan">Komitmen TelkoMedika</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-tm-cyan">Komitmen TelkoMedika</h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            <div class="flex flex-col items-start p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
-                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
-                    <div class="text-tm-cyan text-6xl text-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            <div class="flex flex-col items-center p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
+                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 w-full flex justify-center h-32 md:h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
+                    <div class="text-tm-cyan text-5xl md:text-6xl text-center relative">
                         <i class="fas fa-user-md"></i>
-                        <i class="fas fa-certificate text-2xl -ml-4 align-top text-orange-400"></i>
+                        <i class="fas fa-certificate text-xl md:text-2xl -ml-4 align-top text-orange-400 absolute top-0 right-[-10px]"></i>
                     </div>
                 </div>
-                <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Tenaga<br>Profesional</h3>
+                <h3 class="text-center font-bold text-gray-800 mb-2 italic">Tenaga Profesional</h3>
                 <div class="text-xs text-gray-500 leading-relaxed flex">
                     <span class="text-tm-cyan mr-2">▶</span>
                     <p>TelkoMedika berkomitmen dalam memiliki tenaga kesehatan yang profesional, berpengalaman, dan tersertifikasi.</p>
                 </div>
             </div>
 
-            <div class="flex flex-col items-start p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
-                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
-                    <div class="text-tm-cyan text-6xl text-center">
+            <div class="flex flex-col items-center p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
+                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 w-full flex justify-center h-32 md:h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
+                    <div class="text-tm-cyan text-5xl md:text-6xl text-center">
                         <i class="fas fa-hand-holding-medical"></i>
                     </div>
                 </div>
-                <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Solusi<br>Menyeluruh</h3>
+                <h3 class="text-center font-bold text-gray-800 mb-2 italic">Solusi Menyeluruh</h3>
                 <div class="text-xs text-gray-500 leading-relaxed flex">
                     <span class="text-tm-cyan mr-2">▶</span>
                     <p>Layanan konsultasi dan kustomisasi program kesehatan dengan dukungan sistem event dan cost management.</p>
                 </div>
             </div>
 
-            <div class="flex flex-col items-start p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
-                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
-                    <div class="text-tm-cyan text-6xl text-center">
+            <div class="flex flex-col items-center p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
+                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 w-full flex justify-center h-32 md:h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
+                    <div class="text-tm-cyan text-5xl md:text-6xl text-center">
                         <i class="fas fa-users"></i>
                     </div>
                 </div>
-                <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Mudah<br>Diakses</h3>
+                <h3 class="text-center font-bold text-gray-800 mb-2 italic">Mudah Diakses</h3>
                 <div class="text-xs text-gray-500 leading-relaxed flex">
                     <span class="text-tm-cyan mr-2">▶</span>
                     <p>Didukung dengan 1.200 mitra yang telah memenuhi compliance medis dan hukum di seluruh Indonesia.</p>
                 </div>
             </div>
 
-            <div class="flex flex-col items-start p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
-                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 mx-auto w-full flex justify-center h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
-                    <div class="text-tm-cyan text-6xl text-center">
+            <div class="flex flex-col items-center p-4 group hover:bg-gray-50 rounded-xl transition duration-300">
+                <div class="bg-white border border-gray-100 shadow-md rounded-xl p-6 mb-4 w-full flex justify-center h-32 md:h-40 items-center transition transform group-hover:-translate-y-2 group-hover:shadow-lg">
+                    <div class="text-tm-cyan text-5xl md:text-6xl text-center relative">
                         <i class="fas fa-microchip"></i>
-                        <i class="fas fa-cog text-3xl -ml-2 align-bottom"></i>
+                        <i class="fas fa-cog text-2xl md:text-3xl -ml-2 align-bottom text-gray-400 absolute bottom-0 right-[-5px]"></i>
                     </div>
                 </div>
-                <h3 class="w-full text-center font-bold text-gray-800 mb-4 italic">Teknologi<br>Canggih</h3>
+                <h3 class="text-center font-bold text-gray-800 mb-2 italic">Teknologi Canggih</h3>
                 <div class="text-xs text-gray-500 leading-relaxed flex">
                     <span class="text-tm-cyan mr-2">▶</span>
                     <p>Customer experience terbaik dengan digitalisasi end to end dan Wellness Program.</p>

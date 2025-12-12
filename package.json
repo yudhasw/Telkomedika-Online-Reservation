@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch --config",
-    "flask": "flask run",
+    "flask": "python app.py",
     "dev": "concurrently \"npm run build\" \"npm run flask\""
   },
   "keywords": [],
