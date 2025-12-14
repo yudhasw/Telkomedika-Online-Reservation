@@ -3,6 +3,7 @@ from flask import current_app
 from flask_mail import Message
 from models import Reservasi, JadwalPemeriksaan
 from extensions import mail
+from utils import email
 from datetime import datetime, timedelta, date
 from models import Admin, Pasien
 
@@ -67,7 +68,8 @@ def notifikasiReservasi(pasien, reservasi):
     """
     
     try:
-        mail.send(msg)
+        email.send_mail(msg)
+        # mail.send(msg)
     except Exception as e:
         current_app.logger.error(f"Gagal mengirim email: {e}")
 
