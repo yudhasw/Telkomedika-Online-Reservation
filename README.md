@@ -48,7 +48,6 @@
 <!-- ABOUT THE PROJECT -->
 ## ⭐ About The Project
 Telkomedika Online Reservation adalah aplikasi berbasis web Reservasi Jadwal Pemeriksaan Dokter secara Online di Telkom Medika dirancang untuk memudahkan pasien dalam membuat jadwal reservasi pemeriksaan dengan dokter tanpa harus datang langsung ke Telkom Medika. Dengan adanya aplikasi ini, pasien dapat menghemat waktu dan meningkatkan efisiensi dalam pengolahan jadwal pemeriksaan oleh petugas Telkom Medika.
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 
 ## 📋 Feature
