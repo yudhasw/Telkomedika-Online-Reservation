@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, date
 from extensions import mail, Message
 from models import Reservasi, db, ListJadwal, JadwalPemeriksaan
 from flask import current_app
+from utils import email
 
 def send_reminder_job(app):
     with app.app_context(): 
@@ -47,7 +48,7 @@ def send_reminder_job(app):
                     msg.body = f"""
                     Halo {res.pasien.nama},
                     
-                    Ini adalah pengingat untuk jadwal pemeriksaan kesehatan Anda BESOK.
+                    Ini adalah pengingat untuk jadwal pemeriksaan kesehatan Anda HARI INI.
                     
                     Dokter  : {dokter_nama}
                     Poli    : {poli_nama}
@@ -58,7 +59,8 @@ def send_reminder_job(app):
                     Mohon datang 10 menit lebih awal. Terima kasih.
                     """
                     
-                    mail.send(msg)
+                    # mail.send(msg)
+                    email.send_mail(msg)
      
                     res.is_reminded = 1
                 except Exception as e:

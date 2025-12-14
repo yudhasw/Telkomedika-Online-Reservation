@@ -1,6 +1,7 @@
 import re
 from models import Admin, Pasien
 from extensions import mail, Message
+from utils import email
 
 
 def validate_password_strength(password, confirm_password):
@@ -112,7 +113,8 @@ def send_otp_email(target_email, otp_code, kategori='register'):
         Kode ini bersifat rahasia dan berlaku selama 2 menit.
         Jangan berikan kode ini kepada siapapun, termasuk pihak TelkoMedika.
         """
-        mail.send(msg)
+        email.send_mail(msg)
+        # mail.send(msg)
         return True
     except Exception as e:
         print(f"Error mengirim email: {e}")
