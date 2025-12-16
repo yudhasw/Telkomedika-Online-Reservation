@@ -48,7 +48,6 @@
 <!-- ABOUT THE PROJECT -->
 ## ⭐ About The Project
 Telkomedika Online Reservation adalah aplikasi berbasis web Reservasi Jadwal Pemeriksaan Dokter secara Online di Telkom Medika dirancang untuk memudahkan pasien dalam membuat jadwal reservasi pemeriksaan dengan dokter tanpa harus datang langsung ke Telkom Medika. Dengan adanya aplikasi ini, pasien dapat menghemat waktu dan meningkatkan efisiensi dalam pengolahan jadwal pemeriksaan oleh petugas Telkom Medika.
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 
 ## 📋 Feature
@@ -76,29 +75,25 @@ Berikut ini adalah _prerequisites_ dan  _installation_ jika ingin menjalankan pr
 Ikuti instruksi dibawah untuk mendapatkan _local copy_ dari proyek ini.
 
 ### Prerequisites
-
-Based on the technology stack we have implemented (Python Flask, SQL Server, Tailwind), here is the Prerequisites section drafted in English, ready to be put into your README.md.
-
-📋 Prerequisites
 Before you begin, ensure you have met the following requirements:
 1. Operating System
 Windows (Recommended for SQL Server compatibility), macOS, or Linux.
 
 2. Software & Tools
-  - Python 3.10+: Make sure Python is installed and added to your system PATH.
-  - Node.js & npm: Required to compile Tailwind CSS locally.
-  - Git: To clone the repository.
-  - Microsoft SQL Server: You need a running instance of SQL Server (Express or Developer edition is free for local use).
+    - Python 3.10+: Make sure Python is installed and added to your system PATH.
+    - Node.js & npm: Required to compile Tailwind CSS locally.
+    - Git: To clone the repository.
+    - Microsoft SQL Server: You need a running instance of SQL Server (Express or Developer edition is free for local use).
 
-  - ODBC Driver 18 for SQL Server:
-    This is mandatory for the application to connect to the database.
-    [Download for Windows, macOS, and Linux here.](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver17)
+    - ODBC Driver 18 for SQL Server:
+      This is mandatory for the application to connect to the database.
+      [Download for Windows, macOS, and Linux here.](https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver17)
 
-  - Database Management Tool (Optional but recommended):
-    - SSMS (SQL Server Management Studio) or Azure Data Studio to visualize and manage your tables.
+    - Database Management Tool (Optional but recommended):
+      - SSMS (SQL Server Management Studio) or Azure Data Studio to visualize and manage your tables.
 
 3. Knowledge
-  - Basic understanding of how to use the Command Line or Terminal.
+    - Basic understanding of how to use the Command Line or Terminal.
 
 ### Installation
 
