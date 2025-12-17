@@ -1,23 +1,19 @@
 from datetime import datetime, timedelta, date
 from extensions import mail, Message
 from models import Reservasi, db, ListJadwal, JadwalPemeriksaan
-from flask import current_app
 from utils import email
 
 def send_reminder_job(app):
-    with app.app_context(): 
-
-        besok = date.today() + timedelta(days=1)
-
+    with app.app_context():
+        besok = date.today()
         reservasi_list = Reservasi.query.filter(
             Reservasi.tanggal_reservasi == besok,
-            Reservasi.status.in_(['Menunggu', 'Dikonfirmasi']),
+            Reservasi.status.in_(['Menunggu']),
             Reservasi.is_reminded == 0
         ).all()
 
         if not reservasi_list:
             return
-
 
         for res in reservasi_list:
             if res.pasien and res.pasien.email:
@@ -42,7 +38,7 @@ def send_reminder_job(app):
                         perkiraan_waktu = hasil_estimasi.strftime("%H:%M")
 
                     except Exception as e:
-                        current_app.logger.error(f"Gagal menghitung estimasi waktu: {e}")
+                        app.logger.error(f"Gagal menghitung estimasi waktu: {e}")
                         perkiraan_waktu = "Sesuai Jadwal Praktek"
 
                     msg.body = f"""
@@ -69,8 +65,8 @@ def send_reminder_job(app):
         db.session.commit()
         
 
-def _process_generate_jadwal(target_minggu):
-    with current_app.app_context():
+def _process_generate_jadwal(app, target_minggu):
+    with app.app_context():
         today = date.today()
         
         if target_minggu == 'current':
@@ -117,7 +113,6 @@ def _process_generate_jadwal(target_minggu):
                     continue
 
                 for template in templates:
-                    # Validasi jam terbalik
                     if template.jam_selesai <= template.jam_mulai:
                         continue
 

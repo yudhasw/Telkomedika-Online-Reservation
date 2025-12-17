@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for, current_app
 from datetime import datetime, date, timedelta
 from sqlalchemy.exc import IntegrityError
 from extensions import admin_required
@@ -133,9 +133,10 @@ def save_jadwal():
 def generate_jadwal_manual():
     try:
         data = request.get_json() or {}
-        scope = data.get('scope', 'next') 
+        scope = data.get('scope', 'next')
+        real_app = current_app._get_current_object()
 
-        count = _process_generate_jadwal(target_minggu=scope)
+        count = _process_generate_jadwal(real_app, target_minggu=scope)
         
         waktu_str = "Minggu Ini" if scope == 'current' else "Minggu Depan"
         
