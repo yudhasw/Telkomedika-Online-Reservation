@@ -126,8 +126,13 @@ def _process_generate_jadwal(app, target_minggu):
 
                     new_jadwal, error_msg = JadwalPemeriksaan.create(
                         tanggal=current_date,
-                        list_jadwal_obj=template,
-                        kuota=kuota_otomatis
+                        list_jadwal=template.listjadwal_id,
+                        kuota=kuota_otomatis,
+                        hari=template.hari,
+                        dokter_id=template.dokter_id,
+                        poliklinik_id=template.poliklinik_id,
+                        jam_mulai=template.jam_mulai,
+                        jam_selesai=template.jam_selesai
                     )
                     
                     if new_jadwal:

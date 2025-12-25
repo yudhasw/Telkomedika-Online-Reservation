@@ -4,12 +4,12 @@ from .dokter import Dokter
 from .poliklinik import Poliklinik
 from datetime import datetime, date, timedelta
 from .reservasi import Reservasi
-import locale
+import uuid
 
 class JadwalPemeriksaan(db.Model):
   __tablename__ = 'jadwalpemeriksaan'
-  jadwal_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-  listjadwal_id = db.Column(db.String(255), db.ForeignKey('listjadwal.listjadwal_id'), nullable=False)
+  jadwal_id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+  listjadwal_id = db.Column(db.Integer, db.ForeignKey('listjadwal.listjadwal_id'))
   tanggal = db.Column(db.Date, nullable=False)
   kuota = db.Column(db.Integer, nullable=False)
   hari = db.Column(db.String(20), nullable=False)
@@ -23,10 +23,26 @@ class JadwalPemeriksaan(db.Model):
   dokter = db.relationship('Dokter', backref='jadwal_pemeriksaan')
   poliklinik = db.relationship('Poliklinik', backref='jadwal_pemeriksaan')
 
-  def create(tanggal, list_jadwal, kuota):
-    jadwal = JadwalPemeriksaan(tanggal=tanggal, listjadwal_id=list_jadwal, kuota=kuota, )
-    db.session.add(jadwal)
-    db.session.commit()
+  @classmethod
+  def create(cls, tanggal, list_jadwal, kuota, hari, dokter_id, poliklinik_id, jam_mulai, jam_selesai):
+    try:
+        jadwal = cls(
+            tanggal=tanggal, 
+            listjadwal_id=list_jadwal, 
+            kuota=kuota,
+            hari=hari,
+            dokter_id=dokter_id,
+            poliklinik_id=poliklinik_id,
+            jam_mulai=jam_mulai,
+            jam_selesai=jam_selesai
+        )
+        db.session.add(jadwal)
+        db.session.commit()
+        return jadwal, None 
+        
+    except Exception as e:
+        db.session.rollback()
+        return None, str(e)
 
   def get_sisa_kuota(self, tanggal_target):
         if not tanggal_target:
