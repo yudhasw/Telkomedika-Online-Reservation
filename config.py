@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    DEBUG = os.getenv("FLASK_DEBUG", "False").lower() == "true"
     SERVER_NAME = os.getenv("SERVER_NAME", "localhost")
     DATABASE_NAME = os.getenv("DATABASE_NAME", "TelkomedikaDB")
     USERNAME = os.getenv("DB_USERNAME")
@@ -25,6 +26,17 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+        "pool_size": 10,
+        "max_overflow": 20,
+    }
+
+    SESSION_COOKIE_SECURE = os.getenv("FLASK_ENV") == "production"
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
     SECRET_KEY = os.getenv("SECRET_KEY", "default-dev-key")
 
