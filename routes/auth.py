@@ -1,8 +1,7 @@
 import random
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from models import Admin, Pasien, db
+from models import Admin, Pasien
 from utils import auth_services
 from extensions import pasien_required
 from datetime import datetime, timedelta
@@ -81,11 +80,10 @@ def verify_otp_register():
         else:
             user_data = session.get('temp_user_data')
             if user_data:
-                password_hash = generate_password_hash(user_data['password'])
                 new_pasien, err_msg = Pasien.create(
                         nama=user_data['nama'], 
                         email=user_data['email'], 
-                        password_hash=password_hash, 
+                        password=user_data['password'], 
                         nomor_hp=user_data['phone'], 
                         jenis_kelamin=user_data['jenis_kelamin'], 
                         tanggal_lahir=user_data['tgl_lahir'] 
@@ -137,18 +135,16 @@ def login_pasien():
     email = request.form.get('email')
     password = request.form.get('password')
     
-    user = Pasien.query.filter_by(email=email).first()
+    user = Pasien.authenticate(email, password)
 
-    if user and check_password_hash(user.password_hash, password):
+    if user:
         otp_code = str(random.randint(1000, 9999))
         session['login_otp'] = otp_code
         session['login_user_id'] = user.pasien_id
         session['login_role'] = 'pasien'
         session['login_email'] = user.email
-
         session['login_otp_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
-
-        session['role'] = 'pasien'
+        session["role"] = "pasien"
 
         if auth_services.send_otp_email(user.email, otp_code, 'login'):
             flash('Kode OTP telah dikirim ke email Anda untuk verifikasi login.', 'info')
@@ -282,8 +278,7 @@ def reset_password_form():
         user = Pasien.query.filter_by(email=email).first()
 
         if user:
-            hashed_password = generate_password_hash(password)
-            success = user.set_password(hashed_password)
+            success = user.set_password(password)
             if success:
                 session.pop('reset_email', None)
                 session.pop('reset_otp', None)

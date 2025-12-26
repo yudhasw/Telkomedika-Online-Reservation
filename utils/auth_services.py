@@ -1,6 +1,6 @@
 import re, random
-from flask import session, url_for
-from datetime import date, datetime, timedelta
+from flask import session
+from datetime import datetime, timedelta
 from models import Pasien
 from extensions import Message
 from utils import email

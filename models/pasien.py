@@ -2,6 +2,7 @@ from . import db
 from .reservasi import Reservasi
 from flask_login import UserMixin
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Pasien(db.Model, UserMixin):
   __tablename__ = "pasien"
@@ -24,8 +25,9 @@ class Pasien(db.Model, UserMixin):
       return f"<Pasien {self.nama}>"
 
   @classmethod
-  def create(cls, nama, email, password_hash, nomor_hp, jenis_kelamin, tanggal_lahir):
+  def create(cls, nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
     try:
+      password_hash = generate_password_hash(password)
       pasien = Pasien(
           nama=nama,
           email=email,
@@ -68,33 +70,16 @@ class Pasien(db.Model, UserMixin):
     
   def set_password(self, password_hash):
     try:
-      self.password_hash = password_hash
+      self.password_hash = generate_password_hash(password_hash)
       db.session.commit()
       return True, None
     except Exception as e:
       db.session.rollback()
       return False, str(e)
-
-  def get_upcoming_reservasi(self, tdate):
-    try:
-      upcoming = Reservasi.query.filter(
-            Reservasi.pasien_id == self.pasien_id,
-            Reservasi.status.in_(['Menunggu', 'Dikonfirmasi']),
-            Reservasi.tanggal_reservasi >= tdate
-        ).all()
-      
-      return upcoming
-    except Exception as e:
-      print(f"Error retrieving Upcoming: {e}")
-      return None
-    
-  def get_history_reservasi(self, tdate):
-    try:
-      history = Reservasi.query.filter(
-              Reservasi.pasien_id == self.pasien_id,
-              (Reservasi.status.notin_(['Menunggu', 'Dikonfirmasi'])) | (Reservasi.tanggal_reservasi < tdate)
-          ).order_by(Reservasi.tanggal_reservasi.desc()).all()
-      return history
-    except Exception as e:
-      print(f"Error history Upcoming: {e}")
+  
+  @classmethod
+  def authenticate(cls, email, password):
+      user = cls.query.filter_by(email=email).first()
+      if user and check_password_hash(user.password_hash, password):
+          return user
       return None
