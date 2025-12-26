@@ -7,5 +7,4 @@ __pycache__/
 *.pyo
 instance/
 .env
-/tests/
 .pytest_cache
