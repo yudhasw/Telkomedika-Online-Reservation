@@ -156,17 +156,15 @@ def login_pasien():
     email = request.form.get('email')
     password = request.form.get('password')
     
-    user = Pasien.query.filter_by(email=email).first()
+    user = Pasien.authenticate(email, password)
 
-    if user and check_password_hash(user.password_hash, password):
+    if user:
         otp_code = str(random.randint(1000, 9999))
         session['login_otp'] = otp_code
         session['login_user_id'] = user.pasien_id
         session['login_role'] = 'pasien'
         session['login_email'] = user.email
-
         session['login_otp_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
-
         session["role"] = "pasien"
 
         if auth_services.send_otp_email(user.email, otp_code, 'login'):

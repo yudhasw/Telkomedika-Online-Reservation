@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Pasien(db.Model, UserMixin):
   __tablename__ = "pasien"
@@ -65,8 +66,32 @@ class Pasien(db.Model, UserMixin):
     except Exception as e:
       db.session.rollback()
       return False
-  
 
+  def apply_profile_update(self, cleaned_data: dict) -> str:
+    self.nama = cleaned_data["nama"]
+    self.nomor_hp = cleaned_data["phone"]
+    self.jenis_kelamin = cleaned_data["jenis_kelamin"]
+    self.tanggal_lahir = cleaned_data["tgl_lahir"]
+    return cleaned_data["email"]
+
+  def verify_password(self, raw_password: str) -> bool:
+    return check_password_hash(self.password_hash, raw_password)
+
+  def set_password_plain(self, new_password: str):
+    try:
+        self.password_hash = generate_password_hash(new_password)
+        db.session.commit()
+        return True, None
+    except Exception as e:
+        db.session.rollback()
+        return False, str(e)
+  
+  @classmethod
+  def authenticate(cls, email, password):
+      user = cls.query.filter_by(email=email).first()
+      if user and check_password_hash(user.password_hash, password):
+          return user
+      return None
 
 
  

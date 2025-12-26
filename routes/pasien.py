@@ -7,41 +7,30 @@ from datetime import date, datetime, timedelta
 from utils import pasien_services, auth_services
 from extensions import pasien_required
 
-
 pasien_bp = Blueprint("pasien", __name__)
-
 
 @pasien_bp.route("/home")
 @pasien_required
 def homepage():
-    try:
-        pasien = current_user
-        return render_template('dashboard.html', pasien=pasien)
-    except Exception as e:
-        flash(f"Terjadi kesalahan: {e}", "danger")
-        return render_template('dashboard.html', pasien=pasien)
+    pasien = current_user
+    return render_template('dashboard.html', pasien=pasien)
 
 
 @pasien_bp.route("/profile", methods=['GET'])
 @pasien_required
 def profile():
     try:
-        data_reservasi = Reservasi.get_reservation_data(current_user.pasien_id)
+        upcoming, history = Reservasi.get_upcoming_and_history(current_user.pasien_id)
     except Exception as e:
         current_app.logger.error(f"Error fetching reservation: {e}")
-        data_reservasi = []
+        upcoming, history = [], []
 
-    upcoming = []
-    history = []
-    today = date.today()
-
-    if data_reservasi:
-        for res in data_reservasi:
-            if res.status in ['Menunggu', 'Dikonfirmasi'] and res.tanggal_reservasi >= today:
-                upcoming.append(res)
-            else:
-                history.append(res)
-    return render_template('profile.html',upcoming=upcoming, pasien=current_user, history=history)
+    return render_template(
+        'profile.html',
+        upcoming=upcoming,
+        pasien=current_user,
+        history=history
+    )
 
 
 @pasien_bp.route("/profile/edit", methods=['POST'])
@@ -61,45 +50,41 @@ def profile_edit():
     if not is_valid:
         for err_msg in errors.values():
             if err_msg:
-                flash(f"{err_msg}", "danger")
-        
+                flash(err_msg, "danger")
         return redirect(url_for('pasien.profile', tab='edit'))
-    try:
-        pasien.nama = cleaned_data['nama']
-        pasien.nomor_hp = cleaned_data['phone']
-        pasien.jenis_kelamin = cleaned_data['jenis_kelamin']
-        pasien.tanggal_lahir = cleaned_data['tgl_lahir']
 
-        new_email = cleaned_data['email']
+    try:
+        new_email = pasien.apply_profile_update(cleaned_data)
 
         if new_email != pasien.email:
             otp_code = str(random.randint(1000, 9999))
-  
-            session['pending_new_email'] = new_email
-            session['change_email_otp'] = otp_code
-            session['change_email_expired'] = (datetime.now() + timedelta(minutes=2)).timestamp()
-            
-            if auth_services.send_otp_email(new_email, otp_code, 'register'): 
+
+            session["pending_new_email"] = new_email
+            session["change_email_otp"] = otp_code
+            session["change_email_expired"] = (datetime.now() + timedelta(minutes=2)).timestamp()
+
+            if auth_services.send_otp_email(new_email, otp_code, "register"):
                 db.session.commit()
-                
-                flash("Kami mengirimkan kode verifikasi ke email baru Anda. Mohon verifikasi untuk menyimpan perubahan email.", "info")
-                return redirect(url_for('auth.verify_email_change'))
+                flash(
+                    "Kami mengirimkan kode verifikasi ke email baru Anda. "
+                    "Mohon verifikasi untuk menyimpan perubahan email.",
+                    "info",
+                )
+                return redirect(url_for("auth.verify_email_change"))
             else:
                 db.session.rollback()
                 flash("Gagal mengirim kode verifikasi ke email baru.", "danger")
-                return redirect(url_for('pasien.profile', tab='edit'))
-        
+                return redirect(url_for("pasien.profile", tab="edit"))
+
         db.session.commit()
         flash("Profil berhasil diperbarui.", "success")
-        
-        return redirect(url_for('pasien.profile', tab='profile'))
-        
+        return redirect(url_for("pasien.profile", tab="profile"))
+
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"Gagal update profil: {e}")
         flash("Gagal memperbarui profil. Silakan coba lagi.", "danger")
-        
-        return redirect(url_for('pasien.profile', tab='edit'))
+        return redirect(url_for("pasien.profile", tab="edit"))
 
 
 @pasien_bp.route("/profile/change-password", methods=['POST'])
@@ -111,28 +96,23 @@ def profile_updatepassword():
     new_pass = request.form.get('password')
     conf_pass = request.form.get('conf-password')
 
-    if not check_password_hash(pasien.password_hash, old_pass):
+    if not pasien.verify_password(old_pass):
         flash("Password lama salah.", "danger")
         return redirect(url_for('pasien.profile', tab='password'))
 
     strong, err_msg = auth_services.validate_password_strength(new_pass, conf_pass)
-
     if not strong:
-        flash(err_msg, 'danger')
+        flash(err_msg, "danger")
         return redirect(url_for('pasien.profile', tab='password'))
 
-    try:
-        pasien.password_hash = generate_password_hash(new_pass)
-        db.session.commit()
-        
-        flash("Password berhasil diubah. Silakan login ulang jika diperlukan.", "success")
-        return redirect(url_for('pasien.profile', tab='password'))
-        
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"Gagal ubah password: {e}")
+    success, err = pasien.set_password_plain(new_pass)
+    if not success:
+        current_app.logger.error(f"Gagal ubah password: {err}")
         flash("Terjadi kesalahan sistem.", "danger")
         return redirect(url_for('pasien.profile', tab='password'))
+
+    flash("Password berhasil diubah. Silakan login ulang jika diperlukan.", "success")
+    return redirect(url_for('pasien.profile', tab='password'))
 
 
 @pasien_bp.route("/form-reservasi", methods=['GET', 'POST'])
@@ -218,31 +198,30 @@ def form_reservasi():
         all_poli=all_poli
     )
 
+
 @pasien_bp.route("/reservasi/cancel/<string:reservasi_id>", methods=['POST'])
 @pasien_required
 def batalkan_reservasi(reservasi_id):
-    reservasi = Reservasi.query.get(reservasi_id)
- 
-    if not reservasi:
-        flash("Data reservasi tidak ditemukan.", "danger")
-        return redirect(url_for('pasien.profile', tab='tickets'))
-  
-    if reservasi.pasien_id != current_user.pasien_id:
-        flash("Anda tidak memiliki akses untuk membatalkan reservasi ini.", "danger")
-        return redirect(url_for('pasien.profile', tab='tickets'))
+    success, err_msg = Reservasi.cancel_reservasi(
+        reservasi_id=reservasi_id,
+        pasien_id=current_user.pasien_id
+    )
 
-    if reservasi.status in ['Selesai', 'Dibatalkan', 'Dalam Proses']:
-        flash("Reservasi ini sudah tidak bisa dibatalkan.", "warning")
-        return redirect(url_for('pasien.profile', tab='tickets'))
-
-    success, err_msg = reservasi.set_status('Dibatalkan')
     if success:
         flash("Reservasi berhasil dibatalkan.", "success")
     else:
-        current_app.logger.error(f"Gagal membatalkan reservasi: {err_msg}")
-        flash("Terjadi kesalahan sistem saat membatalkan reservasi.", "danger")
+        if err_msg in [
+            "Data reservasi tidak ditemukan.",
+            "Anda tidak memiliki akses untuk membatalkan reservasi ini.",
+            "Reservasi ini sudah tidak bisa dibatalkan.",
+        ]:
+            flash(err_msg, "danger" if "akses" in err_msg or "tidak ditemukan" in err_msg else "warning")
+        else:
+            current_app.logger.error(f"Gagal membatalkan reservasi: {err_msg}")
+            flash("Terjadi kesalahan sistem saat membatalkan reservasi.", "danger")
 
     return redirect(url_for('pasien.profile', tab='tickets'))
+
 
 @pasien_bp.route('/jadwal-dokter')
 def jadwal_dokter():
