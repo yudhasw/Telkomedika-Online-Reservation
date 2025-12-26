@@ -1,6 +1,8 @@
 from . import db
+from .reservasi import Reservasi
 from flask_login import UserMixin
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Pasien(db.Model, UserMixin):
   __tablename__ = "pasien"
@@ -13,6 +15,8 @@ class Pasien(db.Model, UserMixin):
   tanggal_lahir = db.Column("tanggal_lahir", db.Date)
   password_hash = db.Column("password_hash", db.String(255), nullable=False)
 
+  reservasi = db.relationship('Reservasi', backref='pasien')
+
   @property
   def id(self):
       return self.pasien_id
@@ -20,11 +24,10 @@ class Pasien(db.Model, UserMixin):
   def __repr__(self):
       return f"<Pasien {self.nama}>"
 
-  reservasi = db.relationship('Reservasi', backref='pasien')
-
   @classmethod
-  def create(cls, nama, email, password_hash, nomor_hp, jenis_kelamin, tanggal_lahir):
+  def create(cls, nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
     try:
+      password_hash = generate_password_hash(password)
       pasien = Pasien(
           nama=nama,
           email=email,
@@ -40,33 +43,43 @@ class Pasien(db.Model, UserMixin):
       db.session.rollback()
       return None, str(e)
 
-  @classmethod
-  def update(nama, email, password, nomor_hp, jenis_kelamin, tanggal_lahir):
+  def update_data(self, data):
     try:
-      pasien = Pasien(
-          nama=nama,
-          email=email,
-          password=password,
-          nomor_hp=nomor_hp,
-          jenis_kelamin=jenis_kelamin,
-          tanggal_lahir=tanggal_lahir
-      )
+      self.nama = data.get('nama', self.nama)
+      self.email = data.get('email', self.email)
+      self.nomor_hp = data.get('nomor_hp', self.nomor_hp)
+      self.jenis_kelamin = data.get('jenis_kelamin', self.jenis_kelamin)
+      tgl_lahir = data.get('tanggal_lahir')
+      if tgl_lahir:
+        self.tanggal_lahir = tgl_lahir
+  
       db.session.commit()
-      return pasien, None
+      return True, None
     except SQLAlchemyError as e:
-      db.session.rollback
-      return None, str(e)
+      db.session.rollback()
+      return False, str(e)
+  
+  def set_email(self, email):
+    try:
+      self.email = email
+      db.session.commit()
+      return True, None
+    except Exception as e:
+      db.session.rollback()
+      return False, str(e)
     
   def set_password(self, password_hash):
     try:
-      self.password_hash = password_hash
+      self.password_hash = generate_password_hash(password_hash)
       db.session.commit()
-      return True
+      return True, None
     except Exception as e:
       db.session.rollback()
-      return False
+      return False, str(e)
   
-
-
-
- 
+  @classmethod
+  def authenticate(cls, email, password):
+      user = cls.query.filter_by(email=email).first()
+      if user and check_password_hash(user.password_hash, password):
+          return user
+      return None

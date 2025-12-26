@@ -24,3 +24,24 @@ class Poliklinik(db.Model):
       return poli
 
     return None
+  
+  def delete(self) -> tuple[bool, str | None, int | None]:
+    if len(self.dokter_list) > 0:
+        return (
+            False,
+            f'Masih ada {len(self.dokter_list)} dokter yang terdaftar di poli ini. Pindahkan atau hapus dokter tersebut terlebih dahulu.',
+            409,
+        )
+    if len(self.list_jadwal) > 0:
+        return (
+            False,
+            'Masih ada template jadwal yang menggunakan poli ini.',
+            409,
+        )
+    try:
+        db.session.delete(self)
+        db.session.commit()
+        return True, None, None
+    except Exception as e:
+        db.session.rollback()
+        return False, str(e), 500
