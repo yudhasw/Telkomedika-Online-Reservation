@@ -76,6 +76,13 @@ class Pasien(db.Model, UserMixin):
     except Exception as e:
       db.session.rollback()
       return False, str(e)
+      
+  def verify_password(self, password):
+    try:
+      if check_password_hash(self.password_hash, password):
+        return True
+    except:
+      return False
   
   @classmethod
   def authenticate(cls, email, password):
