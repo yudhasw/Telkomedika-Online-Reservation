@@ -193,7 +193,7 @@ def data_dokter():
     dokters = Dokter.query.order_by(Dokter.nama_dokter.asc()).all()
     polis = Poliklinik.query.all()
     
-    return render_template('admin_datadokter.html', dokters=dokters, polis=polis)
+    return render_template('admin_dataDokter.html', dokters=dokters, polis=polis)
 
 
 @admin_bp.route('/admin/data-dokter/add', methods=['POST'])
