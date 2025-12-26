@@ -5,3 +5,7 @@ __pycache__/
 tests/
 *.pyc
 *.md
+laporan_kompleksitas.txt
+laporan_loc.txt
+metrik.py
+loc_metrics.json
