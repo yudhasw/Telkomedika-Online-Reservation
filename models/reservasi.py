@@ -11,6 +11,16 @@ class Reservasi(db.Model):
   tanggal_reservasi = db.Column(db.Date, nullable=False)
   status = db.Column(db.String(50), default='Menunggu')
   is_reminded = db.Column(db.Boolean, default=False)
+
+  @property
+  def can_be_cancelled(self):
+      forbidden_status = ['Selesai', 'Dibatalkan', 'Dalam Proses']
+      return self.status not in forbidden_status
+
+  def cancel(self, pasien_id):
+      if not self.can_be_cancelled and self.pasien_id != pasien_id:
+          return False, "Reservasi tidak dapat dibatalkan pada status saat ini."
+      return self.set_status('Dibatalkan')
   
   @classmethod
   def create(cls, pasien_id, jadwal_id, no_urut, tanggal, status, is_reminded):

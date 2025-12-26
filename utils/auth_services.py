@@ -1,8 +1,79 @@
-import re
-from models import Admin, Pasien
-from extensions import mail, Message
+import re, random
+from flask import session, url_for
+from datetime import date, datetime, timedelta
+from models import Pasien
+from extensions import Message
 from utils import email
 
+OTP_CONFIG = {
+    'register': {
+        'email_key': 'otp_email',
+        'otp_key': 'otp_code',
+        'expire_key': 'otp_expired_at',
+        'template_type': 'register',
+        'redirect_verify': 'auth.verify_otp_register'
+    },
+    'login': {
+        'email_key': 'login_email',
+        'otp_key': 'login_otp',
+        'expire_key': 'login_otp_expired',
+        'template_type': 'login',
+        'redirect_verify': 'auth.verify_login_otp'
+    },
+    'forgot': {
+        'email_key': 'reset_email',
+        'otp_key': 'reset_otp',
+        'expire_key': 'reset_otp_expired',
+        'template_type': 'login', 
+        'redirect_verify': 'auth.verify_forgot_otp'
+    },
+    'change_email': {
+        'email_key': 'pending_new_email',
+        'otp_key': 'change_email_otp',
+        'expire_key': 'change_email_expired',
+        'template_type': 'register',
+        'redirect_verify': 'auth.verify_email_change'
+    }
+}
+
+def validate_otp(context_name, input_otp):
+    config = OTP_CONFIG.get(context_name)
+    if not config:
+        return False, "Konteks OTP tidak valid."
+
+    real_otp = session.get(config['otp_key'])
+    expired_at = session.get(config['expire_key'])
+    
+    if not real_otp or not expired_at:
+        return False, "Sesi tidak valid atau telah habis. Silakan minta OTP ulang."
+
+    if datetime.now().timestamp() > expired_at:
+        return False, "Kode OTP telah kadaluarsa."
+
+    if input_otp == real_otp:
+        return True, "Valid"
+    
+    return False, "Kode OTP salah."
+
+def process_resend_otp(context_name):
+    config = OTP_CONFIG.get(context_name)
+    if not config:
+        return False, "Jenis permintaan tidak dikenali.", 'auth.login_pasien'
+
+    email = session.get(config['email_key'])
+    redirect_to = config['redirect_verify']
+
+    if not email:
+        return False, "Sesi habis, silakan ulangi proses.", 'auth.login_pasien' # Fallback redirect
+
+    new_otp = str(random.randint(1000, 9999))
+    session[config['otp_key']] = new_otp
+    session[config['expire_key']] = (datetime.now() + timedelta(minutes=2)).timestamp()
+
+    if send_otp_email(email, new_otp, config['template_type']):
+        return True, "Kode OTP baru telah dikirim.", redirect_to
+    else:
+        return False, "Gagal mengirim email layanan.", redirect_to
 
 def validate_password_strength(password, confirm_password):
     if not password:

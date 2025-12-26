@@ -9,20 +9,21 @@ from models import Admin, Pasien
 
 
 def nomorUrut(jadwal_id, tanggal_pelayanan):
-    jadwal = JadwalPemeriksaan.query.get(jadwal_id)
-    
-    if not jadwal:
-        return None
+    try:
+        jadwal = JadwalPemeriksaan.query.get(jadwal_id)
+        
+        if not jadwal:
+            return None, "Jadwal tidak ditemukan"
 
-    current_nomor_urut = Reservasi.query.filter_by(
-        jadwal_id=jadwal_id,
-        tanggal_reservasi=tanggal_pelayanan 
-    ).count()
+        current_nomor_urut = Reservasi.query.filter_by(
+            jadwal_id=jadwal_id,
+            tanggal_reservasi=tanggal_pelayanan 
+        ).count()
 
-    if current_nomor_urut < jadwal.kuota:
-        return current_nomor_urut + 1
-    
-    return None
+        if current_nomor_urut < jadwal.kuota:
+            return current_nomor_urut + 1, None
+    except Exception as e:
+        return None, str(e)
 
 def notifikasiReservasi(pasien, reservasi):
     email_tujuan = pasien.get("email")
