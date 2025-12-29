@@ -267,7 +267,7 @@ def delete_dokter(id):
 @admin_required
 def data_poli():
     polis = Poliklinik.query.order_by(Poliklinik.nama_poli.asc()).all()
-    return render_template('admin_datapoliklinik.html', polis=polis)
+    return render_template('admin_dataPoliklinik.html', polis=polis)
 
 
 @admin_bp.route('/admin/data-poliklinik/add', methods=['POST'])
