@@ -1,0 +1,128 @@
+{% extends "baseAdmin.html" %}
+
+{% block title %}Dashboard - Portal Admin{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div
+        class="bg-gradient-to-r from-tm-red to-tm-dark-red rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+            <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ current_user.nama }}!</h1>
+            <p class="text-red-100 text-lg">Kelola jadwal dokter, data pasien, dan informasi poliklinik dengan mudah dan
+                cepat.</p>
+        </div>
+        <div class="absolute right-0 bottom-0 transform translate-x-10 translate-y-10">
+            <i class="fas fa-user-md text-9xl text-white opacity-10"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+            class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+            <div>
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Dokter</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1">{{ total_dokter }} Dokter</p>
+            </div>
+            <div class="h-12 w-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xl">
+                <i class="fas fa-user-doctor"></i>
+            </div>
+        </div>
+
+        <div
+            class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+            <div>
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Jadwal Aktif</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1">Minggu Ini</p>
+            </div>
+            <div class="h-12 w-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-xl">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+        </div>
+
+        <div
+            class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md transition">
+            <div>
+                <p class="text-sm font-medium text-gray-500 uppercase tracking-wider">Status Server</p>
+                <p class="text-2xl font-bold text-green-500 mt-1">Online</p>
+            </div>
+            <div class="h-12 w-12 bg-teal-50 text-teal-600 rounded-full flex items-center justify-center text-xl">
+                <i class="fas fa-server"></i>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="text-xl font-bold text-gray-800 mt-8 mb-4">Akses Cepat</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <a href="{{ url_for('admin.jadwal') }}"
+            class="group block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-tm-cyan hover:shadow-md transition duration-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-14 w-14 rounded-lg bg-cyan-50 text-tm-cyan flex items-center justify-center text-2xl group-hover:bg-tm-cyan group-hover:text-white transition">
+                    <i class="fas fa-desktop"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800 group-hover:text-tm-cyan">Monitoring Jadwal</h3>
+                    <p class="text-sm text-gray-500 mt-1">Lihat tabel jadwal minggu ini dan minggu depan.</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('admin.create_jadwal') }}"
+            class="group block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-tm-red hover:shadow-md transition duration-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-14 w-14 rounded-lg bg-red-50 text-tm-red flex items-center justify-center text-2xl group-hover:bg-tm-red group-hover:text-white transition">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800 group-hover:text-tm-red">Atur Jadwal & Generate</h3>
+                    <p class="text-sm text-gray-500 mt-1">Kelola template jadwal mingguan dan generate otomatis.</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('admin.data_dokter') }}"
+            class="group block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-purple-500 hover:shadow-md transition duration-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-14 w-14 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition">
+                    <i class="fas fa-user-doctor"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800 group-hover:text-purple-600">Data Dokter</h3>
+                    <p class="text-sm text-gray-500 mt-1">Tambah, edit, atau hapus data dokter spesialis.</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('admin.data_poli') }}"
+            class="group block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-green-500 hover:shadow-md transition duration-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-14 w-14 rounded-lg bg-green-50 text-green-600 flex items-center justify-center text-2xl group-hover:bg-green-600 group-hover:text-white transition">
+                    <i class="fas fa-clinic-medical"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800 group-hover:text-green-600">Data Poliklinik</h3>
+                    <p class="text-sm text-gray-500 mt-1">Tambah atau edit unit layanan poliklinik.</p>
+                </div>
+            </div>
+        </a>
+
+        <a href="{{ url_for('admin.reservasi_list') }}"
+            class="group block bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:border-orange-500 hover:shadow-md transition duration-200">
+            <div class="flex items-center gap-4">
+                <div
+                    class="h-14 w-14 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-2xl group-hover:bg-orange-600 group-hover:text-white transition">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg text-gray-800 group-hover:text-orange-600">Data Reservasi</h3>
+                    <p class="text-sm text-gray-500 mt-1">Edit atau hapus data reservasi pasien.</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Login - Telkomedika{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+</style>
+
+<div class="font-sans text-gray-800 bg-white flex flex-col pt-20">
+    <div class="grow flex items-center justify-center px-4">
+        <div class="w-full max-w-lg">
+
+            <div class="text-center mb-10">
+                <h1 class="text-3xl md:text-4xl font-normal mb-3 text-gray-900">Selamat Datang</h1>
+                <p class="text-gray-500">Log In menggunakan Email untuk melanjutkan</p>
+            </div>
+
+            <form action="{{ url_for('auth.login_pasien') }}" method="POST" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-bold text-gray-700 mb-2 ml-1">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Masukan Email" required
+                        class="w-full px-6 py-3.5 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan focus:ring-1 focus:ring-tm-cyan transition-colors text-gray-700 placeholder-gray-400">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-bold text-gray-700 mb-2 ml-1">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" placeholder="Masukan Password" required
+                            class="w-full px-6 py-3.5 rounded-full border border-gray-400 focus:outline-none focus:border-tm-cyan focus:ring-1 focus:ring-tm-cyan transition-colors text-gray-700 placeholder-gray-400 pr-12">
+                        <button type="button" onclick="togglePassword('password', 'eye-icon')" class="absolute right-5 top-9.5 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fas fa-eye-slash" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div id="flash-wrapper" class="mb-6 space-y-2">
+                    {% for category, message in messages %}
+                    <div class="flash-message p-3 rounded-lg text-sm flex items-center gap-2 
+                        {% if category == 'success' %} bg-green-100 text-green-700 border border-green-200
+                        {% elif category == 'danger' %} bg-red-100 text-red-700 border border-red-200
+                        {% else %} bg-yellow-100 text-yellow-700 border border-yellow-200 {% endif %}">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+                <div class="flex justify-end mb-4">
+                    <a href="{{ url_for('auth.forgot_password') }}" class="text-sm font-medium text-tm-red hover:underline">
+                        Lupa Password?
+                    </a>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full h-14 bg-tm-red text-white text-lg font-bold rounded-full shadow-lg hover:bg-red-700 transition transform-gpu hover:scale-[1.01] active:scale-95">
+                        Login
+                    </button>
+                </div>
+
+                <div class="text-center mt-6">
+                    <p class="text-sm text-gray-500">
+                        Belum punya akun? 
+                        <a href="{{ url_for('auth.register') }}" class="text-tm-red font-bold hover:underline">Daftar di sini</a>
+                    </p>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+{% endblock %}

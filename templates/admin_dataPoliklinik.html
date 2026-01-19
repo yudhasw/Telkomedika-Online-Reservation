@@ -1,0 +1,217 @@
+{% extends "baseAdmin.html" %}
+
+{% block title %}Data Poliklinik - Telkomedika{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+    
+    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Manajemen Poliklinik</h1>
+            <p class="text-gray-500 mt-1">Kelola daftar unit layanan medis (Poliklinik).</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('admin.dashboard') }}" class="px-5 py-2.5 rounded-lg text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
+            <button onclick="openModal('add')" class="px-5 py-2.5 rounded-lg text-white bg-[#E51B24] hover:bg-red-700 font-bold shadow-lg shadow-red-500/30 transition transform hover:-translate-y-0.5">
+                <i class="fas fa-plus-circle mr-2"></i> Tambah Poli
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+        
+        <div class="bg-[#E51B24] text-white p-5 flex justify-between items-center">
+            <h2 class="font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-clinic-medical"></i> Daftar Poliklinik
+            </h2>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full text-white border border-white/30">
+                Total: {{ polis|length }}
+            </span>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-100">
+                    <tr>
+                        <th class="p-4 w-[5%] text-center">No</th>
+                        <th class="p-4 w-[25%]">Nama Poliklinik</th>
+                        <th class="p-4 w-[50%]">Deskripsi</th>
+                        <th class="p-4 w-[20%] text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% if polis %}
+                        {% for p in polis %}
+                        <tr class="hover:bg-red-50/30 transition duration-150 group">
+                            <td class="p-4 text-center text-gray-500 font-mono">{{ loop.index }}</td>
+                            <td class="p-4">
+                                <div class="font-bold text-gray-800 text-base">{{ p.nama_poli }}</div>
+                            </td>
+                            <td class="p-4 text-gray-600 italic">
+                                {{ p.deskripsi or '-' }}
+                            </td>
+                            <td class="p-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="openModal('edit', '{{ p.poliklinik_id }}', '{{ p.nama_poli }}', '{{ p.deskripsi or '' }}')" 
+                                            class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition border border-blue-200 shadow-sm" title="Edit">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button onclick="deletePoli('{{ p.poliklinik_id }}')" 
+                                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition border border-red-200 shadow-sm" title="Hapus">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="p-10 text-center text-gray-400">
+                                <div class="bg-gray-50 p-4 rounded-full mb-3 inline-block">
+                                    <i class="fas fa-folder-open text-3xl"></i>
+                                </div>
+                                <p>Belum ada data poliklinik.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="formModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-[60] transition-opacity duration-300">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all scale-100 border border-gray-100">
+        <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+            <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Tambah Poliklinik</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        
+        <form id="poliForm" onsubmit="submitData(event)">
+            <input type="hidden" id="poliId">
+            <input type="hidden" id="mode" value="add">
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Nama Poliklinik</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-clinic-medical"></i>
+                        </span>
+                        <input type="text" id="namaPoli" required placeholder="Contoh: Poli Mata"
+                            class="w-full pl-10 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#E51B24] focus:border-[#E51B24] outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Deskripsi Singkat</label>
+                    <textarea id="deskripsiPoli" rows="3" placeholder="Contoh: Layanan kesehatan khusus mata..."
+                        class="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#E51B24] focus:border-[#E51B24] outline-none transition resize-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+                <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition font-medium">Batal</button>
+                <button type="submit" class="px-5 py-2.5 bg-[#E51B24] text-white rounded-lg hover:bg-red-700 font-bold transition shadow-lg shadow-red-500/30 flex items-center gap-2">
+                    <i class="fas fa-save"></i> <span id="submitBtnText">Simpan</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('formModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const modeInput = document.getElementById('mode');
+    const idInput = document.getElementById('poliId');
+    const namaInput = document.getElementById('namaPoli');
+    const deskripsiInput = document.getElementById('deskripsiPoli');
+
+    function openModal(mode, id = '', nama = '', deskripsi = '') {
+        modeInput.value = mode;
+        idInput.value = id;
+        namaInput.value = nama;
+        deskripsiInput.value = deskripsi;
+
+        if (mode === 'add') {
+            modalTitle.innerText = "Tambah Poliklinik Baru";
+            submitBtnText.innerText = "Simpan";
+        } else {
+            modalTitle.innerText = "Edit Data Poliklinik";
+            submitBtnText.innerText = "Update";
+        }
+        
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    async function submitData(e) {
+        e.preventDefault();
+        
+        const mode = modeInput.value;
+        const url = mode === 'add' ? "{{ url_for('admin.add_poli') }}" : "{{ url_for('admin.update_poli') }}";
+        
+        const payload = {
+            id: idInput.value,
+            nama: namaInput.value,
+            deskripsi: deskripsiInput.value
+        };
+
+        const originalText = submitBtnText.innerText;
+        submitBtnText.innerText = "Memproses...";
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert("Gagal: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan sistem.");
+        } finally {
+            submitBtnText.innerText = originalText;
+        }
+    }
+
+    async function deletePoli(id) {
+        if (!confirm("Apakah Anda yakin ingin menghapus Poliklinik ini?\n\nPERHATIAN: Data tidak bisa dihapus jika masih ada dokter atau jadwal yang terhubung.")) return;
+
+        try {
+            const res = await fetch(`/admin/data-poliklinik/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert(data.message); 
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan sistem.");
+        }
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+{% endblock %}

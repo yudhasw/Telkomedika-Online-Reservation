@@ -1,0 +1,23 @@
+{
+  "name": "telkomedika-online-reservation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch --config",
+    "flask": "python app.py",
+    "dev": "concurrently \"npm run build\" \"npm run flask\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.16",
+    "preline": "^3.2.3",
+    "tailwindcss": "^4.1.16"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

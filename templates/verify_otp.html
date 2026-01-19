@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Verifikasi OTP - Telkomedika{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+
+<div class="flex-grow container mx-auto px-6 py-8 max-w-5xl">
+
+    <div class="flex border-b border-gray-300 mb-8">
+        <div class="px-4 py-2 font-medium text-tm-red border-b-2 border-tm-red text-lg">
+            Verifikasi Kode (OTP)
+        </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="mb-6 space-y-2 max-w-lg mx-auto">
+        {% for category, message in messages %}
+        <div class="p-3 rounded-lg text-sm flex items-center gap-2 
+                {% if category == 'success' %} bg-green-100 text-green-700 border border-green-200
+                {% elif category == 'danger' %} bg-red-100 text-red-700 border border-red-200
+                {% else %} bg-yellow-100 text-yellow-700 border border-yellow-200 {% endif %}">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="bg-gray-100 rounded-[2rem] p-8 md:p-16 flex flex-col items-center justify-center min-h-[500px] shadow-sm text-center relative">
+
+        <h1 class="text-3xl md:text-4xl text-gray-800 mb-4 font-normal">Masukan Kode OTP</h1>
+
+        <p class="text-gray-500 mb-10 text-sm md:text-base">
+            Masukan Kode yang telah kami kirim ke email anda <br>
+            <span class="font-bold text-gray-800">{{ email }}</span>
+        </p>
+
+        <form action="{{ target_url }}" method="POST" id="otpForm" class="w-full max-w-md flex flex-col items-center">
+
+            <div class="flex justify-center gap-4 md:gap-6 mb-8">
+                <input type="text" maxlength="1" class="otp-input w-16 h-16 md:w-20 md:h-20 border border-gray-400 rounded-2xl text-center text-3xl font-bold bg-transparent focus:outline-none focus:border-tm-red focus:ring-1 focus:ring-tm-red transition-colors text-gray-700" inputmode="numeric" required autofocus>
+                <input type="text" maxlength="1" class="otp-input w-16 h-16 md:w-20 md:h-20 border border-gray-400 rounded-2xl text-center text-3xl font-bold bg-transparent focus:outline-none focus:border-tm-red focus:ring-1 focus:ring-tm-red transition-colors text-gray-700" inputmode="numeric" required>
+                <input type="text" maxlength="1" class="otp-input w-16 h-16 md:w-20 md:h-20 border border-gray-400 rounded-2xl text-center text-3xl font-bold bg-transparent focus:outline-none focus:border-tm-red focus:ring-1 focus:ring-tm-red transition-colors text-gray-700" inputmode="numeric" required>
+                <input type="text" maxlength="1" class="otp-input w-16 h-16 md:w-20 md:h-20 border border-gray-400 rounded-2xl text-center text-3xl font-bold bg-transparent focus:outline-none focus:border-tm-red focus:ring-1 focus:ring-tm-red transition-colors text-gray-700" inputmode="numeric" required>
+
+                <input type="hidden" name="otp_full" id="otp_full">
+            </div>
+
+            <div class="mb-10 text-xs text-gray-500 font-medium">
+                Tidak menerima kode?
+                <a href="{{ resend_url }}" class="text-blue-500 hover:underline">Kirim Ulang</a>
+            </div>
+
+            <div class="mb-10 text-xs text-gray-500 font-medium">
+                <span id="timer-text">Kode berlaku selama <span id="countdown" class="font-bold text-tm-red">02:00</span></span>
+            </div>
+
+            <button type="submit" class="w-full md:w-3/4 bg-tm-red text-white text-lg font-medium py-3 rounded-full shadow-lg hover:bg-red-700 transition transform active:scale-95">
+                Verifikasi
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/verifyOtp.js') }}"></script>
+{% endblock %}

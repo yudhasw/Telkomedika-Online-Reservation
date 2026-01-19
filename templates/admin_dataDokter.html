@@ -1,0 +1,255 @@
+{% extends "baseAdmin.html" %}
+
+{% block title %}Data Dokter - Telkomedika{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-8">
+
+    <div
+        class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Manajemen Data Dokter</h1>
+            <p class="text-gray-500 mt-1">Kelola daftar dokter spesialis dan umum.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{{ url_for('admin.dashboard') }}"
+                class="px-5 py-2.5 rounded-lg text-gray-600 bg-gray-100 hover:bg-gray-200 font-medium transition">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
+            <button onclick="openModal('add')"
+                class="px-5 py-2.5 rounded-lg text-white bg-[#E51B24] hover:bg-red-700 font-bold shadow-lg shadow-red-500/30 transition transform hover:-translate-y-0.5">
+                <i class="fas fa-user-plus mr-2"></i> Tambah Dokter
+            </button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden flex flex-col h-full">
+
+        <div class="bg-[#E51B24] text-white p-5 flex justify-between items-center">
+            <h2 class="font-bold text-lg flex items-center gap-2">
+                <i class="fas fa-user-md"></i> Daftar Dokter
+            </h2>
+            <span class="text-xs bg-white/20 px-3 py-1 rounded-full text-white border border-white/30">
+                Total: {{ dokters|length }}
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-100">
+                    <tr>
+                        <th class="p-4 w-[10%] text-center">No</th>
+                        <th class="p-4 w-[40%]">Nama Dokter</th>
+                        <th class="p-4 w-[30%]">Spesialisasi</th>
+                        <th class="p-4 w-[20%] text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% if dokters %}
+                    {% for d in dokters %}
+                    <tr class="hover:bg-red-50/30 transition duration-150 group">
+                        <td class="p-4 text-center text-gray-500 font-mono">{{ loop.index }}</td>
+                        <td class="p-4">
+                            <div class="font-bold text-gray-800">{{ d.nama_dokter }}</div>
+                        </td>
+                        <td class="p-4">
+                            <span
+                                class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                                {{ d.spesialisasi }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex justify-center gap-2">
+                                <button
+                                    onclick="openModal('edit', '{{ d.dokter_id }}', '{{ d.nama_dokter }}', '{{ d.spesialisasi }}')"
+                                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition border border-blue-200 shadow-sm"
+                                    title="Edit">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button onclick="deleteDokter('{{ d.dokter_id }}')"
+                                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition border border-red-200 shadow-sm"
+                                    title="Hapus">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="p-8 text-center text-gray-400">
+                            <div class="bg-gray-50 p-4 rounded-full mb-3 inline-block">
+                                <i class="fas fa-user-slash text-3xl"></i>
+                            </div>
+                            <p>Belum ada data dokter.</p>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="formModal"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-[60] transition-opacity duration-300">
+    <div
+        class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all scale-100 border border-gray-100">
+        <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+            <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Tambah Dokter</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition"><i
+                    class="fas fa-times text-xl"></i></button>
+        </div>
+
+        <form id="dokterForm" onsubmit="submitData(event)">
+            <input type="hidden" id="dokterId">
+            <input type="hidden" id="mode" value="add">
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Nama Lengkap Dokter</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-user-md"></i>
+                        </span>
+                        <input type="text" id="namaDokter" required placeholder="Contoh: Dr. Budi Santoso, Sp.PD"
+                            class="w-full pl-10 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#E51B24] focus:border-[#E51B24] outline-none transition">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1.5">Spesialisasi</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-stethoscope"></i>
+                        </span>
+                        <select id="spesialisasi" required
+                            class="w-full pl-10 border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-[#E51B24] outline-none bg-white">
+                            <option value="" disabled selected>Pilih Spesialisasi...</option>
+                            {% for poli in polis %}
+                            <option value="{{ poli.poliklinik_id }}">{{ poli.nama_poli }}</option>
+                            {% endfor %}
+                        </select>
+                        <div
+                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-gray-100">
+                <button type="button" onclick="closeModal()"
+                    class="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition font-medium">Batal</button>
+                <button type="submit"
+                    class="px-5 py-2.5 bg-[#E51B24] text-white rounded-lg hover:bg-red-700 font-bold transition shadow-lg shadow-red-500/30 flex items-center gap-2">
+                    <i class="fas fa-save"></i> <span id="submitBtnText">Simpan</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('formModal');
+    const form = document.getElementById('dokterForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const modeInput = document.getElementById('mode');
+    const idInput = document.getElementById('dokterId');
+    const namaInput = document.getElementById('namaDokter');
+    const spesialisasiInput = document.getElementById('spesialisasi');
+
+    function openModal(mode, id = '', nama = '', spesialisasi = '') {
+        modeInput.value = mode;
+        idInput.value = id;
+        namaInput.value = nama;
+
+        if (spesialisasi) {
+            spesialisasiInput.value = spesialisasi;
+        } else {
+            spesialisasiInput.selectedIndex = 0;
+        }
+
+        if (mode === 'add') {
+            modalTitle.innerText = "Tambah Dokter Baru";
+            submitBtnText.innerText = "Simpan";
+        } else {
+            modalTitle.innerText = "Edit Data Dokter";
+            submitBtnText.innerText = "Update";
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+
+    async function submitData(e) {
+        e.preventDefault();
+
+        const mode = modeInput.value;
+        const url = mode === 'add' ? "{{ url_for('admin.add_dokter') }}" : "{{ url_for('admin.update_dokter') }}";
+
+        const payload = {
+            id: idInput.value,
+            nama: namaInput.value,
+            poli_id: document.getElementById('spesialisasi').value
+        };
+
+        const originalText = submitBtnText.innerText;
+        submitBtnText.innerText = "Memproses...";
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert("Gagal: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan sistem.");
+        } finally {
+            submitBtnText.innerText = originalText;
+        }
+    }
+
+    async function deleteDokter(id) {
+        if (!confirm("Apakah Anda yakin ingin menghapus data dokter ini?\n\nTindakan ini tidak dapat dibatalkan.")) return;
+
+        try {
+            const res = await fetch(`/admin/data-dokter/delete/${id}`, {
+                method: 'DELETE'
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                window.location.reload();
+            } else if (res.status === 409) {
+                alert("Gagal: Dokter ini masih memiliki jadwal aktif. Hapus jadwalnya terlebih dahulu di menu 'Atur Jadwal'.");
+            } else {
+                alert("Gagal menghapus: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan sistem.");
+        }
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+{% endblock %}
